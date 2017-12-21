@@ -50,8 +50,6 @@ int main(void) {
 	readDefaultData(file, defaultData);
 	class Living *h = createLiving(file, defaultData);
 
-	something new
-
 	delete h;
 
 	return 0;
