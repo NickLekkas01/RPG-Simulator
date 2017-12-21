@@ -8,37 +8,39 @@
 
 using namespace std;
 
-struct defaultData {
+struct defaultData_t {
 	uint32_t initialHealthPower;
-	struct heroInfo hinfo;
+	struct heroInfo hInfo;
 };
 
-void readDefaultData(const ifstream& file, struct defaultData_t& defaultData) {
-	file >> initialHealthPower;
-	cout << initialHealthPower << endl;
+void readDefaultData(ifstream& file, struct defaultData_t& defaultData) {
+	file >> defaultData.initialHealthPower;
+	cout << defaultData.initialHealthPower << endl;
 	string dataClass;
 	
 	while(file >> dataClass) {
 		if(dataClass == "Hero") {
 			cout << "Hero Data" << endl;
-			file >> defaultData.info.magicPower;
-			file >> defaultData.info.strength;
-			file >> defaultData.info.dexterity;
-			file >> defaultData.info.agility;
-			file >> defaultData.info.money;
-			file >> defaultData.info.exp;
+			file >> defaultData.hInfo.magicPower;
+			file >> defaultData.hInfo.strength;
+			file >> defaultData.hInfo.dexterity;
+			file >> defaultData.hInfo.agility;
+			file >> defaultData.hInfo.money;
+			file >> defaultData.hInfo.exp;
 		}
 	}
 }
 
-class Living *createLiving(const ifstream& file, struct defaultData cData) {
+class Living *createLiving(ifstream& file, struct defaultData_t& defaultData) {
+	struct livingInfo lInfo;
 	cout << "Name: ";
-	cin >> 
-	if(dataClass == "Hero") {
-		cout << "Hero Data" << endl;
-		class Hero w(info, heroTypes::Warrior);
-		w.printInfo();
-	}
+	cin >> lInfo.name;
+	lInfo.level = 1;
+	lInfo.healthPower = lInfo.initialHealthPower = defaultData.initialHealthPower;
+	cout << "Hero Data" << endl;
+	class Hero *h = new Hero(lInfo, defaultData.hInfo, heroTypes::Warrior);
+	h->printInfo();
+	return h;
 }
 
 
