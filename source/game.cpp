@@ -36,7 +36,7 @@ class Living *createLiving(ifstream& file, struct defaultData_t& defaultData) {
 	cout << "Name: ";
 	cin >> lInfo.name;
 	lInfo.level = 1;
-	lInfo.healthPower = lInfo.initialHealthPower = defaultData.initialHealthPower;
+	lInfo.healthPower = defaultData.initialHealthPower;
 	cout << "Hero Data" << endl;
 	class Hero *h = new Hero(lInfo, defaultData.hInfo, heroTypes::Warrior);
 	h->printInfo();
