@@ -52,7 +52,7 @@ int main(void) {
 	readDefaultData(file, defaultData);
 	class Living *h = createLiving(file, defaultData);
 
-	cout << "hello" << endl;
+	cout << "another" << endl;
 
 	delete h;
 
