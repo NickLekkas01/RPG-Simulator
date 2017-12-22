@@ -4,9 +4,19 @@
 #include <iostream>
 #include "Living.h"
 
-struct defaultWarrior {
+struct warriorInfo {
 	uint32_t strength;
 	uint32_t dexterity;
+};
+
+struct paladinInfo {
+	uint32_t strength;
+	uint32_t agility;
+};
+
+struct sorcererInfo {
+	uint32_t dexterity;
+	uint32_t agility;
 };
 
 typedef uint8_t heroType;
