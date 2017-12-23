@@ -1,5 +1,5 @@
 #ifndef WEAPON_H
-#define WEPON_H
+#define WEAPON_H
 
 #include "Item.h"
 
