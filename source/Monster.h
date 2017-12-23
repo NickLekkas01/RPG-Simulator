@@ -35,6 +35,7 @@ struct monsterInfo_t {
 	// NOTE(stefanos): In the monster, we only care about the level
 	// because it spawns for just one round (i.e. the experience has
 	// no meaning in the game)
+	//NOTE(nikos) : if the monster wins an opponent it will gain experience and in battle it can grow level like players
 	uint32_t exp;
 };
 
@@ -70,30 +71,35 @@ public:
 	// Lastly, explain how agility works in terms of what it affects and
 	// how because I have no idea of those games. :P
 
-	void Generate(class Hero H){
-			Living::level=H.Living::level;
-            Living::healthPower=H.Living::healthPower+50;
+	// NOTE(nikos) I agree with the part of not giving the whole class, but shouldn't the prices
+	// of agility,armor and health be equal of the ones of the hero? We can give the level and the other prices.
+	//another thought is: Will we generate a monster for each hero based on his statistics?
+	// And by that I mean having a 11 level monster,15 level monster if we have an 11 level hero and an 15 level hero
+	//About how agility effects the damage, im not sure but we could rise the value of minimum damage if we see high agility(something like that)
+	void Generate(uint8_t lev, uint32_t health, uint32_t agil){
+			Living::level=lev;
+            Living::healthPower=health;
             exp=0;
 			if(/*type==Dragon*/){
                 Living::name="Dragon";
 				damage[0]=10;
                 damage[1]=50;
                 armor=5;
-                agility=H.hInfo.agility;
+                agility=agil;
 			}
 			else if(/*type==Exoskeleton*/){
                 Living::name="Exoskeleton";
 				damage[0]=10;
                 damage[1]=30;
                 armor=10;
-                agility=H.hInfo.agility;
+                agility=agil;
 			}
 			else if(/*type==Spirit*/){
                 Living::name="Spirit";
 				damage[0]=10;
                 damage[1]=30;
                 armor=3;
-                agility=H.hInfo.agility+5;
+                agility=agil+5;
 			}
 		}
 };

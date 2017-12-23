@@ -53,6 +53,10 @@ public:
 
 	// NOTE(stefanos): Explain how the (exp > 100) and (exp = exp - 100)
 	// logic works.
+	
+	//ΝΟΤΕ(nikos): We'll have an the experience of each player, and by winning a monster he will gain experience. If his experience 
+	// passes 100 then he grows one level and the remaining experience is for the next level.
+	//Also i used comments in if's because i'm not so sure about how the variable type works ( just type==0  or type==1 or type==2 ?)
 	void levelUp(){
 		if(exp>100){
 			Living::livingInfo.level++;
