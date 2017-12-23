@@ -9,7 +9,9 @@ class Spell : public Item {
 private:
 	uint32_t damage[2];
 	uint32_t mana;
-	uint8_t minimumLevel;
+	// NOTE(stefanos): minimum level is part of Item
+	// which we inherit
+	// uint8_t minimumLevel;
 	enum spellType type;
 };
 

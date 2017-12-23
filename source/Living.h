@@ -3,20 +3,18 @@
 
 #include <string>
 
-struct livingInfo {
+struct livingInfo_t {
 	std::string name;
 	uint8_t level;
 	uint32_t healthPower;
-	// TODO(stefanos): Put initial health power to game side
-	uint32_t initialHealthPower;
 	bool awake;
 };
 
 class Living {
 private:
-	struct livingInfo lInfo;
+	struct livingInfo_t livingInfo;
 public:
-	Living(const struct livingInfo& info) : lInfo(info) { }
+	Living(const struct livingInfo_t& info) : livingInfo(info) { }
 };
 
 #endif
