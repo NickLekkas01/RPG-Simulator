@@ -31,12 +31,6 @@ struct monsterInfo_t {
 	uint32_t damage[2];
 	uint32_t armor;
 	uint32_t agility;
-
-	// NOTE(stefanos): In the monster, we only care about the level
-	// because it spawns for just one round (i.e. the experience has
-	// no meaning in the game)
-	//NOTE(nikos) : if the monster wins an opponent it will gain experience and in battle it can grow level like players
-	uint32_t exp;
 };
 
 class Monster : public Living {
@@ -77,29 +71,28 @@ public:
 	// And by that I mean having a 11 level monster,15 level monster if we have an 11 level hero and an 15 level hero
 	//About how agility effects the damage, im not sure but we could rise the value of minimum damage if we see high agility(something like that)
 	void Generate(uint8_t lev, uint32_t health, uint32_t agil){
-			Living::level=lev;
-            Living::healthPower=health;
-            exp=0;
-			if(/*type==Dragon*/){
-                Living::name="Dragon";
-				damage[0]=10;
-                damage[1]=50;
-                armor=5;
-                agility=agil;
+			Living::add_level(lev);
+            Living::set_health(health);
+			if(type==0){
+                Living::set_name("Dragon");
+				monsterInfo.damage[0]=10;
+                monsterInfo.damage[1]=50;
+                monsterInfo.armor=5;
+                monsterInfo.agility=agil;
 			}
-			else if(/*type==Exoskeleton*/){
-                Living::name="Exoskeleton";
-				damage[0]=10;
-                damage[1]=30;
-                armor=10;
-                agility=agil;
+			else if(type==1){
+                Living::set_name("Exoskeleton");
+				monsterInfo.damage[0]=10;
+                monsterInfo.damage[1]=30;
+                monsterInfo.armor=10;
+                monsterInfo.agility=agil;
 			}
-			else if(/*type==Spirit*/){
-                Living::name="Spirit";
-				damage[0]=10;
-                damage[1]=30;
-                armor=3;
-                agility=agil+5;
+			else if(type==2){
+                Living::set_name("Spirit");
+				monsterInfo.damage[0]=10;
+                monsterInfo.damage[1]=30;
+                monsterInfo.armor=3;
+                monsterInfo.agility=agil+5;
 			}
 		}
 };

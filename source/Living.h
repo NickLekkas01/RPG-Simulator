@@ -15,6 +15,18 @@ private:
 	struct livingInfo_t livingInfo;
 public:
 	Living(const struct livingInfo_t& info) : livingInfo(info) { }
+	struct livingInfo_t get_livingInfo(){
+		return livingInfo;
+	}
+	void add_level(uint8_t lev){
+		livingInfo.level+=lev;
+	}
+	void set_health(uint32_t num){
+		livingInfo.healthPower+=num;
+	}
+	void set_name(std::string nam){
+		livingInfo.name=nam;
+	}
 };
 
 #endif

@@ -41,7 +41,7 @@ private:
 	heroType type;
 public:
 	Hero(const struct livingInfo& li, const struct heroInfo& hi, uint8_t t) :
-	     Living(li), hInfo(hi), type(t) { }
+	     Living(li), heroInfo(hi), type(t) { }
 	void printInfo(void) const {
 		std::cout << "magicPower: " << heroInfo.magicPower << std::endl;
 		std::cout << "Strength: "   << heroInfo.strength << std::endl;
@@ -53,36 +53,36 @@ public:
 
 	// NOTE(stefanos): Explain how the (exp > 100) and (exp = exp - 100)
 	// logic works.
-	
+
 	//ΝΟΤΕ(nikos): We'll have an the experience of each player, and by winning a monster he will gain experience. If his experience 
 	// passes 100 then he grows one level and the remaining experience is for the next level.
 	//Also i used comments in if's because i'm not so sure about how the variable type works ( just type==0  or type==1 or type==2 ?)
 	void levelUp(){
-		if(exp>100){
-			Living::livingInfo.level++;
-			if(/*type==Warrior*/){
-				strength+=2;
-				agility+=2;
-				dexterity++;
-				magicPower+=30;
-				Living::livingInfo.healthPower+=100;
+		if(heroInfo.exp>100){
+			Living::add_level(1);
+			if(type==0){
+				heroInfo.strength+=2;
+				heroInfo.agility+=2;
+				heroInfo.dexterity++;
+				heroInfo.magicPower+=30;
+				Living::set_health(100);
 			}
-			else if(/*type==Paladin*/){
-				strength+=2;
-				dexterity+=2;
-				agility++;
-				magicPower+=50;
-				Living::livingInfo.healthPower+=80;
+			else if(type==1){
+				heroInfo.strength+=2;
+				heroInfo.dexterity+=2;
+				heroInfo.agility++;
+				heroInfo.magicPower+=50;
+				Living::set_health(80);
 			}
-			else if(/*type==Sorcerer*/){
-				dexterity+=2;
-				agility+=2;
-				strenth+=1;
-				magicPower+=100;
-				Living::livingInfo.healthPower+=50;
+			else if(type==2){
+				heroInfo.dexterity+=2;
+				heroInfo.agility+=2;
+				heroInfo.strength+=1;
+				heroInfo.magicPower+=100;
+				Living::set_health(50);
 			}
-			money+=500;
-			exp=exp-100;
+			heroInfo.money+=500;
+			heroInfo.exp=heroInfo.exp-100;
 		}
 	}
 
