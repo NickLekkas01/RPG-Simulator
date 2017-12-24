@@ -40,7 +40,7 @@ private:
 	struct heroInfo_t heroInfo;
 	heroType type;
 public:
-	Hero(const struct livingInfo& li, const struct heroInfo& hi, uint8_t t) :
+	Hero(const struct livingInfo_t& li, const struct heroInfo_t& hi, uint8_t t) :
 	     Living(li), heroInfo(hi), type(t) { }
 	void printInfo(void) const {
 		std::cout << "magicPower: " << heroInfo.magicPower << std::endl;
