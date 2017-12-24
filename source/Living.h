@@ -7,6 +7,7 @@ struct livingInfo_t {
 	std::string name;
 	uint8_t level;
 	uint32_t healthPower;
+	uint32_t InithealthPower;
 	bool awake;
 };
 
