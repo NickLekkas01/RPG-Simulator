@@ -9,79 +9,55 @@
 
 #define INPUT_FILE_ERROR 1
 
-class Map {
-public:
-	uint32_t Height;
-	uint32_t Width;
-	uint8_t **Grid;
-
-	int readMap(void);
-};
-
 using namespace std;
 
-int Map::readMap(void) {
-	// Read the map
-	ifstream mapFile("./build/map.dat");
-	if(!mapFile.good()) {
-		cout << "There was a problem opening the data input" << endl;
-		return 0;
-	}
-		
-	// Use local variables to avoid cache misses
-	uint32_t width, height;
-	mapFile >> height;
-	mapFile >> width;
-	Height = height;
-	Width = width;
-	uint8_t **grid = new uint8_t*[height];
-	for(int y = 0; y < height; ++y) {
-		grid[y] = new uint8_t[width];
-	}
-	for(int y = 0; y < height; ++y) {
-		for(int x = 0; x < width; ++x) {
-			mapFile >> grid[y][x];
-		}
-	}
-
-	
-	Grid = grid;
-	mapFile.close();
-}
+namespace playerChoices {
+	enum { quit, printMap, initializeHeroes, moveHeroes };
+	const char* choices[] = {"Quit: 0", "Print Map: 1", "Initialize Heroes: 2",
+	"Move Heroes: 3"};
+};
 
 int main(void) {
-	
-	// File location relative to the COMPILER
-	// TODO(stefanos): Remove that from the release
-	ifstream dataFile("./build/defaultData.dat");
-	if(!dataFile.good()) {
-		cout << "There was a problem opening the data input" << endl;
-		return INPUT_FILE_ERROR;
-	}
-
+	bool Running = true;
 	struct defaultData_t defaultData;
-	readDefaultData(dataFile, defaultData);
+	if(!defaultData.readDefaultData())
+		return INPUT_FILE_ERROR;
 
 	cout << defaultData.initialHealthPower << endl;
 	cout << defaultData.exoskeletonInfo.armor << endl;
-
-	dataFile.close();
 	
 	class Map map;
 	if(!map.readMap())
 		return INPUT_FILE_ERROR;
-	for(int y = 0; y < map.Height; ++y) {
-		for(int x = 0; x < map.Width; ++x) {
-			cout << map.Grid[y][x];
-		}
-		cout << endl;
-	}
+	cout << "Welcome to the RPG game" << endl;
 
-	// Cleanup
-	for(int y = 0; y < map.Height; ++y) {
-		delete[] map.Grid[y];
+	// Initial loop
+	while(true) {
+		int32_t choice;
+		cout << "Available choices" << endl;
+		cout << "Quit: 0" << endl;
+		cout << "Print Map: 1" << endl;
+		cout << "Initialize heroes Positions: 2" << endl;
+		cout << "What do you want to do? ";
+		cin >> choice;
+		if(choice == playerChoices::quit) {
+			Running = false;
+			break;
+		} else if(choice == playerChoices::printMap) {
+			map.print();
+		} else if(choice == playerChoices::initializeHeroes) {
+			while(true) {
+				int32_t position[2];
+				cout << "Where do you want to start? " << endl;
+				cin >> position[0];
+				cin >> position[1];
+				if(map.initializeHeroesPosition(position))
+					break;
+				cout << "You can't start there!" << endl;
+			}
+			break;
+		}
 	}
-	delete[] map.Grid;
 
 	return 0;
 }
