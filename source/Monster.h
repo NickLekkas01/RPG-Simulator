@@ -2,21 +2,19 @@
 #define MONSTER_H
 
 #include <iostream>
+#include <cstdint>
 #include "Living.h"
 
 
 struct dragonInfo_t {
-	uint32_t strength;
-	uint32_t dexterity;
+	uint32_t damage[2];
 };
 
 struct exoskeletonInfo_t {
-	uint32_t strength;
-	uint32_t agility;
+	uint32_t armor;
 };
 
 struct spiritInfo_t {
-	uint32_t dexterity;
 	uint32_t agility;
 };
 

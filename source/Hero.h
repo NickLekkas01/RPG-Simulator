@@ -2,6 +2,7 @@
 #define HERO_H
 
 #include <iostream>
+#include <cstdint>
 #include "Living.h"
 
 struct warriorInfo_t {
@@ -20,10 +21,12 @@ struct sorcererInfo_t {
 };
 
 typedef uint8_t heroType;
-namespace heroTypes { 
-	uint8_t Warrior = 0;
-	uint8_t Sorcerer = 1;
-	uint8_t Palladin = 2;
+// NOTE(stefanos): Changed to avoid linker
+// problems
+namespace heroTypes {
+	const uint8_t Warrior = 0;
+	const uint8_t Sorcerer = 1;
+	const uint8_t Paladin = 2;
 };
 
 struct heroInfo_t {

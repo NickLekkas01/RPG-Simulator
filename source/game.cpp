@@ -1,100 +1,87 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <cctype>
 #include <stdint.h>
 #include "Hero.h"
 #include "Monster.h"
+#include "utils.h"
 
 #define INPUT_FILE_ERROR 1
 
-using namespace std;
+class Map {
+public:
+	uint32_t Height;
+	uint32_t Width;
+	uint8_t **Grid;
 
-// TODO(stefanos): Think if it is better to put
-// in warrior, paladin and sorcerer all the info
-// and eliminate the hero Info
-struct defaultData_t {
-	uint32_t initialHealthPower;
-	struct heroInfo_t heroInfo;
-	struct warriorInfo_t warriorInfo;
-	struct paladinInfo_t paladinInfo;
-	struct sorcererInfo_t sorcererInfo;
+	int readMap(void);
 };
 
-// (stefanos): Any line starting with a #
-// is a comment
-void skipComments(istream& input) {
-	char c;
-	string s;
+using namespace std;
 
-	while(!input.eof()) {
-		c = input.get();
-		if(c == '\n')
-			return;
-		if(c == '#') {
-			getline(input, s);
-			c = input.get();
+int Map::readMap(void) {
+	// Read the map
+	ifstream mapFile("./build/map.dat");
+	if(!mapFile.good()) {
+		cout << "There was a problem opening the data input" << endl;
+		return 0;
+	}
+		
+	// Use local variables to avoid cache misses
+	uint32_t width, height;
+	mapFile >> height;
+	mapFile >> width;
+	Height = height;
+	Width = width;
+	uint8_t **grid = new uint8_t*[height];
+	for(int y = 0; y < height; ++y) {
+		grid[y] = new uint8_t[width];
+	}
+	for(int y = 0; y < height; ++y) {
+		for(int x = 0; x < width; ++x) {
+			mapFile >> grid[y][x];
 		}
 	}
-}
 
-// (stefanos): Read default data for hero types and monster types.
-void readDefaultData(istream& input, struct defaultData_t& defaultData) {
-	skipComments(input);
-	input >> defaultData.initialHealthPower;
-	cout << defaultData.initialHealthPower << endl;
-	string dataClass;
 	
-	skipComments(input);
-	while(input >> dataClass) {
-		if(dataClass == "Hero") {
-			cout << "Hero Data" << endl;
-			input >> defaultData.heroInfo.magicPower;
-			input >> defaultData.heroInfo.strength;
-			input >> defaultData.heroInfo.dexterity;
-			input >> defaultData.heroInfo.agility;
-			input >> defaultData.heroInfo.money;
-			input >> defaultData.heroInfo.exp;
-		} else if(dataClass == "Warrior") {
-			input >> defaultData.warriorInfo.strength;
-			input >> defaultData.warriorInfo.dexterity;
-		} else if(dataClass == "Paladin") {
-			input >> defaultData.paladinInfo.strength;
-			input >> defaultData.paladinInfo.agility;
-		} else if(dataClass == "Sorcerer") {
-			input >> defaultData.sorcererInfo.dexterity;
-			input >> defaultData.sorcererInfo.agility;
-		}
-	}
+	Grid = grid;
+	mapFile.close();
 }
-
-/*
-TODO(stefanos): Functionality -- To be specified...
-class Living *createLiving(istream& input, struct defaultData_t& defaultData) {
-	struct livingInfo lInfo;
-	cout << "Name: ";
-	cin >> lInfo.name;
-	lInfo.level = 1;
-	lInfo.healthPower = defaultData.initialHealthPower;
-	cout << "Hero Data" << endl;
-	class Hero *h = new Hero(lInfo, defaultData.hInfo, heroTypes::Warrior);
-	h->printInfo();
-	return h;
-}
-*/
-
 
 int main(void) {
 	
 	// File location relative to the COMPILER
 	// TODO(stefanos): Remove that from the release
-	ifstream file("./build/defaultData.dat");
-	if(!file.good()) {
+	ifstream dataFile("./build/defaultData.dat");
+	if(!dataFile.good()) {
 		cout << "There was a problem opening the data input" << endl;
 		return INPUT_FILE_ERROR;
 	}
 
 	struct defaultData_t defaultData;
-	readDefaultData(file, defaultData);
+	readDefaultData(dataFile, defaultData);
+
+	cout << defaultData.initialHealthPower << endl;
+	cout << defaultData.exoskeletonInfo.armor << endl;
+
+	dataFile.close();
+	
+	class Map map;
+	if(!map.readMap())
+		return INPUT_FILE_ERROR;
+	for(int y = 0; y < map.Height; ++y) {
+		for(int x = 0; x < map.Width; ++x) {
+			cout << map.Grid[y][x];
+		}
+		cout << endl;
+	}
+
+	// Cleanup
+	for(int y = 0; y < map.Height; ++y) {
+		delete[] map.Grid[y];
+	}
+	delete[] map.Grid;
 
 	return 0;
 }
