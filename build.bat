@@ -1,1 +1,0 @@
-g++ .\source\game.cpp .\source\utils.cpp -o .\build\game
