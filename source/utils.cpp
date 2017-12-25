@@ -147,7 +147,10 @@ void Map::print(void) const {
 		for(int x = 0; x < width; ++x) {
 			for(int i = 0; i < padding; ++i)
 				std::cout << " ";
-			std::cout << grid[y][x] << " ";
+			if(grid[y][x] == 'S' && heroesPosition[0] == y && heroesPosition[1] == x)
+				std::cout << "HS";
+			else
+				std::cout << grid[y][x] << " ";
 		}
 		for(int i = 0; i < padding/2 - 1; ++i) {
 			std::cout << std::endl;
@@ -162,7 +165,7 @@ int Map::isValidPosition(int32_t position[2]) const {
 	if(!(position[0] < Height && position[1] < Width))
 		return 0;
 	char square = Grid[position[0]][position[1]];
-	if(square == 'N' || square == 'I')
+	if(square == 'N')
 		return 0;
 
 	return 1;
@@ -187,24 +190,26 @@ int Map::moveHeroes(int32_t direction) {
 	int32_t position[2] = { heroesPosition[0], heroesPosition[1] };
 	if(direction == directions::up) {
 		position[0] -= 1;
-		if(!isValidPosition(position))
-			return 0;
 	} else if(direction == directions::down) {
 		position[0] += 1;
-		if(!isValidPosition(position))
-			return 0;
 	} else if(direction == directions::left) {
 		position[1] -= 1;
-		if(!isValidPosition(position))
-			return 0;
 	} else if(direction == directions::right) {
 		position[1] += 1;
-		if(!isValidPosition(position))
-			return 0;
 	}
-	Grid[heroesPosition[0]][heroesPosition[1]] = 'C';
+	if(!isValidPosition(position))
+		return 0;
+	
+	// reveert back only if they were in a common square
+	if(Grid[heroesPosition[0]][heroesPosition[1]] != 'S')
+		Grid[heroesPosition[0]][heroesPosition[1]] = 'C';
 	heroesPosition[0] = position[0];
-	heroesPosition[1] = position[1];	
-	Grid[position[0]][position[1]] = 'H';
+	heroesPosition[1] = position[1];
+
+	// Change the content of this square only
+	// if it is a common square
+	if(Grid[position[0]][position[1]] != 'S')
+		Grid[position[0]][position[1]] = 'H';
+
 	return 1;
 }
