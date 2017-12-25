@@ -65,6 +65,7 @@ int main(void) {
 
     //NOTE(nikos): we should add the choices of taking an potion, or equiping a weapon
     //NOTE(stefanos): Right! I just added the movement
+	//NOTE(nikos): relax boi
 	size_t storeSize = 20;
 	class Item **store = new Item*[storeSize];
 	// NOTE(stefanos): Manual initialization of items
