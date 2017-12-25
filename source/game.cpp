@@ -60,7 +60,7 @@ int main(void) {
 			cout << "This operation can't be handled!" << endl;
 		}
 	}
-
+    //NOTE(nikos): we should add the choices of taking an potion, or equiping a weapon
 	while(Running) {
 		int32_t choice;
 		cout << "Available choices" << endl;
