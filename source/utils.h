@@ -31,19 +31,24 @@ public:
 	int readDefaultData(void);
 };
 
+
+enum directions { up, down, right, left };
 class Map {
 private:
 	uint32_t Height;
 	uint32_t Width;
 	uint8_t **Grid;
 	int32_t heroesPosition[2];
+
+	int isValidPosition(int32_t*) const;
 public:
 	Map();
 	~Map();
 	int readMap(void);
-	void print(void);
+	void print(void) const;
 	int initializeHeroesPosition(int32_t*);
 	int heroesInitialized(void) const { return (heroesPosition[0] != -1); }
+	int moveHeroes(int32_t);
 };
 
 void skipComments(std::istream&);

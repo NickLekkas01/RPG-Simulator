@@ -136,7 +136,7 @@ int Map::readMap(void) {
 	return 1;
 }
 
-void Map::print(void) {
+void Map::print(void) const {
 	uint8_t **grid = Grid;
 	uint32_t height = Height;
 	uint32_t width = Width;
@@ -156,12 +156,55 @@ void Map::print(void) {
 	std::cout << std::endl;
 }
 
-int Map::initializeHeroesPosition(int32_t position[2]) {
-	assert(position[0] >= 0 && position[1] >= 0);
-	assert(position[0] < Height && position[1] < Width);
+int Map::isValidPosition(int32_t position[2]) const {
+	if(!(position[0] >= 0 && position[1] >= 0))
+		return 0;
+	if(!(position[0] < Height && position[1] < Width))
+		return 0;
 	char square = Grid[position[0]][position[1]];
 	if(square == 'N' || square == 'I')
 		return 0;
+
+	return 1;
+}
+
+int Map::initializeHeroesPosition(int32_t position[2]) {
+	if(isValidPosition(position)) {
+		heroesPosition[0] = position[0];
+		heroesPosition[1] = position[1];
+		Grid[position[0]][position[1]] = 'H';
+		return 1;
+	}
+	return 0;
+}
+
+
+int Map::moveHeroes(int32_t direction) {
+	// IMPORTANT!
+	// NOTE(stefanos): You can only move to common squares
+	// If you want to interact with the store, you have to go in front of the
+	// store.
+	int32_t position[2] = { heroesPosition[0], heroesPosition[1] };
+	if(direction == directions::up) {
+		position[0] -= 1;
+		if(!isValidPosition(position))
+			return 0;
+	} else if(direction == directions::down) {
+		position[0] += 1;
+		if(!isValidPosition(position))
+			return 0;
+	} else if(direction == directions::left) {
+		position[1] -= 1;
+		if(!isValidPosition(position))
+			return 0;
+	} else if(direction == directions::right) {
+		position[1] += 1;
+		if(!isValidPosition(position))
+			return 0;
+	}
+	Grid[heroesPosition[0]][heroesPosition[1]] = 'C';
+	heroesPosition[0] = position[0];
+	heroesPosition[1] = position[1];	
 	Grid[position[0]][position[1]] = 'H';
 	return 1;
 }

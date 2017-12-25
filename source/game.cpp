@@ -12,7 +12,8 @@
 using namespace std;
 
 namespace playerChoices {
-	enum { quit, printMap, initializeHeroes, moveHeroes };
+	int32_t initializeHeroes = 2;
+	enum { quit, printMap, moveHeroes };
 	const char* choices[] = {"Quit: 0", "Print Map: 1", "Initialize Heroes: 2",
 	"Move Heroes: 3"};
 };
@@ -32,7 +33,7 @@ int main(void) {
 	cout << "Welcome to the RPG game" << endl;
 
 	// Initial loop
-	while(true) {
+	while(Running) {
 		int32_t choice;
 		cout << "Available choices" << endl;
 		cout << "Quit: 0" << endl;
@@ -42,7 +43,6 @@ int main(void) {
 		cin >> choice;
 		if(choice == playerChoices::quit) {
 			Running = false;
-			break;
 		} else if(choice == playerChoices::printMap) {
 			map.print();
 		} else if(choice == playerChoices::initializeHeroes) {
@@ -56,6 +56,38 @@ int main(void) {
 				cout << "You can't start there!" << endl;
 			}
 			break;
+		} else {
+			cout << "This operation can't be handled!" << endl;
+		}
+	}
+
+	while(Running) {
+		int32_t choice;
+		cout << "Available choices" << endl;
+		cout << "Quit: 0" << endl;
+		cout << "Print Map: 1" << endl;
+		cout << "Move Heroes: 2" << endl;
+		cout << "What do you want to do? ";
+		cin >> choice;
+		if(choice == playerChoices::quit) {
+			Running = false;
+		} else if(choice == playerChoices::printMap) {
+			map.print();
+		} else if(choice == playerChoices::moveHeroes) {
+			cout << "You can go:" << endl;
+			cout << "Up: " << directions::up << endl;
+			cout << "Down: " << directions::down << endl;
+			cout << "Left: " << directions::left << endl;
+			cout << "Right: " << directions::right << endl;
+			cout << "Go Back: -1" << endl;
+			cout << "Where do you want to go? " << endl;
+			cin >> choice;
+			if(choice == -1) { }
+			if(!map.moveHeroes(choice)) {
+				cout << "You can't go there!" << endl;
+			}
+		} else {
+			cout << "This operation can't be handled!" << endl;
 		}
 	}
 
