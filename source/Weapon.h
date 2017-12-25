@@ -1,12 +1,24 @@
 #ifndef WEAPON_H
 #define WEAPON_H
 
+#include <iostream>
+#include <cstdint>
 #include "Item.h"
 
 class Weapon : public Item {
 private:
 	uint32_t damage;
-	int8_t hands;      // 0 -> 1 hand, 1 -> both
+	uint32_t hands;      // 1 -> 1 hand, 2 -> both
+public:
+	Weapon(std::string nam, uint32_t pr, uint32_t min_level,
+		uint32_t dmg, uint32_t h) :
+		Item(nam, pr, min_level), damage(dmg), hands(h) { }
+	
+	void print(void) const {
+		Item::print();
+		std::cout << "Damage: " << damage << std::endl;
+		std::cout << "Hands required: " << hands << std::endl;
+	}
 };
 
 #endif

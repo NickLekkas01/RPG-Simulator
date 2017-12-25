@@ -55,7 +55,7 @@ public:
 	     Living(li), heroInfo(hi), type(t) {
          InventoryInfo.size=10;
          InventoryInfo.currently_holding=0;
-         InventoryInfo.Inventory=new Item[10];
+         //InventoryInfo.Inventory=new Item[10];
     }
     ~Hero(){
         delete []InventoryInfo.Inventory;
@@ -103,6 +103,7 @@ public:
 			heroInfo.exp=heroInfo.exp-100;
 		}
 	}
+	/*
     uint32_t buy(Item *StoreInventory,uint32_t currentItems,uint32_t size){
         uint32_t option;
         char option2;
@@ -184,6 +185,7 @@ public:
             std::cout<<i<<". "<<StoreInventory[i].get_name()<<" "<<StoreInventory[i].get_price()<<" "<<StoreInventory[i].get_minimumLevel()<<std::endl;
         }
     }
+	*/
 
 };
 
