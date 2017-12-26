@@ -66,18 +66,17 @@ int main(void) {
     //NOTE(nikos): we should add the choices of taking an potion, or equiping a weapon
     //NOTE(stefanos): Right! I just added the movement
 	//NOTE(nikos): relax boi
-	size_t storeSize = 20;
-	class Item **store = new Item*[storeSize];
-	// NOTE(stefanos): Manual initialization of items
-	for(int i = 0; i < storeSize; ++i)
-		store[i] = NULL;
-	store[0] = new Weapon("Sword", 15, 3, 27, 1);
-	uint32_t dmg[2] = {30, 50};
-	store[1] = new Spell("Lighting", 25, 2, dmg, 17, IceSpell);
-	for(int i = 0; i < storeSize; ++i) {
-		if(store[i] != NULL)
-			store[i]->print();
-	}
+
+	
+
+	// Initialize the store
+	// NOTE(stefanos): Shared memory for the store. Items getting to the inventory
+	// have the memory from the store. Memory gets destroyed when we don't need
+	// the store anymore. Provided that any item that any hero has is taken
+	// from the store, this is the end of the game.
+	class Store store(10);
+	store.readItems();
+	store.print();
 	while(Running) {
 		int32_t choice;
 		cout << "Available choices" << endl;
@@ -108,6 +107,5 @@ int main(void) {
 		}
 	}
 	
-	delete[] store;
 	return 0;
 }

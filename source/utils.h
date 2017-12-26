@@ -4,6 +4,10 @@
 #include <istream>
 #include <cstdint>
 #include "Hero.h"
+#include "Item.h"
+#include "Weapon.h"
+#include "Spell.h"
+#include "Potion.h"
 #include "Monster.h"
 
 
@@ -51,7 +55,75 @@ public:
 	int moveHeroes(int32_t);
 };
 
+struct itemLock {
+	class Item* item;
+	int taken;
+};
+
+class Store {
+private:
+	const size_t size;
+	size_t currently_holding;
+	class itemLock *items;
+public:
+	Store(size_t s) : size(s), currently_holding(0) {
+
+		// Allocate the initial shared memory
+		items = new itemLock[size];
+		for(int i = 0; i < size; ++i) {
+			items[i].item = NULL;
+			items[i].taken = 0;
+		}
+	}
+
+	void readItems(void) {
+
+		// Read items
+		// TODO(stefanos): Those items are to be read from a file
+		items[0].item = new Weapon("Sword", 15, 3, 40, 1);
+		currently_holding++;
+		uint32_t damage[2] = {30, 50};
+		items[1].item = new Spell("MySpell", 12, 2, damage, 34, IceSpell);
+		currently_holding++;
+	}
+
+	int hasAvailableSpace(void) const {
+		return currently_holding < size;
+	}
+
+	// Mark an item as taken
+	class Item* removeItem(const std::string& name) {
+		for(int i = 0; i < size; ++i)
+			if(items[i].item->get_name() == name) {
+				items[i].taken = 1;
+				--currently_holding;
+				return items[i].item;
+			}
+
+		return NULL;
+
+	}
+	
+	// Print items using virtual functionality
+	void print(void) const {
+		for(int i = 0; i < size; ++i) {
+			if(items[i].item != NULL && items[i].taken == 0)
+				items[i].item->print();
+		}
+	}
+	
+	// Deallocate the initial memory
+	~Store() {
+		if(items != NULL) {
+			for(int i = 0; i < size; ++i)
+				if(items[i].item != NULL) {
+					delete items[i].item;
+				}
+			delete[] items;
+		}
+	}
+};
+
 void skipComments(std::istream&);
-void readDefaultData(std::istream&, struct defaultData_t&);
 
 #endif

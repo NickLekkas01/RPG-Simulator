@@ -13,6 +13,9 @@ public:
 	Weapon(std::string nam, uint32_t pr, uint32_t min_level,
 		uint32_t dmg, uint32_t h) :
 		Item(nam, pr, min_level), damage(dmg), hands(h) { }
+
+	Weapon(const class Weapon& w) : Item(w), damage(w.damage),
+		hands(w.hands) { }
 	
 	void print(void) const {
 		Item::print();
