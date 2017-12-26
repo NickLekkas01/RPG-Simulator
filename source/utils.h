@@ -75,17 +75,8 @@ public:
 			items[i].taken = 0;
 		}
 	}
-
-	void readItems(void) {
-
-		// Read items
-		// TODO(stefanos): Those items are to be read from a file
-		items[0].item = new Weapon("Sword", 15, 3, 40, 1);
-		currently_holding++;
-		uint32_t damage[2] = {30, 50};
-		items[1].item = new Spell("MySpell", 12, 2, damage, 34, IceSpell);
-		currently_holding++;
-	}
+	
+	int readItems(const std::string&);
 
 	int hasAvailableSpace(void) const {
 		return currently_holding < size;

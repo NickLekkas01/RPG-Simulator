@@ -75,7 +75,9 @@ int main(void) {
 	// the store anymore. Provided that any item that any hero has is taken
 	// from the store, this is the end of the game.
 	class Store store(10);
-	store.readItems();
+	// TODO(stefanos): Path relative to the compiler
+	// Fix that on the release
+	store.readItems("./build/items.dat");
 	store.print();
 	while(Running) {
 		int32_t choice;

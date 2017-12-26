@@ -213,3 +213,38 @@ int Map::moveHeroes(int32_t direction) {
 
 	return 1;
 }
+
+int Store::readItems(const std::string& fileName) {
+	std::ifstream itemsFile(fileName);
+	if(!itemsFile.good()) {
+		std::cout << "There was a problem opening the items data file" << std::endl;
+		return 0;
+	}
+
+	skipComments(itemsFile);
+	std::string itemClass;
+	// TODO(stefanos): Read items and update currently holding.
+	// Stop if it surpasses the size of the store;
+	while(itemsFile >> itemClass) {
+		if(itemClass == "Weapon") {
+		} else if(itemClass == "Spell") {
+		} else if(itemClass == "Potion") {
+		}
+	}
+
+	itemsFile.close();
+
+
+	// NOTE(stefanos): Test code!
+	// Read items
+	// TODO(stefanos): Those items are to be read from a file
+	items[0].item = new Weapon("Sword", 15, 3, 40, 1);
+	currently_holding++;
+	uint32_t damage[2] = {30, 50};
+	items[1].item = new Spell("MySpell", 12, 2, damage, 34, IceSpell);
+	currently_holding++;
+
+	
+	return 1;
+
+}
