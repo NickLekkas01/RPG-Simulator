@@ -223,27 +223,52 @@ int Store::readItems(const std::string& fileName) {
 
 	skipComments(itemsFile);
 	std::string itemClass;
-	// TODO(stefanos): Read items and update currently holding.
-	// Stop if it surpasses the size of the store;
+	// TODO(stefanos): Stop if it surpasses the size of the store;
 	while(itemsFile >> itemClass) {
+		std::string name;
+		uint32_t price, min_level;
+		size_t i;
+		for(i = 0; i < size; ++i)
+			if(items[i].item == NULL) {
+				break;
+			}
+
 		if(itemClass == "Weapon") {
+			uint32_t damage, hands;
+			itemsFile >> name >> price >> min_level >> damage >> hands;
+			items[i].item = new Weapon(name, price, min_level, damage, hands);
+			items[i].taken = 0;
+
 		} else if(itemClass == "Spell") {
+			uint32_t damage[2], mana;
+			// TODO(stefanos): Think about the use of enum
+			enum spellType type;
+			std::string spell_type;
+			itemsFile >> name >> price >> min_level >> damage[0] >> damage[1] >> mana >> spell_type;
+			if(spell_type == "IceSpell")
+				type = IceSpell;
+			else if(spell_type == "FireSpell")
+				type = FireSpell;
+			else
+				type = LightingSpell;
+			items[i].item = new Spell(name, price, min_level, damage, mana, type);
+			items[i].taken = 0;
+
 		} else if(itemClass == "Potion") {
+			uint32_t restoration_amount;
+			uint32_t potion_type;
+			// TODO(stefanos): What is that?
+			bool availability = true;
+
+			itemsFile >> name >> price >> min_level >> restoration_amount >> potion_type;
+			items[i].item = new Potion(name, price, min_level, restoration_amount,
+				potion_type, availability);
 		}
+
+		++currently_holding;
 	}
 
 	itemsFile.close();
-
-
-	// NOTE(stefanos): Test code!
-	// Read items
-	// TODO(stefanos): Those items are to be read from a file
-	items[0].item = new Weapon("Sword", 15, 3, 40, 1);
-	currently_holding++;
-	uint32_t damage[2] = {30, 50};
-	items[1].item = new Spell("MySpell", 12, 2, damage, 34, IceSpell);
-	currently_holding++;
-
 	
 	return 1;
 
