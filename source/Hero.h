@@ -40,7 +40,7 @@ struct heroInfo_t {
 };
 
 struct Inventory_t{
-    Item *Inventory;
+    Item **Inventory;
     uint32_t currently_holding;
     uint32_t size;
 };
@@ -102,7 +102,34 @@ public:
 			heroInfo.money+=500;
 			heroInfo.exp=heroInfo.exp-100;
 		}
+}
+	int buy(Item *Item_bought){
+		if(InventoryInfo.currently_holding<InventoryInfo.size){
+			InventoryInfo.currently_holding++;
+			InventoryInfo[InventoryInfo.currently_holding]=Item_bought;
+			return 0;
+		}
+		else{
+			std::cout<<"Not enough space to buy"<<std::endl;
+			return -1;
+		}
 	}
+
+	Item *sell(std::string name){
+		Item *tmp;
+		for(int i = 0; i < InventoryInfo.currently_holding; i++ ){
+			if(InventoryInfo.Inventory[i]->get_name()==name){
+				tmp=InventoryInfo.Inventory[i];
+				for(int j = i + 1; j<InventoryInfo.currently_holding; j++){
+					InventoryInfo.Inventory[j-1]=InventoryInfo.Inventory[j];
+				}
+				break;
+			}
+		}
+		InventoryInfo.currently_holding--;
+		return tmp;
+	}
+
 	/*
     uint32_t buy(Item *StoreInventory,uint32_t currentItems,uint32_t size){
         uint32_t option;
