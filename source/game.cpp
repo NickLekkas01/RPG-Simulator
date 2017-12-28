@@ -15,9 +15,7 @@ using namespace std;
 
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
-	enum { quit, printMap, moveHeroes, checkInventory};
-	const char* choices[] = {"Quit: 0", "Print Map: 1", "Initialize Heroes: 2",
-	"Move Heroes: 3", "Check Inventory: 4"};
+	enum { quit, printMap, moveHeroes, checkInventory, checkStoreItems, buy, sell};
 };
 
 int main(void) {
@@ -29,7 +27,7 @@ int main(void) {
 	cout << defaultData.initialHealthPower << endl;
 	cout << defaultData.exoskeletonInfo.armor << endl;
 	
-	class Map map;
+	class Map map(3);
 	if(!map.readMap())
 		return INPUT_FILE_ERROR;
 	cout << "Welcome to the RPG game" << endl;
@@ -79,12 +77,23 @@ int main(void) {
 	// Fix that on the release
 	store.readItems("./build/items.dat");
 	store.print();
+
+	// TODO(stefanos): Put a default living info data to defaultData_t
+	struct livingInfo_t livingInfo {"Stefanos", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
+	// NOTE(stefanos): Test code for one hero
+	class Hero h(livingInfo, defaultData.heroInfo, heroTypes::Warrior);
 	while(Running) {
 		int32_t choice;
 		cout << "Available choices" << endl;
 		cout << "Quit: 0" << endl;
 		cout << "Print Map: 1" << endl;
 		cout << "Move Heroes: 2" << endl;
+		if(map.heroesOnStore()) {
+			cout << "Check inventory: 3" << endl;
+			cout << "Check items avaialble on the store: 4" << endl;
+			cout << "Buy something: 5" << endl;
+			cout << "Sell something: 6" << endl;
+		}
 		cout << "What do you want to do? ";
 		cin >> choice;
 		if(choice == playerChoices::quit) {
@@ -104,6 +113,37 @@ int main(void) {
 			if(!map.moveHeroes(choice)) {
 				cout << "You can't go there!" << endl;
 			}
+		// TODO(stefanos): Think about the fact that a player
+		// can actually commit store choices even though
+		// they do not see them.
+		} else if(choice == playerChoices::checkInventory) {
+		} else if(choice == playerChoices::checkStoreItems) {
+			store.print();
+
+		// NOTE(stefanos): Assume that everything we do is for one hero,
+		// TODO: Fix that!
+		} else if(choice == playerChoices::buy) {
+			if(!h.inventoryAvaiableSpace()) {
+				cout << "Not enough space on the inventory" << endl;
+				continue;
+			}
+			string name;
+			store.print();
+			cout << "Type the name of the item you want to buy";
+			cin >> name;
+			class Item *it = store.searchItem(name);
+			if(it == NULL) {
+				cout << "That item is not on the store" << endl;
+				continue;
+			}
+			if(!h.hasEnoughMoney(it)) {
+				cout << "You don't have enough money to buy this item" << endl;
+				continue;
+			}
+			// TODO(stefanos): Take into consideration the return value??
+			h.buy(store.removeItem(name));
+		} else if(choice == playerChoices::sell) {
+			cout << "Wanted to sell" << endl;
 		} else {
 			cout << "This operation can't be handled!" << endl;
 		}

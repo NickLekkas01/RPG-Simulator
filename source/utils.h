@@ -43,16 +43,24 @@ private:
 	uint32_t Width;
 	uint8_t **Grid;
 	int32_t heroesPosition[2];
+	uint32_t numHeroes;
+	class Hero **heroes;
 
 	int isValidPosition(int32_t*) const;
 public:
 	Map();
+	Map(uint32_t numberOfHeroes) : numHeroes(numberOfHeroes) {
+	}
 	~Map();
 	int readMap(void);
 	void print(void) const;
 	int initializeHeroesPosition(int32_t*);
 	int heroesInitialized(void) const { return (heroesPosition[0] != -1); }
 	int moveHeroes(int32_t);
+
+	int heroesOnStore(void) const {
+		return (Grid[heroesPosition[0]][heroesPosition[1]] == 'S');
+	}
 };
 
 struct itemLock {
@@ -82,6 +90,18 @@ public:
 		return currently_holding < size;
 	}
 
+	class Item* searchItem(std::string name) {
+		for(int i = 0; i < size; ++i)
+			if(items[i].item != NULL && items[i].taken == 0) {
+				if(items[i].item->get_name() == name) {
+					return items[i].item;
+				}
+			}
+
+		return NULL;
+
+	}
+
 	// Mark an item as taken
 	class Item* removeItem(const std::string& name) {
 		for(int i = 0; i < size; ++i)
@@ -98,8 +118,10 @@ public:
 	// Print items using virtual functionality
 	void print(void) const {
 		for(int i = 0; i < size; ++i) {
-			if(items[i].item != NULL && items[i].taken == 0)
+			if(items[i].item != NULL && items[i].taken == 0) {
 				items[i].item->print();
+				std::cout << std::endl;
+			}
 		}
 	}
 	

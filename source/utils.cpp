@@ -89,7 +89,6 @@ int defaultData_t::readDefaultData() {
 Map::Map() : Height(0), Width(0), Grid(NULL) {
 	heroesPosition[0] = -1;
 	heroesPosition[1] = -1;
-
 }
 
 Map::~Map() {
