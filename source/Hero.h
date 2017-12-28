@@ -132,6 +132,7 @@ public:
 			// TODO(stefanos): Handle money
 			InventoryInfo.Inventory[InventoryInfo.currently_holding]=Item_bought;
 			InventoryInfo.currently_holding++;
+			heroInfo.money-=Item_bought->get_price();
 			return 1;
 		}
 		else{
@@ -153,6 +154,7 @@ public:
 			}
 		}
 		InventoryInfo.currently_holding--;
+		heroInfo.money+=tmp->get_price()/2;
 		return tmp;
 	}
 };
