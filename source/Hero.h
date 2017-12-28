@@ -103,6 +103,24 @@ public:
 			heroInfo.exp=heroInfo.exp-100;
 		}
 	}
+	void checkInventory(void) const {
+		std::cout << std::endl;
+		std::cout << "Items on inventory" << std::endl;
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i)
+			InventoryInfo.Inventory[i]->print();
+		std::cout << std::endl;
+	}
+
+	class Item* searchItem(std::string name) {
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i)
+			if(InventoryInfo.Inventory[i]->get_name() == name) {
+				return InventoryInfo.Inventory[i];
+			}
+
+		return NULL;
+	}
+
+
 	int inventoryAvaiableSpace(void) const {
 		return (InventoryInfo.currently_holding<InventoryInfo.size);
 	}
@@ -111,8 +129,9 @@ public:
 	}
 	int buy(Item *Item_bought){
 		if(InventoryInfo.currently_holding<InventoryInfo.size){
-			InventoryInfo.currently_holding++;
+			// TODO(stefanos): Handle money
 			InventoryInfo.Inventory[InventoryInfo.currently_holding]=Item_bought;
+			InventoryInfo.currently_holding++;
 			return 1;
 		}
 		else{
@@ -121,6 +140,8 @@ public:
 	}
 
 	Item *sell(std::string name){
+
+		// TODO(stefanos): Handle money
 		Item *tmp;
 		for(int i = 0; i < InventoryInfo.currently_holding; i++ ){
 			if(InventoryInfo.Inventory[i]->get_name()==name){

@@ -76,7 +76,6 @@ int main(void) {
 	// TODO(stefanos): Path relative to the compiler
 	// Fix that on the release
 	store.readItems("./build/items.dat");
-	store.print();
 
 	// TODO(stefanos): Put a default living info data to defaultData_t
 	struct livingInfo_t livingInfo {"Stefanos", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
@@ -88,8 +87,8 @@ int main(void) {
 		cout << "Quit: 0" << endl;
 		cout << "Print Map: 1" << endl;
 		cout << "Move Heroes: 2" << endl;
+		cout << "Check inventory: 3" << endl;
 		if(map.heroesOnStore()) {
-			cout << "Check inventory: 3" << endl;
 			cout << "Check items avaialble on the store: 4" << endl;
 			cout << "Buy something: 5" << endl;
 			cout << "Sell something: 6" << endl;
@@ -117,6 +116,7 @@ int main(void) {
 		// can actually commit store choices even though
 		// they do not see them.
 		} else if(choice == playerChoices::checkInventory) {
+			h.checkInventory();
 		} else if(choice == playerChoices::checkStoreItems) {
 			store.print();
 
@@ -129,7 +129,7 @@ int main(void) {
 			}
 			string name;
 			store.print();
-			cout << "Type the name of the item you want to buy";
+			cout << "Type the name of the item you want to buy: ";
 			cin >> name;
 			class Item *it = store.searchItem(name);
 			if(it == NULL) {
@@ -143,7 +143,17 @@ int main(void) {
 			// TODO(stefanos): Take into consideration the return value??
 			h.buy(store.removeItem(name));
 		} else if(choice == playerChoices::sell) {
-			cout << "Wanted to sell" << endl;
+			// NOTE(stefanos): The procedure is the same with the buy,
+			// just for the store now. Notice, that all the items that
+			// players have, come from the store. So, it's impossible
+			// for the store to not have space, so we don't check that.
+
+			// Show the items that they already have
+			h.checkInventory();
+			string name;
+			cout << "Type the name of the item you want to sell: ";
+			cin >> name;
+			store.addItem(h.sell(name));
 		} else {
 			cout << "This operation can't be handled!" << endl;
 		}
