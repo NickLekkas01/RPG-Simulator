@@ -172,7 +172,12 @@ int main(void) {
 				string name;
 				cout << "Type the name of the item you want to sell: ";
 				cin >> name;
-				store.addItem(h.sell(name));
+				class Item *it = h.seachItem(name);
+				if(it == NULL) {
+					cout << "This item is not on the inventory" << endl;
+				} else {
+					store.addItem(h.sell(name));
+				}
 			}
 		} else {
 			cout << "This operation can't be handled!" << endl;

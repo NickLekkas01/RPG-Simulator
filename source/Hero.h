@@ -177,12 +177,10 @@ public:
                 return 1;
             }
             else{
-                std::cout<<"Not enough money"<<std::endl;
                 return 0;
             }
 		}
 		else{
-            std::cout<<"Full Inventory"<<std::endl;
 			return 0;
 		}
 	}
@@ -201,8 +199,7 @@ public:
 			}
 		}
         if(i==InventoryInfo.currently_holding){
-            std::cout<<"Item not found"<<std::endl;
-            return 0;
+            return NULL;
         }
 		InventoryInfo.currently_holding--;
 		heroInfo.money+=tmp->get_price()/2;
