@@ -15,7 +15,7 @@ using namespace std;
 
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
-	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, checkStoreItems, buy, sell};
+	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equip, checkStoreItems, buy, sell};
 };
 
 int main(void) {
@@ -84,10 +84,11 @@ int main(void) {
 		cout << "Check inventory: 3" << endl;
 		cout << "Display Hero Info: 4" << endl;
 		cout << "Use Potion: 5" << endl;
+		cout << "Equip Weapon: 6" << endl;
 		if(map.heroesOnStore()) {
-			cout << "Check items avaialble on the store: 6" << endl;
-			cout << "Buy something: 7" << endl;
-			cout << "Sell something: 8" << endl;
+			cout << "Check items avaialble on the store: 7" << endl;
+			cout << "Buy something: 8" << endl;
+			cout << "Sell something: 9" << endl;
 		}
 		cout << "What do you want to do? ";
 		cin >> choice;
@@ -123,6 +124,25 @@ int main(void) {
 			} else {
 				store.deleteItem(it);
 			}
+		} else if(choice == playerChoices::equip) {
+			if(h.isInventoryEmpty()) {
+				// TODO(stefanos): Check that the inventory
+				// has things that can be equipped (i.e. it may have
+				// only potions)
+				cout << "There is nothing to equip" << endl;
+				continue;
+			}
+			h.checkInventory();
+			cout << "Type the name of the item you want to equip: " << endl;
+			string name;
+			cin >> name;
+			class Item *it = h.searchItem(name);
+			if(it == NULL) {
+				cout << "The item does not exist" << endl;
+				continue;
+			}
+			// TODO(stefanos): Maybe pass the pointer??
+			h.equipWeapon(it);
 		} else if(map.heroesOnStore()) {
 			if(choice == playerChoices::checkStoreItems) {
 				store.print();

@@ -60,6 +60,8 @@ public:
          InventoryInfo.size=10;
          InventoryInfo.currently_holding=0;
          InventoryInfo.Inventory=new Item*[10];
+		 heroInfo.hands_availability[0] = NULL;
+		 heroInfo.hands_availability[1] = NULL;
     }
     ~Hero(){
         delete []InventoryInfo.Inventory;
@@ -76,6 +78,28 @@ public:
 		std::cout << "Agility: "    << heroInfo.agility << std::endl;
 		std::cout << "Money: "      << heroInfo.money << std::endl;
 		std::cout << "Experience: " << heroInfo.exp << std::endl;
+		std::cout << "Equipment: " << std::endl;
+		if(heroInfo.hands_availability[0] == NULL &&
+			heroInfo.hands_availability[1] == NULL)
+			std::cout << "The hero holds no weapon or spell" << std::endl;
+		else if(heroInfo.hands_availability[0] != heroInfo.hands_availability[1]) {
+			if(heroInfo.hands_availability[0] != NULL) {
+				std::cout << "Hand 1: " << std::endl;
+				std::cout << "\t";
+ 				heroInfo.hands_availability[0]->print();
+				std::cout << std::endl;
+
+			}
+			if(heroInfo.hands_availability[1] != NULL) {
+				std::cout << "Hand 2: " << std::endl;
+				std::cout << "\t";
+ 				heroInfo.hands_availability[1]->print();
+				std::cout << std::endl;
+			}
+		} else {
+			std::cout << "The hero holds a two handed weapon: " << std::endl;
+			heroInfo.hands_availability[0]->print();
+		}
 	}
 
 	// NOTE(stefanos): Explain how the (exp > 100) and (exp = exp - 100)
@@ -92,12 +116,12 @@ public:
 				heroInfo.agility+=2;
 				heroInfo.dexterity++;
 				heroInfo.magicPower+=30;
-				Living::set_health(100);
-			}
-			else if(type==1){
-				heroInfo.strength+=2;
-				heroInfo.dexterity+=2;
-				heroInfo.agility++;
+			Living::set_health(100);
+		}
+		else if(type==1){
+			heroInfo.strength+=2;
+			heroInfo.dexterity+=2;
+			heroInfo.agility++;
 				heroInfo.magicPower+=50;
 				Living::set_health(80);
 			}
@@ -112,6 +136,11 @@ public:
 			heroInfo.exp=heroInfo.exp-100;
 		}
 	}
+
+	bool isInventoryEmpty(void) const {
+		return (InventoryInfo.currently_holding == 0);
+	}
+
 	void checkInventory(void) const {
 		std::cout << std::endl;
 		std::cout << "Items on inventory" << std::endl;
@@ -169,9 +198,10 @@ public:
 		return NULL;
 	}
 
-    bool equipWeapon(std::string name){
+    bool equipWeapon(class Item *it){
         for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
-            if (InventoryInfo.Inventory[i]->getItemType() == itemTypes::Weapon && InventoryInfo.Inventory[i]->get_name() == name) {
+			// TODO(stefanos): Add a "weapon is currently in use" kind of field to the inventory and mark it here.
+            if (InventoryInfo.Inventory[i] == it) {
                 class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
                 uint32_t min_lvl = weap->get_minimumLevel();
                 if (livingInfo.level < min_lvl)
