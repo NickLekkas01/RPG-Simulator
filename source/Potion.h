@@ -6,7 +6,7 @@
 typedef uint32_t potionType;
 namespace potionTypes{
 	enum { health, strength, dexterity, agility };
-	//const char* potionNames[] = 
+	const char* const potionNames[] = { "Health Potion", "Strength Potion", "Dexterity Potion", "Agility Potion" }; 
 }
 
 class Potion : public Item {
@@ -36,9 +36,7 @@ public:
 		Item::print();
 		std::cout << "Restoration Amount: " << restorationAmount << std::endl;
 		std::cout << "Availability: " << availability << std::endl;
-		// TODO(stefanos): For now only the integer. Implement
-		// naming for spell types
-		std::cout << "Spell Type: " << type << std::endl;
+		std::cout << potionTypes::potionNames[type] << std::endl;
 	}
 
 };

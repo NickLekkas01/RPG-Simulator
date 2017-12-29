@@ -110,9 +110,23 @@ public:
 				--currently_holding;
 				return items[i].item;
 			}
-
 		return NULL;
+	}
 
+	// removes and deletes an item from memory
+	int deleteItem(class Item *it) {
+		if(it != NULL) {
+			for(int i = 0; i < size; ++i)
+				if(items[i].item == it) {
+					delete items[i].item;
+					items[i].item = NULL;
+					items[i].taken = 0;
+					--currently_holding;
+					return 1;
+				}
+		}
+
+		return 0;
 	}
 
 	// TODO(stefanos): Maybe add a return value for checking.

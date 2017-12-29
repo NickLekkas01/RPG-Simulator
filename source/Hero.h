@@ -30,6 +30,7 @@ namespace heroTypes {
 	const uint8_t Warrior = 0;
 	const uint8_t Sorcerer = 1;
 	const uint8_t Paladin = 2;
+	const char *const typeNames[] = { "Warrior", "Sorcerer", "Paladin" };
 };
 
 struct heroInfo_t {
@@ -64,6 +65,11 @@ public:
         delete []InventoryInfo.Inventory;
     }
 	void printInfo(void) const {
+		std::cout << "Type: " << heroTypes::typeNames[type] << std::endl;
+		std::cout << "Name: " << livingInfo.name << std::endl;
+		std::cout << "Health Power: " << livingInfo.healthPower << std::endl;
+		std::cout << "Level: " << livingInfo.level << std::endl;
+		std::cout << "Is Awake? " << livingInfo.awake << std::endl;
 		std::cout << "magicPower: " << heroInfo.magicPower << std::endl;
 		std::cout << "Strength: "   << heroInfo.strength << std::endl;
 		std::cout << "Dexterity: "  << heroInfo.dexterity << std::endl;
@@ -132,13 +138,13 @@ public:
 		return NULL;
 	}
 
-	bool usePotion(std::string name) {
+	class Item* usePotion(std::string name) {
 		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
 			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Potion && InventoryInfo.Inventory[i]->get_name() == name) {
 				class Potion *pot = (class Potion*) InventoryInfo.Inventory[i];
 				uint32_t min_lvl = pot->get_minimumLevel();
 				if(livingInfo.level < min_lvl)
-					return false;
+					return NULL;
 				potionType type = pot->get_Potion_type();
 				uint32_t restoration_amount = pot->get_Restoration_amount();
 				if(type == potionTypes::health) {
@@ -151,16 +157,16 @@ public:
 					heroInfo.agility += restoration_amount;
 				}
 
+				class Item *tmp = InventoryInfo.Inventory[i];
 				for(int j = i + 1; j<InventoryInfo.currently_holding; j++){
 					InventoryInfo.Inventory[j-1]=InventoryInfo.Inventory[j];
 				}
 				--InventoryInfo.currently_holding;
-				return true;
+				return tmp;
 			}
 		}
 
-		return false;
-
+		return NULL;
 	}
 
     bool equipWeapon(std::string name){

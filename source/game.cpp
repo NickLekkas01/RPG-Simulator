@@ -15,7 +15,7 @@ using namespace std;
 
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
-	enum { quit, printMap, moveHeroes, checkInventory, usePotion, checkStoreItems, buy, sell};
+	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, checkStoreItems, buy, sell};
 };
 
 int main(void) {
@@ -61,25 +61,17 @@ int main(void) {
 		}
 	}
 
-    //NOTE(nikos): we should add the choices of taking an potion, or equiping a weapon
-    //NOTE(stefanos): Right! I just added the movement
-	//NOTE(nikos): relax boi
-
-	
-
 	// Initialize the store
 	// NOTE(stefanos): Shared memory for the store. Items getting to the inventory
 	// have the memory from the store. Memory gets destroyed when we don't need
 	// the store anymore. Provided that any item that any hero has is taken
 	// from the store, this is the end of the game.
 
-	// TODO(stefanos): Multiple stores?
 	class Store store(10);
 	// TODO(stefanos): Path relative to the compiler
 	// Fix that on the release
 	store.readItems("./build/items.dat");
 
-	// TODO(stefanos): Put a default living info data to defaultData_t
 	struct livingInfo_t livingInfo {"Stefanos", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
 	// NOTE(stefanos): Test code for one hero
 	class Hero h(livingInfo, defaultData.heroInfo, heroTypes::Warrior);
@@ -90,11 +82,12 @@ int main(void) {
 		cout << "Print Map: 1" << endl;
 		cout << "Move Heroes: 2" << endl;
 		cout << "Check inventory: 3" << endl;
-		cout << "Use Potion: 4" << endl;
+		cout << "Display Hero Info: 4" << endl;
+		cout << "Use Potion: 5" << endl;
 		if(map.heroesOnStore()) {
-			cout << "Check items avaialble on the store: 5" << endl;
-			cout << "Buy something: 6" << endl;
-			cout << "Sell something: 7" << endl;
+			cout << "Check items avaialble on the store: 6" << endl;
+			cout << "Buy something: 7" << endl;
+			cout << "Sell something: 8" << endl;
 		}
 		cout << "What do you want to do? ";
 		cin >> choice;
@@ -106,8 +99,8 @@ int main(void) {
 			cout << "You can go:" << endl;
 			cout << "Up: " << directions::up << endl;
 			cout << "Down: " << directions::down << endl;
-			cout << "Left: " << directions::left << endl;
 			cout << "Right: " << directions::right << endl;
+			cout << "Left: " << directions::left << endl;
 			cout << "Go Back: -1" << endl;
 			cout << "Where do you want to go? " << endl;
 			cin >> choice;
@@ -115,25 +108,20 @@ int main(void) {
 			if(!map.moveHeroes(choice)) {
 				cout << "You can't go there!" << endl;
 			}
-		// TODO(stefanos): Think about the fact that a player
-		// can actually commit store choices even though
-		// they do not see them.
 		} else if(choice == playerChoices::checkInventory) {
-				h.checkInventory();
+			h.checkInventory();
+		} else if(choice == playerChoices::heroInfo) {
+			h.printInfo();
 		} else if(choice == playerChoices::usePotion) {
-			// TODO(stefanos): When a potion is used, it vanishes.
-			// i.e. we waste memory by keeping it in the store memory.
 			h.printPotions();
 			cout << "Type the name of the potion: " << endl;
 			string name;
 			cin >> name;
-			if(!h.usePotion(name)) {
+			class Item *it = h.usePotion(name);
+			if(it == NULL) {
 				cout << "The potion either does not exist, or you are not in the required level to use it" << endl;
 			} else {
-				// TODO(stefanos): Maybe have an overloaded removeItem
-				// that takes pointer to save the procedure
-				// of searching again.
-				store.removeItem(name);
+				store.deleteItem(it);
 			}
 		} else if(map.heroesOnStore()) {
 			if(choice == playerChoices::checkStoreItems) {
@@ -159,7 +147,6 @@ int main(void) {
 					cout << "You don't have enough money to buy this item" << endl;
 					continue;
 				}
-				// TODO(stefanos): Take into consideration the return value??
 				h.buy(store.removeItem(name));
 			} else if(choice == playerChoices::sell) {
 				// NOTE(stefanos): The procedure is the same with the buy,
