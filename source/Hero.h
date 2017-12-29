@@ -111,6 +111,16 @@ public:
 		std::cout << std::endl;
 	}
 
+	void printPotions(void) const {
+		std::cout << "Available potions" << std::endl;
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Potion)
+				InventoryInfo.Inventory[i]->print();
+		}
+		std::cout << std::endl;
+
+	}
+
 	class Item* searchItem(std::string name) {
 		for(int i = 0; i < InventoryInfo.currently_holding; ++i)
 			if(InventoryInfo.Inventory[i]->get_name() == name) {
@@ -129,7 +139,6 @@ public:
 	}
 	int buy(Item *Item_bought){
 		if(InventoryInfo.currently_holding<InventoryInfo.size){
-			// TODO(stefanos): Handle money
 			InventoryInfo.Inventory[InventoryInfo.currently_holding]=Item_bought;
 			InventoryInfo.currently_holding++;
 			heroInfo.money-=Item_bought->get_price();
@@ -142,7 +151,6 @@ public:
 
 	Item *sell(std::string name){
 
-		// TODO(stefanos): Handle money
 		Item *tmp;
 		for(int i = 0; i < InventoryInfo.currently_holding; i++ ){
 			if(InventoryInfo.Inventory[i]->get_name()==name){

@@ -235,7 +235,8 @@ int Store::readItems(const std::string& fileName) {
 		if(itemClass == "Weapon") {
 			uint32_t damage, hands;
 			itemsFile >> name >> price >> min_level >> damage >> hands;
-			items[i].item = new Weapon(name, price, min_level, damage, hands);
+			items[i].item = new Weapon(name, price, min_level, 
+				itemTypes::Weapon, damage, hands);
 			items[i].taken = 0;
 
 		} else if(itemClass == "Spell") {
@@ -250,7 +251,8 @@ int Store::readItems(const std::string& fileName) {
 				type = FireSpell;
 			else
 				type = LightingSpell;
-			items[i].item = new Spell(name, price, min_level, damage, mana, type);
+			items[i].item = new Spell(name, price, min_level, 
+				itemTypes::Spell, damage, mana, type);
 			items[i].taken = 0;
 
 		} else if(itemClass == "Potion") {
@@ -260,7 +262,8 @@ int Store::readItems(const std::string& fileName) {
 			bool availability = true;
 
 			itemsFile >> name >> price >> min_level >> restoration_amount >> potion_type;
-			items[i].item = new Potion(name, price, min_level, restoration_amount,
+			items[i].item = new Potion(name, price, min_level, 
+				itemTypes::Potion, restoration_amount,
 				potion_type, availability);
 		}
 

@@ -15,7 +15,7 @@ using namespace std;
 
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
-	enum { quit, printMap, moveHeroes, checkInventory, checkStoreItems, buy, sell};
+	enum { quit, printMap, moveHeroes, checkInventory, usePotion, checkStoreItems, buy, sell};
 };
 
 int main(void) {
@@ -72,6 +72,8 @@ int main(void) {
 	// have the memory from the store. Memory gets destroyed when we don't need
 	// the store anymore. Provided that any item that any hero has is taken
 	// from the store, this is the end of the game.
+
+	// TODO(stefanos): Multiple stores?
 	class Store store(10);
 	// TODO(stefanos): Path relative to the compiler
 	// Fix that on the release
@@ -88,10 +90,11 @@ int main(void) {
 		cout << "Print Map: 1" << endl;
 		cout << "Move Heroes: 2" << endl;
 		cout << "Check inventory: 3" << endl;
+		cout << "Use Potion: 4" << endl;
 		if(map.heroesOnStore()) {
-			cout << "Check items avaialble on the store: 4" << endl;
-			cout << "Buy something: 5" << endl;
-			cout << "Sell something: 6" << endl;
+			cout << "Check items avaialble on the store: 5" << endl;
+			cout << "Buy something: 6" << endl;
+			cout << "Sell something: 7" << endl;
 		}
 		cout << "What do you want to do? ";
 		cin >> choice;
@@ -116,44 +119,48 @@ int main(void) {
 		// can actually commit store choices even though
 		// they do not see them.
 		} else if(choice == playerChoices::checkInventory) {
-			h.checkInventory();
-		} else if(choice == playerChoices::checkStoreItems) {
-			store.print();
+				h.checkInventory();
+		} else if(choice == playerChoices::usePotion) {
+			h.printPotions();
+		} else if(map.heroesOnStore()) {
+			if(choice == playerChoices::checkStoreItems) {
+				store.print();
 
-		// NOTE(stefanos): Assume that everything we do is for one hero,
-		// TODO: Fix that!
-		} else if(choice == playerChoices::buy) {
-			if(!h.inventoryAvaiableSpace()) {
-				cout << "Not enough space on the inventory" << endl;
-				continue;
-			}
-			string name;
-			store.print();
-			cout << "Type the name of the item you want to buy: ";
-			cin >> name;
-			class Item *it = store.searchItem(name);
-			if(it == NULL) {
-				cout << "That item is not on the store" << endl;
-				continue;
-			}
-			if(!h.hasEnoughMoney(it)) {
-				cout << "You don't have enough money to buy this item" << endl;
-				continue;
-			}
-			// TODO(stefanos): Take into consideration the return value??
-			h.buy(store.removeItem(name));
-		} else if(choice == playerChoices::sell) {
-			// NOTE(stefanos): The procedure is the same with the buy,
-			// just for the store now. Notice, that all the items that
-			// players have, come from the store. So, it's impossible
-			// for the store to not have space, so we don't check that.
+			// NOTE(stefanos): Assume that everything we do is for one hero,
+			// TODO: Fix that!
+			} else if(choice == playerChoices::buy) {
+				if(!h.inventoryAvaiableSpace()) {
+					cout << "Not enough space on the inventory" << endl;
+					continue;
+				}
+				string name;
+				store.print();
+				cout << "Type the name of the item you want to buy: ";
+				cin >> name;
+				class Item *it = store.searchItem(name);
+				if(it == NULL) {
+					cout << "That item is not on the store" << endl;
+					continue;
+				}
+				if(!h.hasEnoughMoney(it)) {
+					cout << "You don't have enough money to buy this item" << endl;
+					continue;
+				}
+				// TODO(stefanos): Take into consideration the return value??
+				h.buy(store.removeItem(name));
+			} else if(choice == playerChoices::sell) {
+				// NOTE(stefanos): The procedure is the same with the buy,
+				// just for the store now. Notice, that all the items that
+				// players have, come from the store. So, it's impossible
+				// for the store to not have space, so we don't check that.
 
-			// Show the items that they already have
-			h.checkInventory();
-			string name;
-			cout << "Type the name of the item you want to sell: ";
-			cin >> name;
-			store.addItem(h.sell(name));
+				// Show the items that they already have
+				h.checkInventory();
+				string name;
+				cout << "Type the name of the item you want to sell: ";
+				cin >> name;
+				store.addItem(h.sell(name));
+			}
 		} else {
 			cout << "This operation can't be handled!" << endl;
 		}

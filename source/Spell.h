@@ -14,9 +14,9 @@ private:
 	// uint8_t minimumLevel;
 	enum spellType type;
 public:
-	Spell(std::string nam, uint32_t pr, uint32_t min_level,
+	Spell(std::string nam, uint32_t pr, uint32_t min_level, itemType type,
 		uint32_t dmg[2], uint32_t m, enum spellType t) :
-		Item(nam, pr, min_level), mana(m), type(t) {
+		Item(nam, pr, min_level, type), mana(m), type(t) {
 			damage[0] = dmg[0];
 			damage[1] = dmg[1];
 		}
