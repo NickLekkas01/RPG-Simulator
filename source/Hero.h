@@ -162,15 +162,15 @@ public:
 	}
 
 
-	int inventoryAvaiableSpace(void) const {
+	bool inventoryAvaiableSpace(void) const {
 		return (InventoryInfo.currently_holding<InventoryInfo.size);
 	}
-	int hasEnoughMoney(class Item* it) const {
+	bool hasEnoughMoney(class Item* it) const {
 		return (heroInfo.money > it->get_price());
 	}
 	int buy(Item *Item_bought){
-		if(InventoryInfo.currently_holding<InventoryInfo.size){
-            if(heroInfo.money>Item_bought->get_price()) {
+		if(inventoryAvaiableSpace()){
+            if(hasEnoughMoney(Item_bought)) {
                 InventoryInfo.Inventory[InventoryInfo.currently_holding] = Item_bought;
                 InventoryInfo.currently_holding++;
                 heroInfo.money -= Item_bought->get_price();
