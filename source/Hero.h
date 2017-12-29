@@ -6,6 +6,7 @@
 #include "Living.h"
 #include "Item.h"
 #include "Potion.h"
+#include "Weapon.h"
 
 struct warriorInfo_t {
 	uint32_t strength;
@@ -38,6 +39,7 @@ struct heroInfo_t {
 	uint32_t agility;
 	uint32_t money;
 	uint32_t exp;
+    Weapon *hands_availability[2];
 };
 
 struct Inventory_t{
@@ -160,6 +162,33 @@ public:
 		return false;
 
 	}
+
+    bool equipWeapon(std::string name){
+        for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+            if (InventoryInfo.Inventory[i]->getItemType() == itemTypes::Weapon && InventoryInfo.Inventory[i]->get_name() == name) {
+                class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
+                uint32_t min_lvl = weap->get_minimumLevel();
+                if (livingInfo.level < min_lvl)
+                    return false;
+                if(heroInfo.hands_availability[0]!=NULL && heroInfo.hands_availability[1]!=NULL) {
+                    return false;
+                }
+                else if((heroInfo.hands_availability[0]==NULL || heroInfo.hands_availability[1]==NULL) && weap->get_hands()==1){
+                    if(heroInfo.hands_availability[0]==NULL)
+                        heroInfo.hands_availability[0]=weap;
+                    else
+                        heroInfo.hands_availability[1]=weap;
+                }
+                else if((heroInfo.hands_availability[0]==NULL && heroInfo.hands_availability[1]==NULL) && weap->get_hands()==2) {
+                    heroInfo.hands_availability[0] = weap;
+                    heroInfo.hands_availability[1] = weap;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
 
 
 	bool inventoryAvaiableSpace(void) const {

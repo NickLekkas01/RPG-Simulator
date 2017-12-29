@@ -16,7 +16,15 @@ public:
 
 	Weapon(const class Weapon& w) : Item(w), damage(w.damage),
 		hands(w.hands) { }
-	
+
+    uint32_t get_hands() const {
+        return hands;
+    }
+
+    uint32_t get_damage() const {
+        return damage;
+    }
+
 	void print(void) const {
 		Item::print();
 		std::cout << "Damage: " << damage << std::endl;

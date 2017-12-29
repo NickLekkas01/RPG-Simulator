@@ -172,7 +172,7 @@ int main(void) {
 				string name;
 				cout << "Type the name of the item you want to sell: ";
 				cin >> name;
-				class Item *it = h.seachItem(name);
+				class Item *it = h.searchItem(name);
 				if(it == NULL) {
 					cout << "This item is not on the inventory" << endl;
 				} else {
