@@ -12,7 +12,7 @@ struct livingInfo_t {
 };
 
 class Living {
-private:
+protected:
 	struct livingInfo_t livingInfo;
 public:
 	Living(const struct livingInfo_t& info) : livingInfo(info) { }

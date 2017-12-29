@@ -121,7 +121,20 @@ int main(void) {
 		} else if(choice == playerChoices::checkInventory) {
 				h.checkInventory();
 		} else if(choice == playerChoices::usePotion) {
+			// TODO(stefanos): When a potion is used, it vanishes.
+			// i.e. we waste memory by keeping it in the store memory.
 			h.printPotions();
+			cout << "Type the name of the potion: " << endl;
+			string name;
+			cin >> name;
+			if(!h.usePotion(name)) {
+				cout << "The potion either does not exist, or you are not in the required level to use it" << endl;
+			} else {
+				// TODO(stefanos): Maybe have an overloaded removeItem
+				// that takes pointer to save the procedure
+				// of searching again.
+				store.removeItem(name);
+			}
 		} else if(map.heroesOnStore()) {
 			if(choice == playerChoices::checkStoreItems) {
 				store.print();

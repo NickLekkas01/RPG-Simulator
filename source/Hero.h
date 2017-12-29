@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "Living.h"
 #include "Item.h"
+#include "Potion.h"
 
 struct warriorInfo_t {
 	uint32_t strength;
@@ -118,7 +119,6 @@ public:
 				InventoryInfo.Inventory[i]->print();
 		}
 		std::cout << std::endl;
-
 	}
 
 	class Item* searchItem(std::string name) {
@@ -128,6 +128,37 @@ public:
 			}
 
 		return NULL;
+	}
+
+	bool usePotion(std::string name) {
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Potion && InventoryInfo.Inventory[i]->get_name() == name) {
+				class Potion *pot = (class Potion*) InventoryInfo.Inventory[i];
+				uint32_t min_lvl = pot->get_minimumLevel();
+				if(livingInfo.level < min_lvl)
+					return false;
+				potionType type = pot->get_Potion_type();
+				uint32_t restoration_amount = pot->get_Restoration_amount();
+				if(type == potionTypes::health) {
+					livingInfo.healthPower += restoration_amount;
+				} else if(type == potionTypes::strength) {
+					heroInfo.strength += restoration_amount;
+				} else if(type == potionTypes::dexterity) {
+					heroInfo.dexterity += restoration_amount;
+				} else if(type == potionTypes::agility) {
+					heroInfo.agility += restoration_amount;
+				}
+
+				--InventoryInfo.currently_holding;
+				for(int j = i + 1; j<InventoryInfo.currently_holding; j++){
+					InventoryInfo.Inventory[j-1]=InventoryInfo.Inventory[j];
+				}
+				return true;
+			}
+		}
+
+		return false;
+
 	}
 
 

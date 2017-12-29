@@ -19,10 +19,10 @@ public:
 		uint32_t restoreAmount, potionType potType, bool avail) :
 		Item(name, pr, min_level, type), restorationAmount(restoreAmount),
 		type(potType), availability(avail) { }
-	uint32_t get_Restoration_ammount() const {
+	uint32_t get_Restoration_amount() const {
 		return restorationAmount;
 	}
-	uint32_t get_Potion_type() const {
+	potionType get_Potion_type() const {
 		return type;
 	}
 	bool get_availability() const{
