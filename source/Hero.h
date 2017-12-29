@@ -170,12 +170,19 @@ public:
 	}
 	int buy(Item *Item_bought){
 		if(InventoryInfo.currently_holding<InventoryInfo.size){
-			InventoryInfo.Inventory[InventoryInfo.currently_holding]=Item_bought;
-			InventoryInfo.currently_holding++;
-			heroInfo.money-=Item_bought->get_price();
-			return 1;
+            if(heroInfo.money>Item_bought->get_price()) {
+                InventoryInfo.Inventory[InventoryInfo.currently_holding] = Item_bought;
+                InventoryInfo.currently_holding++;
+                heroInfo.money -= Item_bought->get_price();
+                return 1;
+            }
+            else{
+                std::cout<<"Not enough money"<<std::endl;
+                return 0;
+            }
 		}
 		else{
+            std::cout<<"Full Inventory"<<std::endl;
 			return 0;
 		}
 	}
@@ -183,7 +190,8 @@ public:
 	Item *sell(std::string name){
 
 		Item *tmp;
-		for(int i = 0; i < InventoryInfo.currently_holding; i++ ){
+        int i;
+		for( i = 0; i < InventoryInfo.currently_holding; i++ ){
 			if(InventoryInfo.Inventory[i]->get_name()==name){
 				tmp=InventoryInfo.Inventory[i];
 				for(int j = i + 1; j<InventoryInfo.currently_holding; j++){
@@ -192,6 +200,10 @@ public:
 				break;
 			}
 		}
+        if(i==InventoryInfo.currently_holding){
+            std::cout<<"Item not found"<<std::endl;
+            return 0;
+        }
 		InventoryInfo.currently_holding--;
 		heroInfo.money+=tmp->get_price()/2;
 		return tmp;
