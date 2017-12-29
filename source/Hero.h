@@ -149,10 +149,10 @@ public:
 					heroInfo.agility += restoration_amount;
 				}
 
-				--InventoryInfo.currently_holding;
 				for(int j = i + 1; j<InventoryInfo.currently_holding; j++){
 					InventoryInfo.Inventory[j-1]=InventoryInfo.Inventory[j];
 				}
+				--InventoryInfo.currently_holding;
 				return true;
 			}
 		}
