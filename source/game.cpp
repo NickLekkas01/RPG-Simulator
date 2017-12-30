@@ -27,7 +27,7 @@ int main(void) {
 	cout << defaultData.initialHealthPower << endl;
 	cout << defaultData.exoskeletonInfo.armor << endl;
 	
-	class Map map(3);
+	class Map map;
 	if(!map.readMap())
 		return INPUT_FILE_ERROR;
 	cout << "Welcome to the RPG game" << endl;
@@ -61,20 +61,40 @@ int main(void) {
 		}
 	}
 
+	if(!Running) {
+		return 0;
+	}
+
 	// Initialize the store
 	// NOTE(stefanos): Shared memory for the store. Items getting to the inventory
 	// have the memory from the store. Memory gets destroyed when we don't need
 	// the store anymore. Provided that any item that any hero has is taken
 	// from the store, this is the end of the game.
 
+	// TODO(stefanos): Fix when the heroes start on the store.
+
 	class Store store(10);
 	// TODO(stefanos): Path relative to the compiler
 	// Fix that on the release
 	store.readItems("./build/items.dat");
 
-	struct livingInfo_t livingInfo {"Stefanos", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
-	// NOTE(stefanos): Test code for one hero
-	class Hero h(livingInfo, defaultData.heroInfo, heroTypes::Warrior);
+	uint32_t num_heroes;
+	do {
+		cout << "How many heroes do you want (1-3)? " << endl;
+		cin >> num_heroes;
+	} while(num_heroes < 1 || num_heroes > 3);
+	map.setNumHeroes(num_heroes);
+	for(int i = 0; i < num_heroes; ++i) {
+		struct livingInfo_t livingInfo = {"", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
+		cout << "Type the name of the hero " << i + 1 << ": ";
+		cin >> livingInfo.name;
+
+		string heroClass;
+		cout << "Type the class you want this hero to have: ";
+		cin >> heroClass;
+		map.createHero(livingInfo, defaultData.heroInfo, heroClass); 
+	}
+
 	while(Running) {
 		int32_t choice;
 		cout << "Available choices" << endl;
@@ -93,6 +113,11 @@ int main(void) {
 		}
 		cout << "What do you want to do? ";
 		cin >> choice;
+
+		if(choice > 10) {
+			cout << "This operation can't be handled" << endl;
+			continue;
+		}
 		if(choice == playerChoices::quit) {
 			Running = false;
 		} else if(choice == playerChoices::printMap) {
@@ -110,112 +135,119 @@ int main(void) {
 			if(!map.moveHeroes(choice)) {
 				cout << "You can't go there!" << endl;
 			}
-		} else if(choice == playerChoices::checkInventory) {
-			h.checkInventory();
-		} else if(choice == playerChoices::heroInfo) {
-			h.printInfo();
-		} else if(choice == playerChoices::usePotion) {
-			h.printPotions();
-			cout << "Type the name of the potion: " << endl;
-			string name;
-			cin >> name;
-			class Item *it = h.usePotion(name);
-			if(h.getLevel() < it->get_minimumLevel()) {
-				cout << "You are not on the required level to use this potion" << endl;
-				continue;
-			}
-			if(it == NULL) {
-				cout << "The potion either does not exist, or you are not in the required level to use it" << endl;
-			} else {
-				store.deleteItem(it);
-			}
-		} else if(choice == playerChoices::equip) {
-			if(h.isInventoryEmpty()) {
-				cout << "There is nothing to equip" << endl;
-				continue;
-			}
-			h.printWeapons();
-			cout << "Type the name of the weapon you want to equip: " << endl;
-			string name;
-			cin >> name;
-			class Item *it = h.searchItem(name);
-			if(it == NULL) {
-				cout << "The weapon does not exist" << endl;
-				continue;
-			} else if(it->getItemType() != itemTypes::Weapon) {
-				cout << "You can only equip weapons" << endl;
-				continue;
-			} else if(!h.isOnRequiredLevel(it)) {
-                cout << "You are not on the required level to equip the weapon" << endl;
-                continue;
-            } else if(h.isInUse(it)) {
-                cout << "The item is already equipped" << endl;
-                continue;
-            }
-			if(!h.equipWeapon(it)) {
-                cout << "Could not equip the weapon because there are other weapons in use." << endl;
-            }
-		} else if(choice == playerChoices::unequip){
-            h.checkInventory();
-            cout << "Type the name of the weapon you want to unequip: " << endl;
-            string name;
-            cin >> name;
-            class Item *it = h.searchItem(name);
-            if(it == NULL) {
-                cout << "The weapon does not exist" << endl;
-                continue;
-            } else if(!h.isInUse(it)) {
-                cout << "The weapon is not equipped" << endl;
-                continue;
-            }
-            h.unequipWeapon(it);
-        } else if(map.heroesOnStore()) {
-			if(choice == playerChoices::checkStoreItems) {
-				store.print();
-
-			// NOTE(stefanos): Assume that everything we do is for one hero,
-			// TODO: Fix that!
-			} else if(choice == playerChoices::buy) {
-				if(!h.inventoryAvaiableSpace()) {
-					cout << "Not enough space on the inventory" << endl;
-					continue;
-				}
-				string name;
-				store.print();
-				cout << "Type the name of the item you want to buy: ";
-				cin >> name;
-				class Item *it = store.searchItem(name);
-				if(it == NULL) {
-					cout << "That item is not on the store" << endl;
-					continue;
-				}
-				if(!h.hasEnoughMoney(it)) {
-					cout << "You don't have enough money to buy this item" << endl;
-					continue;
-				}
-				h.buy(store.removeItem(name));
-			} else if(choice == playerChoices::sell) {
-                // NOTE(stefanos): The procedure is the same with the buy,
-                // just for the store now. Notice, that all the items that
-                // players have, come from the store. So, it's impossible
-                // for the store to not have space, so we don't check that.
-
-                // Show the items that they already have
-                h.checkInventory();
-                string name;
-                cout << "Type the name of the item you want to sell: ";
-                cin >> name;
-                class Item *it = h.searchItem(name);
-                if (it == NULL) {
-                    cout << "This item is not on the inventory" << endl;
-                } else if(h.isInUse(it)) {
-                    cout << "This item is in use. Unequip it first if you want to sell it." << endl;
-                } else {
-					store.addItem(h.sell(name));
-				}
-			}
 		} else {
-			cout << "This operation can't be handled!" << endl;
+			string name;
+			cout << "Type the name of the hero you want to do this operation for: " << endl;
+			cin >> name;
+			class Hero *h = map.searchHero(name);
+			if(h == NULL) {
+				cout << "Sorry, that hero does not exist" << endl;
+				continue;
+			}
+			if(choice == playerChoices::checkInventory) {
+				h->checkInventory();
+			} else if(choice == playerChoices::heroInfo) {
+				h->printInfo();
+			} else if(choice == playerChoices::usePotion) {
+				h->printPotions();
+				cout << "Type the name of the potion: " << endl;
+				string name;
+				cin >> name;
+				class Item *it = h->usePotion(name);
+				if(it == NULL) {
+					cout << "The potion either does not exist, or you are not in the required level to use it" << endl;
+					continue;
+				}
+				if(h->getLevel() < it->get_minimumLevel()) {
+					cout << "You are not on the required level to use this potion" << endl;
+					continue;
+				} else {
+					store.deleteItem(it);
+				}
+			} else if(choice == playerChoices::equip) {
+				if(h->isInventoryEmpty()) {
+					cout << "There is nothing to equip" << endl;
+					continue;
+				}
+				h->printWeapons();
+				cout << "Type the name of the weapon you want to equip: " << endl;
+				string name;
+				cin >> name;
+				class Item *it = h->searchItem(name);
+				if(it == NULL) {
+					cout << "The weapon does not exist" << endl;
+					continue;
+				} else if(it->getItemType() != itemTypes::Weapon) {
+					cout << "You can only equip weapons" << endl;
+					continue;
+				} else if(!h->isOnRequiredLevel(it)) {
+        	        cout << "You are not on the required level to equip the weapon" << endl;
+        	        continue;
+        	    } else if(h->isInUse(it)) {
+        	        cout << "The item is already equipped" << endl;
+        	        continue;
+        	    }
+				if(!h->equipWeapon(it)) {
+        	        cout << "Could not equip the weapon because there are other weapons in use." << endl;
+        	    }
+			} else if(choice == playerChoices::unequip){
+        	    h->checkInventory();
+        	    cout << "Type the name of the weapon you want to unequip: " << endl;
+        	    string name;
+        	    cin >> name;
+        	    class Item *it = h->searchItem(name);
+        	    if(it == NULL) {
+        	        cout << "The weapon does not exist" << endl;
+        	        continue;
+        	    } else if(!h->isInUse(it)) {
+        	        cout << "The weapon is not equipped" << endl;
+        	        continue;
+        	    }
+        	    h->unequipWeapon(it);
+        	} else if(map.heroesOnStore()) {
+				if(choice == playerChoices::checkStoreItems) {
+					store.print();
+
+				} else if(choice == playerChoices::buy) {
+					if(!h->inventoryAvaiableSpace()) {
+						cout << "Not enough space on the inventory" << endl;
+						continue;
+					}
+					string name;
+					store.print();
+					cout << "Type the name of the item you want to buy: ";
+					cin >> name;
+					class Item *it = store.searchItem(name);
+					if(it == NULL) {
+						cout << "That item is not on the store" << endl;
+						continue;
+					}
+					if(!h->hasEnoughMoney(it)) {
+						cout << "You don't have enough money to buy this item" << endl;
+						continue;
+					}
+					h->buy(store.removeItem(name));
+				} else if(choice == playerChoices::sell) {
+        	        // NOTE(stefanos): The procedure is the same with the buy,
+        	        // just for the store now. Notice, that all the items that
+        	        // players have, come from the store. So, it's impossible
+        	        // for the store to not have space, so we don't check that.
+
+        	        // Show the items that they already have
+        	        h->checkInventory();
+        	        string name;
+        	        cout << "Type the name of the item you want to sell: ";
+        	        cin >> name;
+        	        class Item *it = h->searchItem(name);
+        	        if (it == NULL) {
+        	            cout << "This item is not on the inventory" << endl;
+        	        } else if(h->isInUse(it)) {
+        	            cout << "This item is in use. Unequip it first if you want to sell it." << endl;
+        	        } else {
+						store.addItem(h->sell(name));
+					}
+				}
+			}
 		}
 	}
 	

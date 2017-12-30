@@ -86,7 +86,7 @@ int defaultData_t::readDefaultData() {
 
 
 /// MAP IMPLEMENTATION ///
-Map::Map() : Height(0), Width(0), Grid(NULL) {
+Map::Map() : Height(0), Width(0), Grid(NULL), heroes(NULL) {
 	heroesPosition[0] = -1;
 	heroesPosition[1] = -1;
 }
@@ -102,6 +102,12 @@ Map::~Map() {
 	}
 	delete[] grid;
 	Grid = NULL;
+	
+	for(uint32_t i = 0; i < numHeroes; ++i)
+		if(heroes[i] != NULL)
+			delete heroes[i];
+	delete heroes;
+	heroes = NULL;
 }
 
 int Map::readMap(void) {

@@ -49,12 +49,62 @@ private:
 	int isValidPosition(int32_t*) const;
 public:
 	Map();
-	Map(uint32_t numberOfHeroes) : numHeroes(numberOfHeroes) {
-	}
 	~Map();
 	int readMap(void);
 	void print(void) const;
+	void printHeroInfo(void) const {
+		for(uint32_t i = 0; i < numHeroes; ++i) {
+			if(heroes[i] != NULL)
+				heroes[i]->printInfo();
+			std::cout << std::endl;
+		}
+	}
 	int initializeHeroesPosition(int32_t*);
+
+	class Hero *searchHero(std::string name) {
+		if(heroes != NULL) {
+			for(uint32_t i = 0; i < numHeroes; ++i) {
+				if(heroes[i] != NULL)
+					if(heroes[i]->getName() == name) {
+						return heroes[i];
+					}
+			}
+		}
+
+		return NULL;
+	}
+	void setNumHeroes(uint32_t num_heroes) {
+		numHeroes = num_heroes;
+		heroes = new Hero*[num_heroes];
+	}
+	// TODO(stefanos): DEBUG CODE - REMOVE THAT
+	/*
+	void printHeroes(void) const {
+		std::cout << "Printing heroes" << std::endl;
+		if(heroes != NULL) {    // Assume that we have space
+			for(uint32_t i = 0; i < numHeroes; ++i)
+				if(heroes[i] != NULL) {
+					heroes[i]->printInfo();
+				}
+		}
+
+	}
+	*/
+	void createHero(struct livingInfo_t livingInfo, 
+		struct heroInfo_t heroInfo, std::string heroClass) {
+
+		// TODO(stefanos): Add more error checking
+		if(heroes != NULL) {    // Assume that we have space
+			for(uint32_t i = 0; i < numHeroes; ++i)
+				if(heroes[i] == NULL) {
+					size_t j;
+					for(j = 0; j < 3; ++j)
+						if(heroTypes::typeNames[j] == heroClass)
+							break;
+					heroes[i] = new Hero(livingInfo, heroInfo, j);
+				}
+		}
+	}
 	int heroesInitialized(void) const { return (heroesPosition[0] != -1); }
 	int moveHeroes(int32_t);
 

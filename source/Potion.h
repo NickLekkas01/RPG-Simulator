@@ -17,7 +17,7 @@ public:
 	Potion(std::string name, uint32_t pr, uint32_t min_level, itemType type,
 		uint32_t restoreAmount, potionType potType, bool avail) :
 		Item(name, pr, min_level, type), restorationAmount(restoreAmount),
-		type(potType), availability(avail) { }
+		type(potType) { }
 	uint32_t get_Restoration_amount() const {
 		return restorationAmount;
 	}
@@ -28,7 +28,6 @@ public:
 	void print(void) const {
 		Item::print();
 		std::cout << "Restoration Amount: " << restorationAmount << std::endl;
-		std::cout << "Availability: " << availability << std::endl;
 		std::cout << potionTypes::potionNames[type] << std::endl;
 	}
 

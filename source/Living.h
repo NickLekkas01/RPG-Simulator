@@ -5,7 +5,7 @@
 
 struct livingInfo_t {
 	std::string name;
-	uint8_t level;
+	uint32_t level;
 	uint32_t healthPower;
 	uint32_t initialHealthPower;
 	bool awake;
@@ -20,8 +20,12 @@ public:
 		return livingInfo;
 	}
 
-	void getLevel(void) const {
+	uint32_t getLevel(void) const {
 		return livingInfo.level;
+	}
+
+	std::string getName(void) const {
+		return livingInfo.name;
 	}
 
 	void add_level(uint8_t lev){
