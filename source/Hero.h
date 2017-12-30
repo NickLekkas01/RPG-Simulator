@@ -70,6 +70,7 @@ public:
     }
     ~Hero(){
         delete []InventoryInfo.Inventory;
+        delete []InventoryInfo.ItemsUsed;
     }
 	void printInfo(void) const {
 		std::cout << "Type: " << heroTypes::typeNames[type] << std::endl;
@@ -146,12 +147,28 @@ public:
 		return (InventoryInfo.currently_holding == 0);
 	}
 
+	void printWeapons(void) const {
+		std::cout << std::endl;
+		std::cout << "Weapons on inventory" << std::endl;
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Weapon) {
+				InventoryInfo.Inventory[i]->print();
+				std::cout << "In use? " << InventoryInfo.ItemsUsed[i] << std::endl;
+			}
+		}
+		std::cout << std::endl;
+
+	}
+
 	void checkInventory(void) const {
 		std::cout << std::endl;
 		std::cout << "Items on inventory" << std::endl;
 		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
 			InventoryInfo.Inventory[i]->print();
-			std::cout << "In use? " << InventoryInfo.ItemsUsed[i] << std::endl;
+			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Weapon) {
+				std::cout << "In use? " << InventoryInfo.ItemsUsed[i] << std::endl;
+			}
+
 		}
 		std::cout << std::endl;
 	}
@@ -184,7 +201,8 @@ public:
 				potionType type = pot->get_Potion_type();
 				uint32_t restoration_amount = pot->get_Restoration_amount();
 				if(type == potionTypes::health) {
-					livingInfo.healthPower += restoration_amount;
+					if((livingInfo.healthPower += restoration_amount) > livingInfo.initialHealthPower)
+						livingInfo.healthPower = livingInfo.initialHealthPower;
 				} else if(type == potionTypes::strength) {
 					heroInfo.strength += restoration_amount;
 				} else if(type == potionTypes::dexterity) {
@@ -220,14 +238,7 @@ public:
 			// TODO(stefanos): Add a "weapon is currently in use" kind of field to the inventory and mark it here.
             if (InventoryInfo.Inventory[i] == it) {
 				InventoryInfo.ItemsUsed[i] = true;
-				uint32_t hands;
-				if (it->getItemType() == itemTypes::Weapon) {
-					class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
-					hands = weap->get_hands();
-				} else {
-					class Spell *spell = (class Spell *) InventoryInfo.Inventory[i];
-					hands = spell->get_hands();
-				}
+				class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
                 uint32_t min_lvl = weap->get_minimumLevel();
                 if (livingInfo.level < min_lvl)
                     return false;
@@ -258,14 +269,8 @@ public:
         for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
             if (InventoryInfo.Inventory[i] == it) {
 				InventoryInfo.ItemsUsed[i] = false;
-				uint32_t hands;
-				if (it->getItemType() == itemTypes::Weapon) {
-					class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
-					hands = weap->get_hands();
-				} else {
-					class Spell *spell = (class Spell *) InventoryInfo.Inventory[i];
-					hands = spell->get_hands();
-				}
+				class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
+				uint32_t hands = weap->get_hands();
                 if((heroInfo.hands_availability[0]==it || heroInfo.hands_availability[1]==it) && hands==1){
                     if(heroInfo.hands_availability[0]==it)
                         heroInfo.hands_availability[0]=NULL;

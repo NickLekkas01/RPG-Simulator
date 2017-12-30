@@ -13,7 +13,6 @@ class Potion : public Item {
 private:
 	uint32_t restorationAmount;
     potionType type;
-    bool availability;
 public:
 	Potion(std::string name, uint32_t pr, uint32_t min_level, itemType type,
 		uint32_t restoreAmount, potionType potType, bool avail) :
@@ -24,12 +23,6 @@ public:
 	}
 	potionType get_Potion_type() const {
 		return type;
-	}
-	bool get_availability() const{
-		return availability;
-	}
-	void set_availability(bool b){
-		availability=b;
 	}
 
 	void print(void) const {

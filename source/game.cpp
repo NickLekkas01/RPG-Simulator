@@ -115,12 +115,15 @@ int main(void) {
 		} else if(choice == playerChoices::heroInfo) {
 			h.printInfo();
 		} else if(choice == playerChoices::usePotion) {
-			// TODO(stefanos): Take in consideration the initial values of properties of hero.
 			h.printPotions();
 			cout << "Type the name of the potion: " << endl;
 			string name;
 			cin >> name;
 			class Item *it = h.usePotion(name);
+			if(h.getLevel() < it->get_minimumLevel()) {
+				cout << "You are not on the required level to use this potion" << endl;
+				continue;
+			}
 			if(it == NULL) {
 				cout << "The potion either does not exist, or you are not in the required level to use it" << endl;
 			} else {
@@ -128,22 +131,22 @@ int main(void) {
 			}
 		} else if(choice == playerChoices::equip) {
 			if(h.isInventoryEmpty()) {
-				// TODO(stefanos): Check that the inventory
-				// has things that can be equipped (i.e. it may have
-				// only potions)
 				cout << "There is nothing to equip" << endl;
 				continue;
 			}
-			h.checkInventory();
-			cout << "Type the name of the item you want to equip: " << endl;
+			h.printWeapons();
+			cout << "Type the name of the weapon you want to equip: " << endl;
 			string name;
 			cin >> name;
 			class Item *it = h.searchItem(name);
 			if(it == NULL) {
-				cout << "The item does not exist" << endl;
+				cout << "The weapon does not exist" << endl;
+				continue;
+			} else if(it->getItemType() != itemTypes::Weapon) {
+				cout << "You can only equip weapons" << endl;
 				continue;
 			} else if(!h.isOnRequiredLevel(it)) {
-                cout << "You are not on the required level to equip the item" << endl;
+                cout << "You are not on the required level to equip the weapon" << endl;
                 continue;
             } else if(h.isInUse(it)) {
                 cout << "The item is already equipped" << endl;
@@ -154,15 +157,15 @@ int main(void) {
             }
 		} else if(choice == playerChoices::unequip){
             h.checkInventory();
-            cout << "Type the name of the item you want to unequip: " << endl;
+            cout << "Type the name of the weapon you want to unequip: " << endl;
             string name;
             cin >> name;
             class Item *it = h.searchItem(name);
             if(it == NULL) {
-                cout << "The item does not exist" << endl;
+                cout << "The weapon does not exist" << endl;
                 continue;
             } else if(!h.isInUse(it)) {
-                cout << "The item is not equipped" << endl;
+                cout << "The weapon is not equipped" << endl;
                 continue;
             }
             h.unequipWeapon(it);

@@ -13,16 +13,13 @@ private:
 	// which we inherit
 	// uint8_t minimumLevel;
 	enum spellType type;
-	const uint32_t hands;
 public:
 	Spell(std::string nam, uint32_t pr, uint32_t min_level, itemType type,
 		uint32_t dmg[2], uint32_t m, enum spellType t) :
-		Item(nam, pr, min_level, type), mana(m), type(t), hands(1) {
+		Item(nam, pr, min_level, type), mana(m), type(t) {
 		damage[0] = dmg[0];
 		damage[1] = dmg[1];
 	}
-
-	uint32_t get_hands(void) const { return hands; }
 
 	void print(void) const {
 		Item::print();
