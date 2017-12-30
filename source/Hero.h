@@ -149,8 +149,10 @@ public:
 	void checkInventory(void) const {
 		std::cout << std::endl;
 		std::cout << "Items on inventory" << std::endl;
-		for(int i = 0; i < InventoryInfo.currently_holding; ++i)
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
 			InventoryInfo.Inventory[i]->print();
+			std::cout << "In use? " << InventoryInfo.ItemsUsed[i] << std::endl;
+		}
 		std::cout << std::endl;
 	}
 
@@ -203,11 +205,29 @@ public:
 		return NULL;
 	}
 
+	bool isInUse(Item *it) {
+		return (heroInfo.hands_availability[0] == it || heroInfo.hands_availability[1] == it);
+	}
+
+	bool isOnRequiredLevel(Item *it) {
+		return (livingInfo.level >= it->get_minimumLevel());
+	}
+
     bool equipWeapon(class Item *it){
+		if(isInUse(it))
+			return false;
         for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
 			// TODO(stefanos): Add a "weapon is currently in use" kind of field to the inventory and mark it here.
             if (InventoryInfo.Inventory[i] == it) {
-                class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
+				InventoryInfo.ItemsUsed[i] = true;
+				uint32_t hands;
+				if (it->getItemType() == itemTypes::Weapon) {
+					class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
+					hands = weap->get_hands();
+				} else {
+					class Spell *spell = (class Spell *) InventoryInfo.Inventory[i];
+					hands = spell->get_hands();
+				}
                 uint32_t min_lvl = weap->get_minimumLevel();
                 if (livingInfo.level < min_lvl)
                     return false;
@@ -233,25 +253,28 @@ public:
     }
 
     bool unequipWeapon(class Item *it){
+		if(!isInUse(it))
+			return false;
         for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
-            // TODO(stefanos): Add a "weapon is currently in use" kind of field to the inventory and mark it here.
             if (InventoryInfo.Inventory[i] == it) {
-                class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
-                if(heroInfo.hands_availability[0]==NULL && heroInfo.hands_availability[1]==NULL) {
-                    return false;
-                }
-                else if((heroInfo.hands_availability[0]==it || heroInfo.hands_availability[1]==it) && weap->get_hands()==1){
+				InventoryInfo.ItemsUsed[i] = false;
+				uint32_t hands;
+				if (it->getItemType() == itemTypes::Weapon) {
+					class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
+					hands = weap->get_hands();
+				} else {
+					class Spell *spell = (class Spell *) InventoryInfo.Inventory[i];
+					hands = spell->get_hands();
+				}
+                if((heroInfo.hands_availability[0]==it || heroInfo.hands_availability[1]==it) && hands==1){
                     if(heroInfo.hands_availability[0]==it)
                         heroInfo.hands_availability[0]=NULL;
                     else
                         heroInfo.hands_availability[1]=NULL;
                 }
-                else if((heroInfo.hands_availability[0]==it && heroInfo.hands_availability[1]==it) && weap->get_hands()==2) {
+                else if((heroInfo.hands_availability[0]==it && heroInfo.hands_availability[1]==it) && hands==2) {
                     heroInfo.hands_availability[0] = NULL;
                     heroInfo.hands_availability[1] = NULL;
-                }
-                else{
-                    return false;
                 }
             }
         }

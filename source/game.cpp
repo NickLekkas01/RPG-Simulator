@@ -15,7 +15,7 @@ using namespace std;
 
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
-	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equip, checkStoreItems, buy, sell};
+	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equip, unequip, checkStoreItems, buy, sell};
 };
 
 int main(void) {
@@ -85,10 +85,11 @@ int main(void) {
 		cout << "Display Hero Info: 4" << endl;
 		cout << "Use Potion: 5" << endl;
 		cout << "Equip Weapon: 6" << endl;
+		cout << "Unequip Weapon: 7" << endl;
 		if(map.heroesOnStore()) {
-			cout << "Check items avaialble on the store: 7" << endl;
-			cout << "Buy something: 8" << endl;
-			cout << "Sell something: 9" << endl;
+			cout << "Check items avaialble on the store: 8" << endl;
+			cout << "Buy something: 9" << endl;
+			cout << "Sell something: 10" << endl;
 		}
 		cout << "What do you want to do? ";
 		cin >> choice;
@@ -114,6 +115,7 @@ int main(void) {
 		} else if(choice == playerChoices::heroInfo) {
 			h.printInfo();
 		} else if(choice == playerChoices::usePotion) {
+			// TODO(stefanos): Take in consideration the initial values of properties of hero.
 			h.printPotions();
 			cout << "Type the name of the potion: " << endl;
 			string name;
@@ -140,10 +142,31 @@ int main(void) {
 			if(it == NULL) {
 				cout << "The item does not exist" << endl;
 				continue;
-			}
-			// TODO(stefanos): Maybe pass the pointer??
-			h.equipWeapon(it);
-		} else if(map.heroesOnStore()) {
+			} else if(!h.isOnRequiredLevel(it)) {
+                cout << "You are not on the required level to equip the item" << endl;
+                continue;
+            } else if(h.isInUse(it)) {
+                cout << "The item is already equipped" << endl;
+                continue;
+            }
+			if(!h.equipWeapon(it)) {
+                cout << "Could not equip the weapon because there are other weapons in use." << endl;
+            }
+		} else if(choice == playerChoices::unequip){
+            h.checkInventory();
+            cout << "Type the name of the item you want to unequip: " << endl;
+            string name;
+            cin >> name;
+            class Item *it = h.searchItem(name);
+            if(it == NULL) {
+                cout << "The item does not exist" << endl;
+                continue;
+            } else if(!h.isInUse(it)) {
+                cout << "The item is not equipped" << endl;
+                continue;
+            }
+            h.unequipWeapon(it);
+        } else if(map.heroesOnStore()) {
 			if(choice == playerChoices::checkStoreItems) {
 				store.print();
 
@@ -169,20 +192,22 @@ int main(void) {
 				}
 				h.buy(store.removeItem(name));
 			} else if(choice == playerChoices::sell) {
-				// NOTE(stefanos): The procedure is the same with the buy,
-				// just for the store now. Notice, that all the items that
-				// players have, come from the store. So, it's impossible
-				// for the store to not have space, so we don't check that.
+                // NOTE(stefanos): The procedure is the same with the buy,
+                // just for the store now. Notice, that all the items that
+                // players have, come from the store. So, it's impossible
+                // for the store to not have space, so we don't check that.
 
-				// Show the items that they already have
-				h.checkInventory();
-				string name;
-				cout << "Type the name of the item you want to sell: ";
-				cin >> name;
-				class Item *it = h.searchItem(name);
-				if(it == NULL) {
-					cout << "This item is not on the inventory" << endl;
-				} else {
+                // Show the items that they already have
+                h.checkInventory();
+                string name;
+                cout << "Type the name of the item you want to sell: ";
+                cin >> name;
+                class Item *it = h.searchItem(name);
+                if (it == NULL) {
+                    cout << "This item is not on the inventory" << endl;
+                } else if(h.isInUse(it)) {
+                    cout << "This item is in use. Unequip it first if you want to sell it." << endl;
+                } else {
 					store.addItem(h.sell(name));
 				}
 			}
