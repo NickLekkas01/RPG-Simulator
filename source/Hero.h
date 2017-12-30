@@ -45,6 +45,7 @@ struct heroInfo_t {
 
 struct Inventory_t{
     Item **Inventory;
+    bool *ItemsUsed;
     uint32_t currently_holding;
     uint32_t size;
 };
@@ -60,6 +61,10 @@ public:
          InventoryInfo.size=10;
          InventoryInfo.currently_holding=0;
          InventoryInfo.Inventory=new Item*[10];
+         InventoryInfo.ItemsUsed=new bool[InventoryInfo.size];
+         for(int i = 0 ; i < InventoryInfo.size ; i++){
+             InventoryInfo.ItemsUsed[i]=false;
+         }
 		 heroInfo.hands_availability[0] = NULL;
 		 heroInfo.hands_availability[1] = NULL;
     }
@@ -224,6 +229,33 @@ public:
                 }
             }
         }
+        return true;
+    }
+
+    bool unequipWeapon(class Item *it){
+        for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+            // TODO(stefanos): Add a "weapon is currently in use" kind of field to the inventory and mark it here.
+            if (InventoryInfo.Inventory[i] == it) {
+                class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
+                if(heroInfo.hands_availability[0]==NULL && heroInfo.hands_availability[1]==NULL) {
+                    return false;
+                }
+                else if((heroInfo.hands_availability[0]==it || heroInfo.hands_availability[1]==it) && weap->get_hands()==1){
+                    if(heroInfo.hands_availability[0]==it)
+                        heroInfo.hands_availability[0]=NULL;
+                    else
+                        heroInfo.hands_availability[1]=NULL;
+                }
+                else if((heroInfo.hands_availability[0]==it && heroInfo.hands_availability[1]==it) && weap->get_hands()==2) {
+                    heroInfo.hands_availability[0] = NULL;
+                    heroInfo.hands_availability[1] = NULL;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
