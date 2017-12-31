@@ -187,11 +187,8 @@ public:
 
 		// NOTE(stefanos): Put it in the initial
 		// position (the position it was when you got it)
-		// TODO(stefanos): Think about empty (NULL) positions.
 		for(int i = 0; i < size; ++i)
-			if(items[i].item != NULL && items[i].item->get_name() == it->get_name()
-				&& items[i].taken == 1) {
-				items[i].item = it;
+			if(items[i].item != NULL && items[i].item == it && items[i].taken == 1) {
 				items[i].taken = 0;
 				++currently_holding;
 			}

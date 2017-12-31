@@ -180,7 +180,8 @@ int Map::initializeHeroesPosition(int32_t position[2]) {
 	if(isValidPosition(position)) {
 		heroesPosition[0] = position[0];
 		heroesPosition[1] = position[1];
-		Grid[position[0]][position[1]] = 'H';
+		if(Grid[position[0]][position[1]] != 'S')
+			Grid[position[0]][position[1]] = 'H';
 		return 1;
 	}
 	return 0;
