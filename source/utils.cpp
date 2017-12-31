@@ -106,7 +106,7 @@ Map::~Map() {
 	for(uint32_t i = 0; i < numHeroes; ++i)
 		if(heroes[i] != NULL)
 			delete heroes[i];
-	delete heroes;
+	delete[] heroes;
 	heroes = NULL;
 }
 

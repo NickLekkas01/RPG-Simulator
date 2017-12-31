@@ -76,6 +76,8 @@ public:
 	void setNumHeroes(uint32_t num_heroes) {
 		numHeroes = num_heroes;
 		heroes = new Hero*[num_heroes];
+		for(uint32_t i = 0; i < num_heroes; ++i)
+			heroes[i] = NULL;
 	}
 	// TODO(stefanos): DEBUG CODE - REMOVE THAT
 	/*
@@ -90,8 +92,8 @@ public:
 
 	}
 	*/
-	void createHero(struct livingInfo_t livingInfo, 
-		struct heroInfo_t heroInfo, std::string heroClass) {
+	void createHero(const struct livingInfo_t& livingInfo, 
+		struct heroInfo_t& heroInfo, const std::string& heroClass) {
 
 		// TODO(stefanos): Add more error checking
 		if(heroes != NULL) {    // Assume that we have space
@@ -102,6 +104,7 @@ public:
 						if(heroTypes::typeNames[j] == heroClass)
 							break;
 					heroes[i] = new Hero(livingInfo, heroInfo, j);
+					return;
 				}
 		}
 	}

@@ -95,6 +95,9 @@ int main(void) {
 		map.createHero(livingInfo, defaultData.heroInfo, heroClass); 
 	}
 
+	/* TODO(stefanos): DEBUG CODE - REMOVE THAT
+	map.printHeroes();
+	*/
 	while(Running) {
 		int32_t choice;
 		cout << "Available choices" << endl;

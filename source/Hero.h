@@ -40,7 +40,6 @@ struct heroInfo_t {
 	uint32_t agility;
 	uint32_t money;
 	uint32_t exp;
-    Weapon *hands_availability[2];
 };
 
 struct Inventory_t{
@@ -54,6 +53,7 @@ class Hero : public Living {
 private:
 	struct heroInfo_t heroInfo;
 	heroType type;
+    Weapon *hands_availability[2];
     struct Inventory_t InventoryInfo;
 public:
 	Hero(const struct livingInfo_t& li, const struct heroInfo_t& hi, heroType t) :
@@ -65,8 +65,8 @@ public:
          for(int i = 0 ; i < InventoryInfo.size ; i++){
              InventoryInfo.ItemsUsed[i]=false;
          }
-		 heroInfo.hands_availability[0] = NULL;
-		 heroInfo.hands_availability[1] = NULL;
+		 hands_availability[0] = NULL;
+		 hands_availability[1] = NULL;
     }
     ~Hero(){
         delete []InventoryInfo.Inventory;
@@ -85,26 +85,26 @@ public:
 		std::cout << "Money: "      << heroInfo.money << std::endl;
 		std::cout << "Experience: " << heroInfo.exp << std::endl;
 		std::cout << "Equipment: " << std::endl;
-		if(heroInfo.hands_availability[0] == NULL &&
-			heroInfo.hands_availability[1] == NULL)
+		if(hands_availability[0] == NULL &&
+			hands_availability[1] == NULL)
 			std::cout << "The hero holds no weapon or spell" << std::endl;
-		else if(heroInfo.hands_availability[0] != heroInfo.hands_availability[1]) {
-			if(heroInfo.hands_availability[0] != NULL) {
+		else if(hands_availability[0] != hands_availability[1]) {
+			if(hands_availability[0] != NULL) {
 				std::cout << "Hand 1: " << std::endl;
 				std::cout << "\t";
- 				heroInfo.hands_availability[0]->print();
+ 				hands_availability[0]->print();
 				std::cout << std::endl;
 
 			}
-			if(heroInfo.hands_availability[1] != NULL) {
+			if(hands_availability[1] != NULL) {
 				std::cout << "Hand 2: " << std::endl;
 				std::cout << "\t";
- 				heroInfo.hands_availability[1]->print();
+ 				hands_availability[1]->print();
 				std::cout << std::endl;
 			}
 		} else {
 			std::cout << "The hero holds a two handed weapon: " << std::endl;
-			heroInfo.hands_availability[0]->print();
+			hands_availability[0]->print();
 		}
 	}
 
@@ -224,7 +224,7 @@ public:
 	}
 
 	bool isInUse(Item *it) {
-		return (heroInfo.hands_availability[0] == it || heroInfo.hands_availability[1] == it);
+		return (hands_availability[0] == it || hands_availability[1] == it);
 	}
 
 	bool isOnRequiredLevel(Item *it) {
@@ -242,18 +242,18 @@ public:
                 uint32_t min_lvl = weap->get_minimumLevel();
                 if (livingInfo.level < min_lvl)
                     return false;
-                if(heroInfo.hands_availability[0]!=NULL && heroInfo.hands_availability[1]!=NULL) {
+                if(hands_availability[0]!=NULL && hands_availability[1]!=NULL) {
                     return false;
                 }
-                else if((heroInfo.hands_availability[0]==NULL || heroInfo.hands_availability[1]==NULL) && weap->get_hands()==1){
-                    if(heroInfo.hands_availability[0]==NULL)
-                        heroInfo.hands_availability[0]=weap;
+                else if((hands_availability[0]==NULL || hands_availability[1]==NULL) && weap->get_hands()==1){
+                    if(hands_availability[0]==NULL)
+                        hands_availability[0]=weap;
                     else
-                        heroInfo.hands_availability[1]=weap;
+                        hands_availability[1]=weap;
                 }
-                else if((heroInfo.hands_availability[0]==NULL && heroInfo.hands_availability[1]==NULL) && weap->get_hands()==2) {
-                    heroInfo.hands_availability[0] = weap;
-                    heroInfo.hands_availability[1] = weap;
+                else if((hands_availability[0]==NULL && hands_availability[1]==NULL) && weap->get_hands()==2) {
+                    hands_availability[0] = weap;
+                    hands_availability[1] = weap;
                 }
                 else{
                     return false;
@@ -271,15 +271,15 @@ public:
 				InventoryInfo.ItemsUsed[i] = false;
 				class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
 				uint32_t hands = weap->get_hands();
-                if((heroInfo.hands_availability[0]==it || heroInfo.hands_availability[1]==it) && hands==1){
-                    if(heroInfo.hands_availability[0]==it)
-                        heroInfo.hands_availability[0]=NULL;
+                if((hands_availability[0]==it || hands_availability[1]==it) && hands==1){
+                    if(hands_availability[0]==it)
+                        hands_availability[0]=NULL;
                     else
-                        heroInfo.hands_availability[1]=NULL;
+                        hands_availability[1]=NULL;
                 }
-                else if((heroInfo.hands_availability[0]==it && heroInfo.hands_availability[1]==it) && hands==2) {
-                    heroInfo.hands_availability[0] = NULL;
-                    heroInfo.hands_availability[1] = NULL;
+                else if((hands_availability[0]==it && hands_availability[1]==it) && hands==2) {
+                    hands_availability[0] = NULL;
+                    hands_availability[1] = NULL;
                 }
             }
         }
