@@ -142,10 +142,8 @@ int main(void) {
 		return INPUT_FILE_ERROR;
 	cout << "Welcome to the RPG game" << endl;
 
-	/*
 	struct livingInfo_t test = {"FirstMonster", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
-	class Monster m(test, defaultData.monsterInfo, 
-	*/
+	class Monster m(test, defaultData.monsterInfo, monsterTypes::Dragon); 
 
 	// Initial loop
 	while(Running) {
@@ -282,9 +280,17 @@ int main(void) {
 			// read from a file.
 			float p = 0.3;
 			float x = rand() / ((float) RAND_MAX);
-	
-			if(x < p) {
-				cout << "FIGHT!!!!!!!!" << endl;
+			
+			// TODO(stefanos): Test code where in every square
+			// there is a fight.
+			// In release version, revert this back to using
+			// probability
+			//if(x < p) {
+			cout << "FIGHT!!!!!!!!" << endl;
+			for(uint32_t i = 0; i < num_heroes; ++i) {
+				cout << "Hero " << i+1 << " attacks" << endl;
+				class Hero *h = map.searchHero(i);
+				cout << "Attack Damage: " << h->getAttackDamage() << endl;
 			}
 		} else {
 			string name;

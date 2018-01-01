@@ -75,6 +75,12 @@ public:
 
 		return NULL;
 	}
+
+	class Hero *searchHero(uint32_t i) {
+		// Assume that we have allocated memory for 'heroes'
+		return heroes[i];
+	}
+
 	void setNumHeroes(uint32_t num_heroes) {
 		numHeroes = num_heroes;
 		heroes = new Hero*[num_heroes];

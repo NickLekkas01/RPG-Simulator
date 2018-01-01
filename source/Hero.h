@@ -69,9 +69,10 @@ public:
 		 hands_availability[1] = NULL;
     }
     ~Hero(){
-        delete []InventoryInfo.Inventory;
+   		delete []InventoryInfo.Inventory;
         delete []InventoryInfo.ItemsUsed;
-    }
+	}
+
 	void printInfo(void) const {
 		std::cout << "Type: " << heroTypes::typeNames[type] << std::endl;
 		std::cout << "Name: " << livingInfo.name << std::endl;
@@ -158,6 +159,20 @@ public:
 		}
 		std::cout << std::endl;
 
+	}
+
+	uint32_t getAttackDamage(void) {
+		uint32_t damage = heroInfo.strength;
+		Weapon *weapon1 = hands_availability[0];
+		Weapon *weapon2 = hands_availability[1];
+		if(weapon1 != NULL) {
+			damage += weapon1->get_damage();
+			if(weapon1->get_hands() != 2 && weapon2 != NULL) {
+				damage += weapon2->get_damage();
+			}
+		}
+
+		return damage;
 	}
 
 	void checkInventory(void) const {
