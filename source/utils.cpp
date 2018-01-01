@@ -43,8 +43,8 @@ int defaultData_t::readDefaultData() {
 
 	skipComments(dataFile);
 	dataFile >> initialHealthPower;
-	std::string dataClass;
 	
+	std::string dataClass;
 	skipComments(dataFile);
 	while(dataFile >> dataClass) {
 		if(dataClass == "Hero") {

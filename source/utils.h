@@ -17,6 +17,7 @@
 struct defaultData_t {
 public:
 	uint32_t initialHealthPower;
+	uint32_t probabilityToFight;  // at % percentage
 	// Hero
 	struct heroInfo_t heroInfo;
 	struct warriorInfo_t warriorInfo;
@@ -45,6 +46,7 @@ private:
 	int32_t heroesPosition[2];
 	uint32_t numHeroes;
 	class Hero **heroes;
+	class Monster **monsters;
 
 	int isValidPosition(int32_t*) const;
 public:
@@ -92,18 +94,18 @@ public:
 
 	}
 	*/
+	void createMonsters(void) {
+		return;
+	}
+
 	void createHero(const struct livingInfo_t& livingInfo, 
-		struct heroInfo_t& heroInfo, const std::string& heroClass) {
+		struct heroInfo_t& heroInfo, uint32_t heroClass) {
 
 		// TODO(stefanos): Add more error checking
 		if(heroes != NULL) {    // Assume that we have space
 			for(uint32_t i = 0; i < numHeroes; ++i)
 				if(heroes[i] == NULL) {
-					size_t j;
-					for(j = 0; j < 3; ++j)
-						if(heroTypes::typeNames[j] == heroClass)
-							break;
-					heroes[i] = new Hero(livingInfo, heroInfo, j);
+					heroes[i] = new Hero(livingInfo, heroInfo, heroClass);
 					return;
 				}
 		}

@@ -2,7 +2,9 @@
 #include <string>
 #include <fstream>
 #include <cctype>
-#include <stdint.h>
+#include <cstdint>
+#include <cstdlib>
+#include <ctime>
 #include "Hero.h"
 #include "Monster.h"
 #include "Weapon.h"
@@ -133,13 +135,17 @@ int main(void) {
 	if(!defaultData.readDefaultData())
 		return INPUT_FILE_ERROR;
 
-	cout << defaultData.initialHealthPower << endl;
-	cout << defaultData.exoskeletonInfo.armor << endl;
-	
+	srand(time(NULL));
+
 	class Map map;
 	if(!map.readMap())
 		return INPUT_FILE_ERROR;
 	cout << "Welcome to the RPG game" << endl;
+
+	/*
+	struct livingInfo_t test = {"FirstMonster", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
+	class Monster m(test, defaultData.monsterInfo, 
+	*/
 
 	// Initial loop
 	while(Running) {
@@ -198,9 +204,31 @@ int main(void) {
 		cin >> livingInfo.name;
 
 		string heroClass;
-		cout << "Type the class you want this hero to have: ";
-		cin >> heroClass;
-		map.createHero(livingInfo, defaultData.heroInfo, heroClass); 
+		size_t j;
+		struct heroInfo_t tempInfo = defaultData.heroInfo;
+		while(true) {
+			cout << "Type the class you want this hero to have: ";
+			cin >> heroClass;
+			if(heroClass == "Warrior") {
+				tempInfo.strength = defaultData.warriorInfo.strength;
+				tempInfo.dexterity = defaultData.warriorInfo.dexterity;
+				j = 0;
+				break;
+			} else if(heroClass == "Paladin") {
+				tempInfo.strength = defaultData.paladinInfo.strength;
+				tempInfo.agility = defaultData.paladinInfo.agility;
+				j = 1;
+				break;
+			} else if(heroClass == "Sorcerer") {
+				tempInfo.dexterity = defaultData.sorcererInfo.dexterity;
+				tempInfo.agility = defaultData.sorcererInfo.agility;
+				j = 2;
+				break;
+			} else {
+				cout << "That hero class does not exist" << endl;
+			}
+		}
+		map.createHero(livingInfo, tempInfo, j);
 	}
 
 	/* TODO(stefanos): DEBUG CODE - REMOVE THAT
@@ -242,9 +270,21 @@ int main(void) {
 			cout << "Go Back: -1" << endl;
 			cout << "Where do you want to go? " << endl;
 			cin >> choice;
-			if(choice == -1) { }
+			if(choice == -1) { continue; }
 			if(!map.moveHeroes(choice)) {
 				cout << "You can't go there!" << endl;
+			}
+
+			// compute probability of getting into a fight
+
+
+			// TODO(stefanos): Could not get this value
+			// read from a file.
+			float p = 0.3;
+			float x = rand() / ((float) RAND_MAX);
+	
+			if(x < p) {
+				cout << "FIGHT!!!!!!!!" << endl;
 			}
 		} else {
 			string name;
