@@ -24,6 +24,14 @@ public:
 		return livingInfo.level;
 	}
 
+	bool isAwake(void) const {
+		return livingInfo.awake;
+	}
+
+	void setAwake(bool state) {
+		livingInfo.awake = state;
+	}
+
 	std::string getName(void) const {
 		return livingInfo.name;
 	}

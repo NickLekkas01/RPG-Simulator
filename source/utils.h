@@ -3,6 +3,8 @@
 
 #include <istream>
 #include <cstdint>
+#include <string>
+#include <sstream>
 #include "Hero.h"
 #include "Item.h"
 #include "Weapon.h"
@@ -81,11 +83,60 @@ public:
 		return heroes[i];
 	}
 
-	void setNumHeroes(uint32_t num_heroes) {
+	class Monster *searchMonster(uint32_t i) {
+		// Assume that we have allocated memory for 'monsters'
+		return monsters[i];
+	}
+
+	void generateMonsters(const struct defaultData_t& defaultData) {
+		// Assume that we have memory for monsters
+		for(size_t i = 0; i < numHeroes; ++i) {
+			class Hero *h = searchHero(i);
+			uint32_t level = h->getLevel();
+			std::stringstream name;
+			name << "Monster " << i;
+		struct livingInfo_t tempLivingInfo = {name.str(), level, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
+		struct monsterInfo_t tempMonsterInfo = defaultData.monsterInfo;
+			uint32_t type = rand() % 3;
+			if(type == 0) {
+				tempMonsterInfo.damage[0] = defaultData.dragonInfo.damage[0];
+				tempMonsterInfo.damage[1] = defaultData.dragonInfo.damage[1];
+			} else if(type == 1) {
+				tempMonsterInfo.armor = defaultData.exoskeletonInfo.armor;
+			} else {
+				tempMonsterInfo.agility = defaultData.spiritInfo.agility;
+			}
+
+			monsters[i] = new Monster(tempLivingInfo, tempMonsterInfo, type);
+		}
+	}
+
+	bool allHeroesAwake(void) const {
+		for(size_t i = 0; i < numHeroes; ++i) {
+			if(!(heroes[i]->isAwake()))
+				return false;
+		}
+		
+		return true;
+	}
+
+	bool allMonstersAwake(void) const {
+		for(size_t i = 0; i < numHeroes; ++i) {
+			if(!(monsters[i]->isAwake()))
+				return false;
+		}
+		
+		return true;
+	}
+
+	void setNumHeroesAndMonsters(uint32_t num_heroes) {
 		numHeroes = num_heroes;
 		heroes = new Hero*[num_heroes];
-		for(uint32_t i = 0; i < num_heroes; ++i)
+		monsters = new Monster*[num_heroes];
+		for(uint32_t i = 0; i < num_heroes; ++i) {
 			heroes[i] = NULL;
+			monsters[i] = NULL;
+		}
 	}
 	// TODO(stefanos): DEBUG CODE - REMOVE THAT
 	/*

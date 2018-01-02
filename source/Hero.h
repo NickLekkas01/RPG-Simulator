@@ -208,6 +208,7 @@ public:
 
 	class Item* usePotion(std::string name) {
 		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+
 			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Potion && InventoryInfo.Inventory[i]->get_name() == name) {
 				class Potion *pot = (class Potion*) InventoryInfo.Inventory[i];
 				uint32_t min_lvl = pot->get_minimumLevel();
@@ -215,6 +216,8 @@ public:
 					return NULL;
 				potionType type = pot->get_Potion_type();
 				uint32_t restoration_amount = pot->get_Restoration_amount();
+				// TODO(stefanos): Set upper bound for how much any property
+				// can be raised.
 				if(type == potionTypes::health) {
 					if((livingInfo.healthPower += restoration_amount) > livingInfo.initialHealthPower)
 						livingInfo.healthPower = livingInfo.initialHealthPower;

@@ -142,8 +142,6 @@ int main(void) {
 		return INPUT_FILE_ERROR;
 	cout << "Welcome to the RPG game" << endl;
 
-	struct livingInfo_t test = {"FirstMonster", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
-	class Monster m(test, defaultData.monsterInfo, monsterTypes::Dragon); 
 
 	// Initial loop
 	while(Running) {
@@ -195,7 +193,7 @@ int main(void) {
 		cout << "How many heroes do you want (1-3)? " << endl;
 		cin >> num_heroes;
 	} while(num_heroes < 1 || num_heroes > 3);
-	map.setNumHeroes(num_heroes);
+	map.setNumHeroesAndMonsters(num_heroes);
 	for(int i = 0; i < num_heroes; ++i) {
 		struct livingInfo_t livingInfo = {"", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
 		cout << "Type the name of the hero " << i + 1 << ": ";
@@ -287,10 +285,35 @@ int main(void) {
 			// probability
 			//if(x < p) {
 			cout << "FIGHT!!!!!!!!" << endl;
-			for(uint32_t i = 0; i < num_heroes; ++i) {
-				cout << "Hero " << i+1 << " attacks" << endl;
-				class Hero *h = map.searchHero(i);
-				cout << "Attack Damage: " << h->getAttackDamage() << endl;
+			map.generateMonsters(defaultData);
+
+			bool fightContinues = true;
+
+			while(fightContinues) {
+				for(uint32_t i = 0; i < num_heroes; ++i) {
+					cout << "Hero " << i+1 << " attacks" << endl;
+					class Hero *h = map.searchHero(i);
+					cout << "Attack Damage: " << h->getAttackDamage() << endl;
+					class Monster *m = map.searchMonster(i);
+					m->receiveAttack(h->getAttackDamage());
+					m->printInfo();
+				}
+
+				if(!map.allHeroesAwake()) {
+					fightContinues = false;
+					cout << endl;
+					cout << endl;
+					cout << "MONSTERS WON" << endl;
+					cout << endl;
+					cout << endl;
+				} else if(!map.allMonstersAwake()) {
+					fightContinues = false;
+					cout << endl;
+					cout << endl;
+					cout << "HEROES WON" << endl;
+					cout << endl;
+					cout << endl;
+				}
 			}
 		} else {
 			string name;
