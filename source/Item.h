@@ -9,6 +9,7 @@ namespace itemTypes {
 	const uint32_t Weapon = 0;
 	const uint32_t Spell = 1;
 	const uint32_t Potion = 2;
+	const uint32_t Armor = 3;
 };
 
 class Item {

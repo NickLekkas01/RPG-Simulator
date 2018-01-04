@@ -7,6 +7,7 @@
 #include "Item.h"
 #include "Potion.h"
 #include "Weapon.h"
+#include "Armor.h"
 
 struct warriorInfo_t {
 	uint32_t strength;
@@ -54,10 +55,11 @@ private:
 	struct heroInfo_t heroInfo;
 	heroType type;
     Weapon *hands_availability[2];
+	class Armor* armor;
     struct Inventory_t InventoryInfo;
 public:
 	Hero(const struct livingInfo_t& li, const struct heroInfo_t& hi, heroType t) :
-	     Living(li), heroInfo(hi), type(t) {
+	     Living(li), heroInfo(hi), type(t), armor(NULL) {
          InventoryInfo.size=10;
          InventoryInfo.currently_holding=0;
          InventoryInfo.Inventory=new Item*[10];
@@ -144,6 +146,29 @@ public:
 		}
 	}
 
+
+	void receiveAttack(uint32_t opDamage) {
+		uint32_t armorValue;
+		if(armor != NULL)
+			armorValue = armor->getArmor();
+		else
+			armorValue = 0;
+		if(armor != NULL && armorValue > opDamage) {
+			armor->decreaseArmor(opDamage);
+		} else {
+			uint32_t temp = (opDamage - armorValue);
+			if(livingInfo.healthPower > temp)
+				livingInfo.healthPower -= temp;
+			else {
+				livingInfo.healthPower = 0;
+				livingInfo.awake = false;
+			}
+
+			if(armor != NULL)
+				armor->resetArmor();
+		}
+	}
+
 	bool isInventoryEmpty(void) const {
 		return (InventoryInfo.currently_holding == 0);
 	}
@@ -153,6 +178,19 @@ public:
 		std::cout << "Weapons on inventory" << std::endl;
 		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
 			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Weapon) {
+				InventoryInfo.Inventory[i]->print();
+				std::cout << "In use? " << InventoryInfo.ItemsUsed[i] << std::endl;
+			}
+		}
+		std::cout << std::endl;
+
+	}
+
+	void printArmors(void) const {
+		std::cout << std::endl;
+		std::cout << "Armors on inventory" << std::endl;
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Armor) {
 				InventoryInfo.Inventory[i]->print();
 				std::cout << "In use? " << InventoryInfo.ItemsUsed[i] << std::endl;
 			}
@@ -242,11 +280,48 @@ public:
 	}
 
 	bool isInUse(Item *it) {
-		return (hands_availability[0] == it || hands_availability[1] == it);
+		if(it->getItemType() == itemTypes::Weapon)
+			return (hands_availability[0] == it || hands_availability[1] == it);
+		else if(it->getItemType() == itemTypes::Armor)
+			return armor == (class Armor *) it;
 	}
 
 	bool isOnRequiredLevel(Item *it) {
 		return (livingInfo.level >= it->get_minimumLevel());
+	}
+
+	bool equipArmor(class Item *it) {
+		if(isInUse(it))
+			return false;
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+			if(InventoryInfo.Inventory[i] == it) {
+				InventoryInfo.ItemsUsed[i] = true;
+				class Armor *a = (class Armor *) it;
+				if(armor != NULL) {
+					return false;
+				}
+
+				if(livingInfo.level < it->get_minimumLevel())
+					return false;
+
+				armor = a;
+			}
+		}
+	}
+
+	bool unequipArmor(class Item *it) {
+		if(!isInUse(it))
+			return false;
+		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
+			if(InventoryInfo.Inventory[i] == it) {
+				InventoryInfo.ItemsUsed[i] = false;
+				if(armor == NULL) {
+					return false;
+				}
+
+				armor = NULL;
+			}
+		}
 	}
 
     bool equipWeapon(class Item *it){

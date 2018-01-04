@@ -17,7 +17,8 @@ using namespace std;
 
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
-	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equip, unequip, checkStoreItems, buy, sell};
+	// TODO(stefanos): Add equipArmor
+	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equipWeapon, unequipWeapon, equipArmor, unequipArmor, checkStoreItems, buy, sell};
 };
 
 void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store, class Map& map) {
@@ -43,7 +44,7 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 		} else {
 			store.deleteItem(it);
 		}
-	} else if(choice == playerChoices::equip) {
+	} else if(choice == playerChoices::equipWeapon) {
 		if(h->isInventoryEmpty()) {
 			cout << "There is nothing to equip" << endl;
 			return;
@@ -69,25 +70,62 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 		if(!h->equipWeapon(it)) {
 	        cout << "Could not equip the weapon because there are other weapons in use." << endl;
 	    }
-	} else if(choice == playerChoices::unequip){
-	    h->checkInventory();
-	    cout << "Type the name of the weapon you want to unequip: " << endl;
-	    string name;
-	    cin >> name;
-	    class Item *it = h->searchItem(name);
-	    if(it == NULL) {
-	        cout << "The weapon does not exist" << endl;
-	        return;
-	    } else if(!h->isInUse(it)) {
-	        cout << "The weapon is not equipped" << endl;
-	        return;
-	    }
-	    h->unequipWeapon(it);
+	} else if(choice == playerChoices::unequipWeapon) {
+		h->checkInventory();
+		cout << "Type the name of the weapon you want to unequip: " << endl;
+		string name;
+		cin >> name;
+		class Item *it = h->searchItem(name);
+		if (it == NULL) {
+			cout << "The weapon does not exist" << endl;
+			return;
+		} else if (!h->isInUse(it)) {
+			cout << "The weapon is not equipped" << endl;
+			return;
+		}
+		h->unequipWeapon(it);
+	} else if(choice == playerChoices::equipArmor) {
+		if(h->isInventoryEmpty()) {
+			cout << "There is nothing to equip" << endl;
+			return;
+		}
+		h->printArmors();
+		cout << "Type the name of the armor you want to equip: " << endl;
+		string name;
+		cin >> name;
+		class Item *it = h->searchItem(name);
+		if(it == NULL) {
+			cout << "The armor does not exist" << endl;
+			return;
+		} else if(it->getItemType() != itemTypes::Armor) {
+			cout << "You can only equip armors" << endl;
+			return;
+		} else if(!h->isOnRequiredLevel(it)) {
+			cout << "You are not on the required level to equip the armor" << endl;
+			return;
+		} else if(h->isInUse(it)) {
+			cout << "The armor is already equipped" << endl;
+			return;
+		}
+		if(!h->equipArmor(it)) {
+			cout << "Could not equip the armor because there are other armors in use." << endl;
+		}
+	} else if(choice == playerChoices::unequipArmor){
+		h->checkInventory();
+		cout << "Type the name of the armor you want to unequip: " << endl;
+		string name;
+		cin >> name;
+		class Item *it = h->searchItem(name);
+		if(it == NULL) {
+			cout << "The armor does not exist" << endl;
+			return;
+		} else if(!h->isInUse(it)) {
+			cout << "The armor is not equipped" << endl;
+			return;
+		}
+		h->unequipWeapon(it);
 	} else if(map.heroesOnStore()) {
-		if(choice == playerChoices::checkStoreItems) {
-			store.print();
-
-		} else if(choice == playerChoices::buy) {
+		if(choice == playerChoices::buy) {
 			if(!h->inventoryAvaiableSpace()) {
 				cout << "Not enough space on the inventory" << endl;
 				return;
@@ -241,15 +279,17 @@ int main(void) {
 		cout << "Use Potion: 5" << endl;
 		cout << "Equip Weapon: 6" << endl;
 		cout << "Unequip Weapon: 7" << endl;
+		cout << "Equip Armor: 8" << endl;
+		cout << "Unequip Armor: 9" << endl;
 		if(map.heroesOnStore()) {
-			cout << "Check items avaialble on the store: 8" << endl;
-			cout << "Buy something: 9" << endl;
-			cout << "Sell something: 10" << endl;
+			cout << "Check items available on the store: 10" << endl;
+			cout << "Buy something: 11" << endl;
+			cout << "Sell something: 12" << endl;
 		}
 		cout << "What do you want to do? ";
 		cin >> choice;
 
-		if(choice > 10) {
+		if(choice > 12) {
 			cout << "This operation can't be handled" << endl;
 			continue;
 		}
@@ -266,8 +306,8 @@ int main(void) {
 			cout << "Go Back: -1" << endl;
 			cout << "Where do you want to go? " << endl;
 			cin >> choice;
-			if(choice == -1) { continue; }
-			if(!map.moveHeroes(choice)) {
+			if (choice == -1) { continue; }
+			if (!map.moveHeroes(choice)) {
 				cout << "You can't go there!" << endl;
 			}
 
@@ -278,35 +318,51 @@ int main(void) {
 			// read from a file.
 			float p = 0.3;
 			float x = rand() / ((float) RAND_MAX);
-			
+
 			// TODO(stefanos): Test code where in every square
 			// there is a fight.
 			// In release version, revert this back to using
 			// probability
-			//if(x < p) {
+			//if(x <= p) {
 			cout << "FIGHT!!!!!!!!" << endl;
 			map.generateMonsters(defaultData);
 
 			bool fightContinues = true;
 
-			while(fightContinues) {
-				for(uint32_t i = 0; i < num_heroes; ++i) {
-					cout << "Hero " << i+1 << " attacks" << endl;
-					class Hero *h = map.searchHero(i);
+			while (fightContinues) {
+				for (uint32_t i = 0; i < num_heroes; ++i) {
+
+					class Hero *h;
+					class Monster *m;
+					//// Hero attack ////
+					cout << "Hero " << i + 1 << " attacks" << endl;
+					h = map.searchHero(i);
 					cout << "Attack Damage: " << h->getAttackDamage() << endl;
-					class Monster *m = map.searchMonster(i);
+					// TODO(stefanos): Let the user decide which monster to hit:DONE
+					uint32_t option;
+					cout<<"Give which monster you want to hit"<<endl;
+					cin>>option;
+					m = map.searchMonster(option);
 					m->receiveAttack(h->getAttackDamage());
 					m->printInfo();
+
+					//// Monster attack ////
+					cout << "Monster " << i+1 << " attacks" << endl;
+					m = map.searchMonster(i);
+					cout << "Attack Damage: " << m->getAttackDamage() << endl;
+					h = map.searchHero(i);
+					h->receiveAttack(m->getAttackDamage());
+					h->printInfo();
 				}
 
-				if(!map.allHeroesAwake()) {
+				if (map.allHeroesDead()) {
 					fightContinues = false;
 					cout << endl;
 					cout << endl;
 					cout << "MONSTERS WON" << endl;
 					cout << endl;
 					cout << endl;
-				} else if(!map.allMonstersAwake()) {
+				} else if (map.allMonstersDead()) {
 					fightContinues = false;
 					cout << endl;
 					cout << endl;
@@ -315,6 +371,10 @@ int main(void) {
 					cout << endl;
 				}
 			}
+			map.freeMonsters();
+			// TODO(stefanos): Free monster memory
+		} else if(map.heroesOnStore() && choice == playerChoices::checkStoreItems) {
+			store.print();
 		} else {
 			string name;
 			cout << "Type the name of the hero you want " \
@@ -325,6 +385,8 @@ int main(void) {
 				cout << "Sorry, that hero does not exist" << endl;
 				continue;
 			}
+
+			cout << "CHOICE: " << choice << endl;
 
 			handleHeroSpecificChoices(choice, h, store, map);
 		}

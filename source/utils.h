@@ -10,6 +10,7 @@
 #include "Weapon.h"
 #include "Spell.h"
 #include "Potion.h"
+#include "Armor.h"
 #include "Monster.h"
 
 
@@ -54,6 +55,14 @@ private:
 public:
 	Map();
 	~Map();
+	void freeMonsters(){
+		for(uint32_t i = 0; i < numHeroes; ++i){
+			if(monsters[i] != NULL){
+				delete monsters[i];
+				monsters[i] = NULL;
+			}
+		}
+	}
 	int readMap(void);
 	void print(void) const;
 	void printHeroInfo(void) const {
@@ -111,18 +120,18 @@ public:
 		}
 	}
 
-	bool allHeroesAwake(void) const {
+	bool allHeroesDead(void) const {
 		for(size_t i = 0; i < numHeroes; ++i) {
-			if(!(heroes[i]->isAwake()))
+			if(heroes[i]->isAwake())
 				return false;
 		}
 		
 		return true;
 	}
 
-	bool allMonstersAwake(void) const {
+	bool allMonstersDead(void) const {
 		for(size_t i = 0; i < numHeroes; ++i) {
-			if(!(monsters[i]->isAwake()))
+			if(monsters[i]->isAwake())
 				return false;
 		}
 		
@@ -151,9 +160,6 @@ public:
 
 	}
 	*/
-	void createMonsters(void) {
-		return;
-	}
 
 	void createHero(const struct livingInfo_t& livingInfo, 
 		struct heroInfo_t& heroInfo, uint32_t heroClass) {

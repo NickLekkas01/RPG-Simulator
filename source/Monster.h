@@ -55,6 +55,11 @@ public:
 		}
 	}
 
+	uint32_t getAttackDamage() const {
+		uint32_t res = rand() % (monsterInfo.damage[1] - monsterInfo.damage[0]) + monsterInfo.damage[0];
+		return res;
+	}
+
 	bool willGetAttacked(void) const {
 		uint32_t x = rand() % 101;
 		if(x < monsterInfo.agility)

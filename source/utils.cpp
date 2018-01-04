@@ -244,6 +244,7 @@ int Store::readItems(const std::string& fileName) {
 		std::string name;
 		uint32_t price, min_level;
 		size_t i;
+		// TODO(stefanos): Just go to the next position
 		for(i = 0; i < size; ++i)
 			if(items[i].item == NULL) {
 				break;
@@ -282,6 +283,11 @@ int Store::readItems(const std::string& fileName) {
 			items[i].item = new Potion(name, price, min_level, 
 				itemTypes::Potion, restoration_amount,
 				potion_type, availability);
+		} else if(itemClass == "Armor") {
+			uint32_t armorValue;
+
+			itemsFile >> name >> price >> min_level >> armorValue;
+			items[i].item = new Armor(name, price, min_level, itemTypes::Armor, armorValue);
 		}
 
 		++currently_holding;
