@@ -21,6 +21,18 @@ public:
 		damage[1] = dmg[1];
 	}
 
+	uint32_t getMinDamage(){
+		return damage[0];
+	}
+
+	uint32_t getMaxDamage(){
+		return damage[1];
+	}
+
+	uint32_t getMana(){
+		return mana;
+	}
+
 	void print(void) const {
 		Item::print();
 		std::cout << "Damage Low: " << damage[0] << std::endl;

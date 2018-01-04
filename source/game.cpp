@@ -344,11 +344,11 @@ int main(void) {
 					do {
 						cout << "Give which monster you want to hit" << endl;
 						cin >> option;
-					}while(option>-1 && option<num_heroes)
+					}while(option>-1 && option<num_heroes);
 
 					m = map.searchMonster(option);
 
-					while() {
+					while(true) {
 						cout << "Choose option:" << endl << "Attack(0) Spell(1) Potion(2)" << endl;
 						cin >> option;
 						if (option == 0) {

@@ -8,6 +8,7 @@
 #include "Potion.h"
 #include "Weapon.h"
 #include "Armor.h"
+#include "Spell.h"
 
 struct warriorInfo_t {
 	uint32_t strength;
@@ -211,6 +212,24 @@ public:
 		}
 
 		return damage;
+	}
+
+	void reduceMana(uint32_t mana){
+		heroInfo.magicPower-=mana;
+	}
+
+	uint32_t getSpellDamage(std::string name){
+		class Spell *S;
+		S=(class Spell *)searchItem(name);
+		if(S->get_minimumLevel() < livingInfo.level){
+			uint32_t minDam,maxDam;
+			minDam=S->getMinDamage();
+			maxDam=S->getMaxDamage();
+			reduceMana(S->getMana());
+			//TODO(nikos): See the type of the spell and do the proper impacts
+			return ( rand()%(maxDam-minDam)+minDam );
+		}
+		return 0;
 	}
 
 	void checkInventory(void) const {
