@@ -340,10 +340,31 @@ int main(void) {
 					cout << "Attack Damage: " << h->getAttackDamage() << endl;
 					// TODO(stefanos): Let the user decide which monster to hit:DONE
 					uint32_t option;
-					cout<<"Give which monster you want to hit"<<endl;
-					cin>>option;
+
+					do {
+						cout << "Give which monster you want to hit" << endl;
+						cin >> option;
+					}while(option>-1 && option<num_heroes)
+
 					m = map.searchMonster(option);
-					m->receiveAttack(h->getAttackDamage());
+
+					while() {
+						cout << "Choose option:" << endl << "Attack(0) Spell(1) Potion(2)" << endl;
+						cin >> option;
+						if (option == 0) {
+							m->receiveAttack(h->getAttackDamage());
+							//break;
+						} else if (option == 1) {
+							//m->receiveAttack(h->getSpellDamage());
+							//break;
+						} else if (option == 2) {
+							//h->usePotion("mySpell");
+							//break;
+						} else {
+							cout << "Not proper option" << endl;
+						}
+					}
+
 					m->printInfo();
 
 					//// Monster attack ////

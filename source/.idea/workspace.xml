@@ -70,21 +70,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="game.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/game.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="350" column="45" lean-forward="true" selection-start-line="350" selection-start-column="45" selection-end-line="350" selection-end-column="45" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Hero.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Hero.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="153" column="12" lean-forward="true" selection-start-line="153" selection-start-column="12" selection-end-line="153" selection-end-column="12" />
+            <state relative-caret-position="194">
+              <caret line="201" column="21" lean-forward="false" selection-start-line="201" selection-start-column="13" selection-end-line="201" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -120,6 +110,16 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="game.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/game.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="580">
+              <caret line="374" column="20" lean-forward="true" selection-start-line="374" selection-start-column="20" selection-end-line="374" selection-end-column="20" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="FindInProjectRecents">
@@ -141,6 +141,7 @@
       <find>generateMonsters</find>
       <find>Map</find>
       <find>generate</find>
+      <find>getattac</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -227,12 +228,12 @@
       <updated>1514888807556</updated>
       <workItem from="1514888808930" duration="26000" />
       <workItem from="1515085728134" duration="435000" />
-      <workItem from="1515086189053" duration="8583000" />
+      <workItem from="1515086189053" duration="9820000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9044000" />
+    <option name="totallyTimeSpent" value="10281000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -453,14 +454,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Hero.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="153" column="12" lean-forward="true" selection-start-line="153" selection-start-column="12" selection-end-line="153" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Monster.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="250">
@@ -485,10 +478,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Hero.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="201" column="21" lean-forward="false" selection-start-line="201" selection-start-column="13" selection-end-line="201" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/game.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="350" column="45" lean-forward="true" selection-start-line="350" selection-start-column="45" selection-end-line="350" selection-end-column="45" />
+        <state relative-caret-position="580">
+          <caret line="374" column="20" lean-forward="true" selection-start-line="374" selection-start-column="20" selection-end-line="374" selection-end-column="20" />
           <folding />
         </state>
       </provider>
