@@ -17,7 +17,6 @@ using namespace std;
 
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
-	// TODO(stefanos): Add equipArmor
 	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equipWeapon, unequipWeapon, equipArmor, unequipArmor, checkStoreItems, buy, sell};
 };
 
@@ -38,7 +37,7 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 				"not in the required level to use it" << endl;
 			return;
 		}
-		if(h->getLevel() < it->get_minimumLevel()) {
+		if(h->getLevel() < it->getMinLevel()) {
 			cout << "You are not on the required level to use this potion" << endl;
 			return;
 		} else {
@@ -307,7 +306,10 @@ int main(void) {
 			cout << "Where do you want to go? " << endl;
 			cin >> choice;
 			if (choice == -1) { continue; }
-			if (!map.moveHeroes(choice)) {
+			else if(choice < 0 || choice > 3) {
+				cout << "Not a valid choice" << endl;
+				continue;
+			} if (!map.moveHeroes(choice)) {
 				cout << "You can't go there!" << endl;
 			}
 
@@ -328,35 +330,62 @@ int main(void) {
 			map.generateMonsters(defaultData);
 
 			bool fightContinues = true;
+			for (uint32_t i = 0; i < num_heroes; ++i) {
+				class Hero *h = map.searchHero(i);
+				class Monster *m = map.searchMonster(i);
+				h->printInfo();
+				cout << endl;
+				m->printInfo();
+				cout << endl;
+			}
 
 			while (fightContinues) {
 				for (uint32_t i = 0; i < num_heroes; ++i) {
 
 					class Hero *h;
 					class Monster *m;
+
+
 					//// Hero attack ////
 					cout << "Hero " << i + 1 << " attacks" << endl;
 					h = map.searchHero(i);
 					cout << "Attack Damage: " << h->getAttackDamage() << endl;
 					// TODO(stefanos): Let the user decide which monster to hit:DONE
-					uint32_t option;
+					int32_t option;
 
 					do {
 						cout << "Give which monster you want to hit" << endl;
 						cin >> option;
-					}while(option>-1 && option<num_heroes);
+						cout << option << endl;
+					} while(option < 0 || option>(num_heroes - 1));
 
-					m = map.searchMonster(option);
+					m = map.searchMonster((uint32_t)option);
 
 					while(true) {
 						cout << "Choose option:" << endl << "Attack(0) Spell(1) Potion(2)" << endl;
 						cin >> option;
+						// TODO(stefanos): Take agility into consideration
 						if (option == 0) {
 							m->receiveAttack(h->getAttackDamage());
-							//break;
+							break;
 						} else if (option == 1) {
-							//m->receiveAttack(h->getSpellDamage());
-							//break;
+							string spellName;
+							cout << "Type the name of the spell you want to use" << endl;
+							cin >> spellName;
+							class Spell *s = h->searchItem(spellName);
+							if(s == NULL) {
+								cout << "This spell does not exist" << endl;
+								continue;
+							}
+							if(h->getLevel() < s->getMinLevel()) {
+								cout << "You are not on the required level to use this spell" << endl;
+								continue;
+							}
+							if(!h->executeSpell(s, m)) {
+								cout << "You don't have enough magic power to execute this spell" << endl;
+								continue;
+							}
+							break;
 						} else if (option == 2) {
 							//h->usePotion("mySpell");
 							//break;
@@ -366,14 +395,17 @@ int main(void) {
 					}
 
 					m->printInfo();
+					cout << endl;
 
 					//// Monster attack ////
 					cout << "Monster " << i+1 << " attacks" << endl;
 					m = map.searchMonster(i);
-					cout << "Attack Damage: " << m->getAttackDamage() << endl;
+					uint32_t damage = m->getAttackDamage();
+					cout << "Attack Damage: " << damage << endl;
 					h = map.searchHero(i);
-					h->receiveAttack(m->getAttackDamage());
+					h->receiveAttack(damage);
 					h->printInfo();
+					cout << endl;
 				}
 
 				if (map.allHeroesDead()) {

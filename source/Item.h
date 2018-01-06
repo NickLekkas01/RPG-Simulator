@@ -36,7 +36,7 @@ public:
 		return iType;
 	}
 
-	uint8_t get_minimumLevel() const{
+	uint8_t getMinLevel() const{
 		return minimum_level;
 	}
 

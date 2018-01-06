@@ -218,17 +218,17 @@ public:
 		heroInfo.magicPower-=mana;
 	}
 
-	uint32_t getSpellDamage(std::string name){
-		class Spell *S;
-		S=(class Spell *)searchItem(name);
-		if(S->get_minimumLevel() < livingInfo.level){
-			uint32_t minDam,maxDam;
-			minDam=S->getMinDamage();
-			maxDam=S->getMaxDamage();
-			reduceMana(S->getMana());
-			//TODO(nikos): See the type of the spell and do the proper impacts
-			return ( rand()%(maxDam-minDam)+minDam );
+	bool executeSpell(class Spell *s, class Monster *m){
+		uint32_t mana = s->getMana();
+		if(getMagicPower() < mana) {
+			return false;
 		}
+		uint32_t minDam,maxDam;
+		minDam=s->getMinDamage();
+		maxDam=s->getMaxDamage();
+		reduceMana(mana);
+		//TODO(nikos): See the type of the spell and do the proper impacts
+		return ( rand()%(maxDam-minDam)+minDam );
 		return 0;
 	}
 
@@ -268,7 +268,7 @@ public:
 
 			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Potion && InventoryInfo.Inventory[i]->get_name() == name) {
 				class Potion *pot = (class Potion*) InventoryInfo.Inventory[i];
-				uint32_t min_lvl = pot->get_minimumLevel();
+				uint32_t min_lvl = pot->getMinLevel();
 				if(livingInfo.level < min_lvl)
 					return NULL;
 				potionType type = pot->get_Potion_type();
@@ -306,7 +306,7 @@ public:
 	}
 
 	bool isOnRequiredLevel(Item *it) {
-		return (livingInfo.level >= it->get_minimumLevel());
+		return (livingInfo.level >= it->getMinLevel());
 	}
 
 	bool equipArmor(class Item *it) {
@@ -320,7 +320,7 @@ public:
 					return false;
 				}
 
-				if(livingInfo.level < it->get_minimumLevel())
+				if(livingInfo.level < it->getMinLevel())
 					return false;
 
 				armor = a;
@@ -351,7 +351,7 @@ public:
             if (InventoryInfo.Inventory[i] == it) {
 				InventoryInfo.ItemsUsed[i] = true;
 				class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];
-                uint32_t min_lvl = weap->get_minimumLevel();
+                uint32_t min_lvl = weap->getMinLevel();
                 if (livingInfo.level < min_lvl)
                     return false;
                 if(hands_availability[0]!=NULL && hands_availability[1]!=NULL) {
