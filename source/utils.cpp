@@ -276,13 +276,11 @@ int Store::readItems(const std::string& fileName) {
 		} else if(itemClass == "Potion") {
 			uint32_t restoration_amount;
 			uint32_t potion_type;
-			// TODO(stefanos): What is that?
-			bool availability = true;
 
 			itemsFile >> name >> price >> min_level >> restoration_amount >> potion_type;
 			items[i].item = new Potion(name, price, min_level, 
 				itemTypes::Potion, restoration_amount,
-				potion_type, availability);
+				potion_type);
 		} else if(itemClass == "Armor") {
 			uint32_t armorValue;
 

@@ -37,6 +37,7 @@ public:
 		Item::print();
 		std::cout << "Damage Low: " << damage[0] << std::endl;
 		std::cout << "Damage High: " << damage[1] << std::endl;
+		std::cout << "Mana: " << mana << std::endl;
 		// TODO(stefanos): For now only the integer. Implement
 		// naming for spell types
 		std::cout << "Spell Type: " << type << std::endl;

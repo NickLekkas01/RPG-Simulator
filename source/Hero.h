@@ -32,7 +32,7 @@ namespace heroTypes {
 	const uint8_t Warrior = 0;
 	const uint8_t Sorcerer = 1;
 	const uint8_t Paladin = 2;
-	const char *const typeNames[] = { "Warrior", "Sorcerer", "Paladin" };
+	const char *const typeNames[] = { "Warrior", "Paladin", "Sorcerer" };
 };
 
 struct heroInfo_t {
@@ -214,22 +214,31 @@ public:
 		return damage;
 	}
 
+	uint32_t getMagicPower(void) const {
+		return heroInfo.magicPower;
+	}
+
 	void reduceMana(uint32_t mana){
 		heroInfo.magicPower-=mana;
 	}
 
-	bool executeSpell(class Spell *s, class Monster *m){
+	uint32_t getCastSpellDamage(class Spell *s) {
 		uint32_t mana = s->getMana();
 		if(getMagicPower() < mana) {
-			return false;
+			return 0;
 		}
 		uint32_t minDam,maxDam;
 		minDam=s->getMinDamage();
 		maxDam=s->getMaxDamage();
 		reduceMana(mana);
-		//TODO(nikos): See the type of the spell and do the proper impacts
-		return ( rand()%(maxDam-minDam)+minDam );
-		return 0;
+		uint32_t dexterity = heroInfo.dexterity;
+		uint32_t temp = rand()%(maxDam-minDam)+minDam;
+		uint32_t damage = temp + temp * (getLevel() / ((float) 100))
+			+ temp * (dexterity / ((float) 100));
+		if(damage  > maxDam)
+			damage = maxDam;
+		std::cout << "castSpell Damage: " << damage << std::endl;
+		return damage;
 	}
 
 	void checkInventory(void) const {

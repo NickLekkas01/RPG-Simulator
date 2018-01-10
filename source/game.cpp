@@ -372,7 +372,7 @@ int main(void) {
 							string spellName;
 							cout << "Type the name of the spell you want to use" << endl;
 							cin >> spellName;
-							class Spell *s = h->searchItem(spellName);
+							class Spell *s = (class Spell *) h->searchItem(spellName);
 							if(s == NULL) {
 								cout << "This spell does not exist" << endl;
 								continue;
@@ -381,10 +381,12 @@ int main(void) {
 								cout << "You are not on the required level to use this spell" << endl;
 								continue;
 							}
-							if(!h->executeSpell(s, m)) {
+							uint32_t spellDam = h->getCastSpellDamage(s);
+							if(!spellDam) {
 								cout << "You don't have enough magic power to execute this spell" << endl;
 								continue;
 							}
+							m->receiveAttack(spellDam);
 							break;
 						} else if (option == 2) {
 							//h->usePotion("mySpell");
@@ -396,6 +398,18 @@ int main(void) {
 
 					m->printInfo();
 					cout << endl;
+
+					if (map.allHeroesDead()) {
+						fightContinues = false;
+						cout << endl << endl;
+						cout << "MONSTERS WON" << endl;
+						cout << endl << endl;
+					} else if (map.allMonstersDead()) {
+						fightContinues = false;
+						cout << endl << endl;
+						cout << "HEROES WON" << endl;
+						cout << endl << endl;
+					}
 
 					//// Monster attack ////
 					cout << "Monster " << i+1 << " attacks" << endl;
@@ -410,22 +424,17 @@ int main(void) {
 
 				if (map.allHeroesDead()) {
 					fightContinues = false;
-					cout << endl;
-					cout << endl;
+					cout << endl << endl;
 					cout << "MONSTERS WON" << endl;
-					cout << endl;
-					cout << endl;
+					cout << endl << endl;
 				} else if (map.allMonstersDead()) {
 					fightContinues = false;
-					cout << endl;
-					cout << endl;
+					cout << endl << endl;
 					cout << "HEROES WON" << endl;
-					cout << endl;
-					cout << endl;
+					cout << endl << endl;
 				}
 			}
 			map.freeMonsters();
-			// TODO(stefanos): Free monster memory
 		} else if(map.heroesOnStore() && choice == playerChoices::checkStoreItems) {
 			store.print();
 		} else {

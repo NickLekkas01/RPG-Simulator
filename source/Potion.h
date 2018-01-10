@@ -15,7 +15,7 @@ private:
     potionType type;
 public:
 	Potion(std::string name, uint32_t pr, uint32_t min_level, itemType type,
-		uint32_t restoreAmount, potionType potType, bool avail) :
+		uint32_t restoreAmount, potionType potType) :
 		Item(name, pr, min_level, type), restorationAmount(restoreAmount),
 		type(potType) { }
 	uint32_t get_Restoration_amount() const {
