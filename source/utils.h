@@ -21,17 +21,16 @@ struct defaultData_t {
 public:
 	uint32_t initialHealthPower;
 	uint32_t probabilityToFight;  // at % percentage
-	// Hero
-	struct heroInfo_t heroInfo;
-	struct warriorInfo_t warriorInfo;
-	struct paladinInfo_t paladinInfo;
-	struct sorcererInfo_t sorcererInfo;
+	
+	// Heroes
+	struct heroInfo_t warriorInfo;
+	struct heroInfo_t paladinInfo;
+	struct heroInfo_t sorcererInfo;
 	
 	// Monster
-	struct monsterInfo_t monsterInfo;
-	struct dragonInfo_t dragonInfo;
-	struct exoskeletonInfo_t exoskeletonInfo;
-	struct spiritInfo_t spiritInfo;
+	struct monsterInfo_t dragonInfo;
+	struct monsterInfo_t exoskeletonInfo;
+	struct monsterInfo_t spiritInfo;
 
 
 	defaultData_t() { }
@@ -106,18 +105,31 @@ public:
 			std::stringstream name;
 			name << "Monster " << i;
 		struct livingInfo_t tempLivingInfo = {name.str(), level, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
-		struct monsterInfo_t tempMonsterInfo = defaultData.monsterInfo;
 			uint32_t type = rand() % 3;
-			if(type == 0) {
-				tempMonsterInfo.damage[0] = defaultData.dragonInfo.damage[0];
-				tempMonsterInfo.damage[1] = defaultData.dragonInfo.damage[1];
-			} else if(type == 1) {
-				tempMonsterInfo.armor = defaultData.exoskeletonInfo.armor;
-			} else {
-				tempMonsterInfo.agility = defaultData.spiritInfo.agility;
+			if(type == monsterTypes::Dragon) {
+				monsters[i] = new Monster(tempLivingInfo, &(defaultData.dragonInfo),
+					type);
+			} else if(type == monsterTypes::Exoskeleton) {
+				monsters[i] = new Monster(tempLivingInfo, &(defaultData.exoskeletonInfo),
+					type);
+			} else {    // Spirit
+				monsters[i] = new Monster(tempLivingInfo, &(defaultData.spiritInfo),
+					type);
+			}
+		}
+	}
+
+	void roundEnd(uint32_t healthToRegen, uint32_t magicPowerToRegen) {
+		for(size_t i = 0; i < numHeroes; ++i) {
+			class Hero *h = heroes[i];
+			if(h->isAwake()) {
+				h->regenerate(healthToRegen, magicPowerToRegen);
 			}
 
-			monsters[i] = new Monster(tempLivingInfo, tempMonsterInfo, type);
+			class Monster *m = monsters[i];
+			if(m->isAwake()) {
+				m->regenerate(healthToRegen);
+			}
 		}
 	}
 
@@ -179,7 +191,7 @@ public:
 	*/
 
 	void createHero(const struct livingInfo_t& livingInfo, 
-		struct heroInfo_t& heroInfo, uint32_t heroClass) {
+		const struct heroInfo_t *const heroInfo, heroType heroClass) {
 
 		// TODO(stefanos): Add more error checking
 		if(heroes != NULL) {    // Assume that we have space

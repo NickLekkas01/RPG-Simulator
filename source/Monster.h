@@ -5,19 +5,6 @@
 #include <cstdint>
 #include "Living.h"
 
-
-struct dragonInfo_t {
-	uint32_t damage[2];
-};
-
-struct exoskeletonInfo_t {
-	uint32_t armor;
-};
-
-struct spiritInfo_t {
-	uint32_t agility;
-};
-
 typedef uint8_t monsterType;
 namespace monsterTypes { 
 	const uint8_t Dragon = 0;
@@ -35,10 +22,16 @@ struct monsterInfo_t {
 class Monster : public Living {
 private:
 	struct monsterInfo_t monsterInfo;
+	const struct monsterInfo_t *const initialData;
 	monsterType type;
 public:
-	Monster(const struct livingInfo_t& li, const struct monsterInfo_t& mi, monsterType t) :
-	     Living(li), monsterInfo(mi), type(t) { }
+	Monster(const struct livingInfo_t& li, const struct monsterInfo_t *const mi, monsterType t) :
+	     Living(li), initialData(mi), type(t) {
+			 monsterInfo.damage[0] = mi->damage[0];
+			 monsterInfo.damage[1] = mi->damage[1];
+			 monsterInfo.armor = mi->armor;
+			 monsterInfo.agility = mi->agility;
+		 }
 
 	void receiveAttack(uint32_t opDamage) {
 		if(monsterInfo.armor > opDamage) {
@@ -82,6 +75,11 @@ public:
 		if(x < monsterInfo.agility)
 			return false;
 		return true;
+	}
+
+	void regenerate(uint32_t healthToRegen) {
+		if(livingInfo.healthPower + healthToRegen < livingInfo.initialHealthPower)
+			livingInfo.healthPower += healthToRegen;
 	}
 
 

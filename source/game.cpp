@@ -238,30 +238,25 @@ int main(void) {
 
 		string heroClass;
 		size_t j;
-		struct heroInfo_t tempInfo = defaultData.heroInfo;
 		while(true) {
 			cout << "Type the class you want this hero to have: ";
 			cin >> heroClass;
 			if(heroClass == "Warrior") {
-				tempInfo.strength = defaultData.warriorInfo.strength;
-				tempInfo.dexterity = defaultData.warriorInfo.dexterity;
-				j = 0;
+				map.createHero(livingInfo, &(defaultData.warriorInfo), 
+					heroTypes::Warrior);
 				break;
 			} else if(heroClass == "Paladin") {
-				tempInfo.strength = defaultData.paladinInfo.strength;
-				tempInfo.agility = defaultData.paladinInfo.agility;
-				j = 1;
+				map.createHero(livingInfo, &(defaultData.paladinInfo), 
+					heroTypes::Paladin);
 				break;
 			} else if(heroClass == "Sorcerer") {
-				tempInfo.dexterity = defaultData.sorcererInfo.dexterity;
-				tempInfo.agility = defaultData.sorcererInfo.agility;
-				j = 2;
+				map.createHero(livingInfo, &(defaultData.sorcererInfo),
+					heroTypes::Sorcerer);
 				break;
 			} else {
 				cout << "That hero class does not exist" << endl;
 			}
 		}
-		map.createHero(livingInfo, tempInfo, j);
 	}
 
 	/* TODO(stefanos): DEBUG CODE - REMOVE THAT
@@ -344,8 +339,8 @@ int main(void) {
 			int spellsActivated[3][3] = { 0 };
 
 			// Number of rounds that a spell is active
-			// TODO(stefanos): Static for now, make it more dynamic.
-			int roundsOfSpell = 3;
+			// TODO(stefanos): Constant for now, make it more dynamic.
+			int roundsOfSpell = 2;
 
 			while (fightContinues) {
 				for (uint32_t i = 0; i < num_heroes; ++i) {
@@ -358,7 +353,6 @@ int main(void) {
 					if(h->isAwake()) {
 						cout << "Hero " << i + 1 << " attacks" << endl;
 						cout << "Attack Damage: " << h->getAttackDamage() << endl;
-						// TODO(stefanos): Let the user decide which monster to hit:DONE
 						int32_t option;
 
 						do {
@@ -437,7 +431,7 @@ int main(void) {
 						cout << endl;
 					}
 
-					// end of fight check
+					// check for end of fight
 
 					// TODO(stefanos): Complicated code, possibly
 					// I have to redo that!
@@ -450,7 +444,14 @@ int main(void) {
 						cout << "Monster " << i+1 << " attacks" << endl;
 						uint32_t damage = m->getAttackDamage();
 						cout << "Attack Damage: " << damage << endl;
-						h = map.searchHero(i);
+						size_t j = i;
+						while(j < 3) {
+							if((h = map.searchHero(j))->isAwake())
+								break;
+							++j;
+							if(j == 3)
+								j = 0;
+						}
 						h->receiveAttack(damage);
 						h->printInfo();
 						cout << endl;
@@ -463,25 +464,29 @@ int main(void) {
 
 
 				/////// ROUND END /////////
-				for(int j = 0; j < 3; ++j) {
-					for(int k = 0; k < 3; ++k) {
+				for(int j = 0; j < 3; ++j) {   // loop monsters
+					for(int k = 0; k < 3; ++k) {   // loop spells
 						int temp;
-						if((temp = spellsActivated[j][k]) > 0) {
+						if((temp = spellsActivated[j][k]) > 0) {  // a spell is active
 							--temp;
 							spellsActivated[j][k] = temp;
-							if(temp == 0) {
+							if(temp == 0) {   // spell just ended - revert back the stats
 								cout << "End of spell" << endl;
 								class Monster *a = map.searchMonster(j);
 								if(k == 0)    // IceSpell
 									a->setDamageRange(30, 100);
 								else if(k == 1)   // FireSpell
 									a->setArmor(30);
-								else
+								else     // LightingSpell
 									a->setAgility(2);
 							}
 						}
 					}
 				}
+
+				// TODO(stefanos): Constant values for now.
+				// Should be part of the input file
+				map.roundEnd(20, 25);
 			}
 			map.freeMonsters();
 		} else if(map.heroesOnStore() && choice == playerChoices::checkStoreItems) {

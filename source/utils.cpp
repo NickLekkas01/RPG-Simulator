@@ -1,4 +1,4 @@
- #include <string>
+#include <string>
 #include <iostream>
 #include <cstdint>
 #include <istream>
@@ -47,34 +47,43 @@ int defaultData_t::readDefaultData() {
 	std::string dataClass;
 	skipComments(dataFile);
 	while(dataFile >> dataClass) {
-		if(dataClass == "Hero") {
-			dataFile >> heroInfo.magicPower;
-			dataFile >> heroInfo.strength;
-			dataFile >> heroInfo.dexterity;
-			dataFile >> heroInfo.agility;
-			dataFile >> heroInfo.money;
-			dataFile >> heroInfo.exp;
-		} else if(dataClass == "Warrior") {
+		if(dataClass == "Warrior") {
+			dataFile >> warriorInfo.magicPower;
+			dataFile >> warriorInfo.money;
+			dataFile >> warriorInfo.exp;
 			dataFile >> warriorInfo.strength;
 			dataFile >> warriorInfo.dexterity;
+			dataFile >> warriorInfo.agility;
 		} else if(dataClass == "Paladin") {
+			dataFile >> paladinInfo.magicPower;
+			dataFile >> paladinInfo.money;
+			dataFile >> paladinInfo.exp;
 			dataFile >> paladinInfo.strength;
+			dataFile >> paladinInfo.dexterity;
 			dataFile >> paladinInfo.agility;
 		} else if(dataClass == "Sorcerer") {
+			dataFile >> sorcererInfo.magicPower;
+			dataFile >> sorcererInfo.money;
+			dataFile >> sorcererInfo.exp;
+			dataFile >> sorcererInfo.strength;
 			dataFile >> sorcererInfo.dexterity;
 			dataFile >> sorcererInfo.agility;
 		}
-		if(dataClass == "Monster") {
-			dataFile >> monsterInfo.damage[0];
-			dataFile >> monsterInfo.damage[1];
-			dataFile >> monsterInfo.armor;
-			dataFile >> monsterInfo.agility;
-		} else if(dataClass == "Dragon") {
+
+		if(dataClass == "Dragon") {
 			dataFile >> dragonInfo.damage[0];
 			dataFile >> dragonInfo.damage[1];
+			dataFile >> dragonInfo.armor;
+			dataFile >> dragonInfo.agility;
 		} else if(dataClass == "Exoskeleton") {
+			dataFile >> exoskeletonInfo.damage[0];
+			dataFile >> exoskeletonInfo.damage[1];
 			dataFile >> exoskeletonInfo.armor;
+			dataFile >> exoskeletonInfo.agility;
 		} else if(dataClass == "Spirit") {
+			dataFile >> spiritInfo.damage[0];
+			dataFile >> spiritInfo.damage[1];
+			dataFile >> spiritInfo.armor;
 			dataFile >> spiritInfo.agility;
 		}
 	}

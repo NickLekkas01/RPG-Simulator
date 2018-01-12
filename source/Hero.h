@@ -10,21 +10,6 @@
 #include "Armor.h"
 #include "Spell.h"
 
-struct warriorInfo_t {
-	uint32_t strength;
-	uint32_t dexterity;
-};
-
-struct paladinInfo_t {
-	uint32_t strength;
-	uint32_t agility;
-};
-
-struct sorcererInfo_t {
-	uint32_t dexterity;
-	uint32_t agility;
-};
-
 typedef uint8_t heroType;
 // NOTE(stefanos): Changed to avoid linker
 // problems
@@ -54,13 +39,14 @@ struct Inventory_t{
 class Hero : public Living {
 private:
 	struct heroInfo_t heroInfo;
+	const struct heroInfo_t *const initialData;
 	heroType type;
     Weapon *hands_availability[2];
 	class Armor* armor;
     struct Inventory_t InventoryInfo;
 public:
-	Hero(const struct livingInfo_t& li, const struct heroInfo_t& hi, heroType t) :
-	     Living(li), heroInfo(hi), type(t), armor(NULL) {
+	Hero(const struct livingInfo_t& li, const struct heroInfo_t *const hi, heroType t) :
+	     Living(li), heroInfo(*hi), initialData(hi), type(t), armor(NULL) {
          InventoryInfo.size=10;
          InventoryInfo.currently_holding=0;
          InventoryInfo.Inventory=new Item*[10];
@@ -112,36 +98,33 @@ public:
 		}
 	}
 
-	// NOTE(stefanos): Explain how the (exp > 100) and (exp = exp - 100)
-	// logic works.
+	void regenerate(uint32_t healthToRegen, uint32_t magicPowerToRegen) {
+		if(livingInfo.healthPower + healthToRegen <= livingInfo.initialHealthPower)
+			livingInfo.healthPower += healthToRegen;
+		if(heroInfo.magicPower + magicPowerToRegen <= initialData->magicPower)
+			heroInfo.magicPower += magicPowerToRegen ;
+	}
 
-	//ΝΟΤΕ(nikos): We'll have an the experience of each player, and by winning a monster he will gain experience. If his experience 
-	// passes 100 then he grows one level and the remaining experience is for the next level.
-	//Also i used comments in if's because i'm not so sure about how the variable type works ( just type==0  or type==1 or type==2 ?)
 	void levelUp(){
 		if(heroInfo.exp>100){
 			Living::add_level(1);
-			if(type==0){
+			if(type == heroTypes::Warrior){
 				heroInfo.strength+=2;
 				heroInfo.agility+=2;
 				heroInfo.dexterity++;
 				heroInfo.magicPower+=30;
-			Living::set_health(100);
-		}
-		else if(type==1){
-			heroInfo.strength+=2;
-			heroInfo.dexterity+=2;
-			heroInfo.agility++;
+			} else if(type == heroTypes::Paladin){
+				heroInfo.strength+=2;
+				heroInfo.dexterity+=2;
+				heroInfo.agility++;
 				heroInfo.magicPower+=50;
-				Living::set_health(80);
-			}
-			else if(type==2){
+			} else if(type == heroTypes::Sorcerer){
 				heroInfo.dexterity+=2;
 				heroInfo.agility+=2;
 				heroInfo.strength+=1;
 				heroInfo.magicPower+=100;
-				Living::set_health(50);
 			}
+
 			heroInfo.money+=500;
 			heroInfo.exp=heroInfo.exp-100;
 		}
@@ -199,6 +182,7 @@ public:
 		std::cout << std::endl;
 
 	}
+
 
 	uint32_t getAttackDamage(void) {
 		uint32_t damage = heroInfo.strength;
@@ -335,6 +319,8 @@ public:
 				armor = a;
 			}
 		}
+		
+		return true;
 	}
 
 	bool unequipArmor(class Item *it) {
