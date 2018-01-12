@@ -21,6 +21,10 @@ public:
 		damage[1] = dmg[1];
 	}
 
+	enum spellType getSpellType(void) const {
+		return type;
+	}
+
 	uint32_t getMinDamage(){
 		return damage[0];
 	}

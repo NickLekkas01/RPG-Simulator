@@ -339,99 +339,148 @@ int main(void) {
 				cout << endl;
 			}
 
+			// We have 3 monsters at most and each monster can have
+			// at most 1 spell activated at a given time.
+			int spellsActivated[3][3] = { 0 };
+
+			// Number of rounds that a spell is active
+			// TODO(stefanos): Static for now, make it more dynamic.
+			int roundsOfSpell = 3;
+
 			while (fightContinues) {
 				for (uint32_t i = 0; i < num_heroes; ++i) {
 
 					class Hero *h;
 					class Monster *m;
 
-
 					//// Hero attack ////
-					cout << "Hero " << i + 1 << " attacks" << endl;
 					h = map.searchHero(i);
-					cout << "Attack Damage: " << h->getAttackDamage() << endl;
-					// TODO(stefanos): Let the user decide which monster to hit:DONE
-					int32_t option;
+					if(h->isAwake()) {
+						cout << "Hero " << i + 1 << " attacks" << endl;
+						cout << "Attack Damage: " << h->getAttackDamage() << endl;
+						// TODO(stefanos): Let the user decide which monster to hit:DONE
+						int32_t option;
 
-					do {
-						cout << "Give which monster you want to hit" << endl;
-						cin >> option;
-						cout << option << endl;
-					} while(option < 0 || option>(num_heroes - 1));
+						do {
+							cout << "Give which monster you want to hit" << endl;
+							cin >> option;
+							cout << option << endl;
+						} while(option < 0 || option>(num_heroes - 1));
 
-					m = map.searchMonster((uint32_t)option);
+						m = map.searchMonster((uint32_t)option);
 
-					while(true) {
-						cout << "Choose option:" << endl << "Attack(0) Spell(1) Potion(2)" << endl;
-						cin >> option;
-						// TODO(stefanos): Take agility into consideration
-						if (option == 0) {
-							m->receiveAttack(h->getAttackDamage());
-							break;
-						} else if (option == 1) {
-							string spellName;
-							cout << "Type the name of the spell you want to use" << endl;
-							cin >> spellName;
-							class Spell *s = (class Spell *) h->searchItem(spellName);
-							if(s == NULL) {
-								cout << "This spell does not exist" << endl;
-								continue;
+						while(true) {
+							cout << "Choose option:" << endl << "Attack(0) Spell(1) Potion(2)" << endl;
+							cin >> option;
+							// TODO(stefanos): Take agility into consideration
+							if (option == 0) {
+								m->receiveAttack(h->getAttackDamage());
+								break;
+							} else if (option == 1) {
+								string spellName;
+								cout << "Type the name of the spell you want to use" << endl;
+								cin >> spellName;
+								class Spell *s = (class Spell *) h->searchItem(spellName);
+								if(s == NULL) {
+									cout << "This spell does not exist" << endl;
+									continue;
+								}
+								if(h->getLevel() < s->getMinLevel()) {
+									cout << "You are not on the required level to use this spell" << endl;
+									continue;
+								}
+								uint32_t spellDam = h->getCastSpellDamage(s);
+								if(!spellDam) {
+									cout << "You don't have enough magic power to execute this spell" << endl;
+									continue;
+								}
+								// TODO(stefanos): Maybe a better implementation
+								// would be that we do have 3 subclasses for spell.
+								// The Spell class is going to be abstract because
+								// of a pure virtual method that will be something
+								// like activateSpell(). That will take a monster
+								// as input and depending on which spell it is,
+								// it's going to do the appropriate diminishing on the
+								// monster. For each spell class, we will set the
+								// amount of decrement for each thing.
+								// In that way, instead of the code below,
+								// we will just do: s->activateSpell(m);
+								// And when the spell is over, the class
+								// is also going to have a virtual method
+								// to reset the monster back to its original
+								// state.
+								
+								// For now, even with this implenmentation,
+								// the checking about whether a spell
+								// is still active, stays the same.
+								enum spellType type = s->getSpellType();
+								spellsActivated[i][type] = roundsOfSpell;
+								// TODO(stefanos): Amount of decrement
+								// is static for now. Could be part of defaultData?
+								if(type == IceSpell)
+									m->setDamageRange(30, 70);
+								else if(type == FireSpell)
+									m->setArmor(20);
+								else
+									m->setAgility(15);
+								m->receiveAttack(spellDam);
+								break;
+							} else if (option == 2) {
+								//h->usePotion("mySpell");
+								//break;
+							} else {
+								cout << "Not proper option" << endl;
 							}
-							if(h->getLevel() < s->getMinLevel()) {
-								cout << "You are not on the required level to use this spell" << endl;
-								continue;
-							}
-							uint32_t spellDam = h->getCastSpellDamage(s);
-							if(!spellDam) {
-								cout << "You don't have enough magic power to execute this spell" << endl;
-								continue;
-							}
-							m->receiveAttack(spellDam);
-							break;
-						} else if (option == 2) {
-							//h->usePotion("mySpell");
-							//break;
-						} else {
-							cout << "Not proper option" << endl;
 						}
+
+						m->printInfo();
+						cout << endl;
 					}
 
-					m->printInfo();
-					cout << endl;
+					// end of fight check
 
-					if (map.allHeroesDead()) {
-						fightContinues = false;
-						cout << endl << endl;
-						cout << "MONSTERS WON" << endl;
-						cout << endl << endl;
-					} else if (map.allMonstersDead()) {
-						fightContinues = false;
-						cout << endl << endl;
-						cout << "HEROES WON" << endl;
-						cout << endl << endl;
-					}
+					// TODO(stefanos): Complicated code, possibly
+					// I have to redo that!
+					if(!(fightContinues = !map.fightEnded()))
+						break;
 
 					//// Monster attack ////
-					cout << "Monster " << i+1 << " attacks" << endl;
 					m = map.searchMonster(i);
-					uint32_t damage = m->getAttackDamage();
-					cout << "Attack Damage: " << damage << endl;
-					h = map.searchHero(i);
-					h->receiveAttack(damage);
-					h->printInfo();
-					cout << endl;
+					if(m->isAwake()) {
+						cout << "Monster " << i+1 << " attacks" << endl;
+						uint32_t damage = m->getAttackDamage();
+						cout << "Attack Damage: " << damage << endl;
+						h = map.searchHero(i);
+						h->receiveAttack(damage);
+						h->printInfo();
+						cout << endl;
+					}
+
+					// end of fight check
+					if(!(fightContinues = !map.fightEnded()))
+						break;
 				}
 
-				if (map.allHeroesDead()) {
-					fightContinues = false;
-					cout << endl << endl;
-					cout << "MONSTERS WON" << endl;
-					cout << endl << endl;
-				} else if (map.allMonstersDead()) {
-					fightContinues = false;
-					cout << endl << endl;
-					cout << "HEROES WON" << endl;
-					cout << endl << endl;
+
+				/////// ROUND END /////////
+				for(int j = 0; j < 3; ++j) {
+					for(int k = 0; k < 3; ++k) {
+						int temp;
+						if((temp = spellsActivated[j][k]) > 0) {
+							--temp;
+							spellsActivated[j][k] = temp;
+							if(temp == 0) {
+								cout << "End of spell" << endl;
+								class Monster *a = map.searchMonster(j);
+								if(k == 0)    // IceSpell
+									a->setDamageRange(30, 100);
+								else if(k == 1)   // FireSpell
+									a->setArmor(30);
+								else
+									a->setAgility(2);
+							}
+						}
+					}
 				}
 			}
 			map.freeMonsters();

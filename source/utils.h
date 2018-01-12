@@ -73,6 +73,7 @@ public:
 		}
 	}
 	int initializeHeroesPosition(int32_t*);
+	
 
 	class Hero *searchHero(std::string name) {
 		if(heroes != NULL) {
@@ -136,6 +137,22 @@ public:
 		}
 		
 		return true;
+	}
+
+	bool fightEnded(void) const {
+		if(allHeroesDead()) {
+			std::cout << std::endl << std::endl;
+			std::cout << "MONSTERS WON" << std::endl;
+			std::cout << std::endl << std::endl;
+			return true;
+		} else if(allMonstersDead()) {
+			std::cout << std::endl << std::endl;
+			std::cout << "HEROES WON" << std::endl;
+			std::cout << std::endl << std::endl;
+			return true;
+		}
+
+		return false;
 	}
 
 	void setNumHeroesAndMonsters(uint32_t num_heroes) {

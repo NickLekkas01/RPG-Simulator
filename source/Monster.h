@@ -55,6 +55,23 @@ public:
 		}
 	}
 
+	monsterType getMonsterType(void) const {
+		return type;
+	}
+
+	void setDamageRange(uint32_t low, uint32_t high) {
+		monsterInfo.damage[0] = low;
+		monsterInfo.damage[1] = high;
+	}
+
+	void setArmor(uint32_t armor) {
+		monsterInfo.armor = armor;
+	}
+
+	void setAgility(uint32_t agility) {
+		monsterInfo.agility = agility;
+	}
+
 	uint32_t getAttackDamage() const {
 		uint32_t res = rand() % (monsterInfo.damage[1] - monsterInfo.damage[0]) + monsterInfo.damage[0];
 		return res;
@@ -67,6 +84,7 @@ public:
 		return true;
 	}
 
+
 	void printInfo(void) const {
 		std::cout << "Type: " << monsterTypes::monsterNames[type] << std::endl;
 		std::cout << "Name: " << Living::getName() << std::endl;
@@ -77,52 +95,6 @@ public:
 		std::cout << "Armor: "  << monsterInfo.armor << std::endl;
 		std::cout << "Agility: "    << monsterInfo.agility << std::endl;
 	}
-
-
-	// NOTE(stefanos):
-	// Generate accesses private data of Hero, which is wrong. Better with
-	// getters but more importantly,
- 	// possibly we only care for the level of the monster,
-	// so we don't have to pass a hero to Generate(), just
-	// the level of the monster we want to generate and have
-	// some kind of dynamic generation (i.e. agility = 1.5 * level).
-	// In that way, we remove the dependency with Hero.
-	// Also, Generate() should be the constructor, because it is
-	// in the gameplay side (that's me :D )when we generate a monster
-	// and we construct it based on the level and some default data.
-	// Lastly, explain how agility works in terms of what it affects and
-	// how because I have no idea of those games. :P
-
-	// NOTE(nikos) I agree with the part of not giving the whole class, but shouldn't the prices
-	// of agility,armor and health be equal of the ones of the hero? We can give the level and the other prices.
-	//another thought is: Will we generate a monster for each hero based on his statistics?
-	// And by that I mean having a 11 level monster,15 level monster if we have an 11 level hero and an 15 level hero
-	//About how agility effects the damage, im not sure but we could rise the value of minimum damage if we see high agility(something like that)
-	void Generate(uint8_t lev, uint32_t health, uint32_t agil){
-			Living::add_level(lev);
-            Living::set_health(health);
-			if(type==0){
-                Living::set_name("Dragon");
-				monsterInfo.damage[0]=10;
-                monsterInfo.damage[1]=50;
-                monsterInfo.armor=5;
-                monsterInfo.agility=agil;
-			}
-			else if(type==1){
-                Living::set_name("Exoskeleton");
-				monsterInfo.damage[0]=10;
-                monsterInfo.damage[1]=30;
-                monsterInfo.armor=10;
-                monsterInfo.agility=agil;
-			}
-			else if(type==2){
-                Living::set_name("Spirit");
-				monsterInfo.damage[0]=10;
-                monsterInfo.damage[1]=30;
-                monsterInfo.armor=3;
-                monsterInfo.agility=agil+5;
-			}
-		}
 };
 
 #endif
