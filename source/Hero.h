@@ -264,19 +264,31 @@ public:
 				uint32_t min_lvl = pot->getMinLevel();
 				if(livingInfo.level < min_lvl)
 					return NULL;
-				potionType type = pot->get_Potion_type();
-				uint32_t restoration_amount = pot->get_Restoration_amount();
+				potionType type = pot->getPotionType();
+				uint32_t restoration_amount = pot->getRestorationAmount();
 				// TODO(stefanos): Set upper bound for how much any property
 				// can be raised.
 				if(type == potionTypes::health) {
 					if((livingInfo.healthPower += restoration_amount) > livingInfo.initialHealthPower)
 						livingInfo.healthPower = livingInfo.initialHealthPower;
 				} else if(type == potionTypes::strength) {
-					heroInfo.strength += restoration_amount;
+					if((heroInfo.strength += restoration_amount) <= 
+						initialData->strength) {
+
+						heroInfo.strength += restoration_amount;
+					}
 				} else if(type == potionTypes::dexterity) {
-					heroInfo.dexterity += restoration_amount;
+					if((heroInfo.dexterity += restoration_amount) <= 
+						initialData->dexterity) {
+
+						heroInfo.dexterity += restoration_amount;
+					}
 				} else if(type == potionTypes::agility) {
-					heroInfo.agility += restoration_amount;
+					if((heroInfo.agility += restoration_amount) <= 
+						initialData->agility) {
+
+						heroInfo.agility += restoration_amount;
+					}
 				}
 
 				class Item *tmp = InventoryInfo.Inventory[i];

@@ -359,74 +359,98 @@ int main(void) {
 						cout << "Hero " << i + 1 << " attacks" << endl;
 						cout << "Attack Damage: " << h->getAttackDamage() << endl;
 						int32_t option;
-
-						do {
-							cout << "Give which monster you want to hit" << endl;
-							cin >> option;
-							cout << option << endl;
-						} while(option < 0 || option>(num_heroes - 1));
-
-						m = map.searchMonster((uint32_t)option);
-
 						while(true) {
-							cout << "Choose option:" << endl << "Attack(0) Spell(1) Potion(2)" << endl;
+							cout << "Choose option:" << endl << "Fight(0) use Potion(1)" << endl;
 							cin >> option;
-							// TODO(stefanos): Take agility into consideration
-							if (option == 0) {
-								m->receiveAttack(h->getAttackDamage());
+							if(option == 1) {
+								h->printPotions();
+								cout << "Type the name of the potion: " << endl;
+								string name;
+								cin >> name;
+								class Item *it = h->usePotion(name);
+								if(it == NULL) {
+									cout << "The potion either does not exist, or you are " \
+										"not in the required level to use it" << endl;
+									continue;
+								}
+								if(h->getLevel() < it->getMinLevel()) {
+									cout << "You are not on the required level to use this potion" << endl;
+									continue;
+								} else {
+									store.deleteItem(it);
+								}
+								h->printInfo();
 								break;
-							} else if (option == 1) {
-								string spellName;
-								cout << "Type the name of the spell you want to use" << endl;
-								cin >> spellName;
-								class Spell *s = (class Spell *) h->searchItem(spellName);
-								if(s == NULL) {
-									cout << "This spell does not exist" << endl;
-									continue;
-								}
-								if(h->getLevel() < s->getMinLevel()) {
-									cout << "You are not on the required level to use this spell" << endl;
-									continue;
-								}
-								uint32_t spellDam = h->getCastSpellDamage(s);
-								if(!spellDam) {
-									cout << "You don't have enough magic power to execute this spell" << endl;
-									continue;
-								}
-								
-								// For now, even with this implenmentation,
-								// the checking about whether a spell
-								// is still active, stays the same.
-								spellType type = s->getSpellType();
-								size_t j;
-								for(j = 0; j < 3; ++j) {
-									if(spellsActivated[i][j].s == NULL)
-										break;
-								}
-								spellsActivated[i][j].s = s;
-								spellsActivated[i][j].roundsRemaining = roundsOfSpell;
-								// TODO(stefanos): Amount of decrement
-								// is static for now. Could be part of defaultData?
-								uint32_t am = s->getReductionAmount();
-								if(type == spellTypes::IceSpell) {
-									m->reduceHighDamage(am);
-								} else if(type == spellTypes::FireSpell)
-									m->reduceArmor(am);
-								else
-									m->reduceAgility(am);
+							} else if(option == 0) {
+								do {
+									cout << "Give which monster you want to hit" << endl;
+									cin >> option;
+									cout << option << endl;
+								} while(option < 0 || option>(num_heroes - 1));
 
-								m->receiveAttack(spellDam);
+								m = map.searchMonster((uint32_t)option);
+
+								while(true) {
+									cout << "Choose option:" << endl << "Attack(0) Spell(1)" << endl;
+									cin >> option;
+									// TODO(stefanos): Take agility into consideration
+									if (option == 0) {
+										m->receiveAttack(h->getAttackDamage());
+										break;
+									} else if (option == 1) {
+										string spellName;
+										cout << "Type the name of the spell you want to use" << endl;
+										cin >> spellName;
+										class Spell *s = (class Spell *) h->searchItem(spellName);
+										if(s == NULL) {
+											cout << "This spell does not exist" << endl;
+											continue;
+										}
+										if(h->getLevel() < s->getMinLevel()) {
+											cout << "You are not on the required level to use this spell" << endl;
+											continue;
+										}
+										uint32_t spellDam = h->getCastSpellDamage(s);
+										if(!spellDam) {
+											cout << "You don't have enough magic power to execute this spell" << endl;
+											continue;
+										}
+										
+										// For now, even with this implenmentation,
+										// the checking about whether a spell
+										// is still active, stays the same.
+										spellType type = s->getSpellType();
+										size_t j;
+										for(j = 0; j < 3; ++j) {
+											if(spellsActivated[i][j].s == NULL)
+												break;
+										}
+										spellsActivated[i][j].s = s;
+										spellsActivated[i][j].roundsRemaining = roundsOfSpell;
+										// TODO(stefanos): Amount of decrement
+										// is static for now. Could be part of defaultData?
+										uint32_t am = s->getReductionAmount();
+										if(type == spellTypes::IceSpell) {
+											m->reduceHighDamage(am);
+										} else if(type == spellTypes::FireSpell)
+											m->reduceArmor(am);
+										else
+											m->reduceAgility(am);
+
+										m->receiveAttack(spellDam);
+										break;
+									} else {
+										cout << "Not a proper option" << endl;
+									}
+								}
+
+								m->printInfo();
+								cout << endl;
 								break;
-							} else if (option == 2) {
-								//h->usePotion("mySpell");
-								//break;
 							} else {
-								cout << "Not proper option" << endl;
+								cout << "Not a proper option" << endl;
 							}
 						}
-
-						m->printInfo();
-						cout << endl;
 					}
 
 					// check for end of fight

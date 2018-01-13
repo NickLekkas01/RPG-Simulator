@@ -5,7 +5,10 @@
 
 typedef uint32_t potionType;
 namespace potionTypes{
-	enum { health, strength, dexterity, agility };
+	const uint32_t health = 0;
+	const uint32_t strength = 0;
+	const uint32_t dexterity = 0;
+	const uint32_t agility = 0;
 	const char* const potionNames[] = { "Health Potion", "Strength Potion", "Dexterity Potion", "Agility Potion" }; 
 }
 
@@ -18,10 +21,11 @@ public:
 		uint32_t restoreAmount, potionType potType) :
 		Item(name, pr, min_level, type), restorationAmount(restoreAmount),
 		type(potType) { }
-	uint32_t get_Restoration_amount() const {
+
+	uint32_t getRestorationAmount() const {
 		return restorationAmount;
 	}
-	potionType get_Potion_type() const {
+	potionType getPotionType() const {
 		return type;
 	}
 
