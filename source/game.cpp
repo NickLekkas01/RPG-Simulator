@@ -15,6 +15,11 @@
 
 using namespace std;
 
+struct spell_record {
+	class Spell *s;
+	uint32_t roundsRemaining;
+};
+
 namespace playerChoices {
 	int32_t initializeHeroes = 2;
 	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equipWeapon, unequipWeapon, equipArmor, unequipArmor, checkStoreItems, buy, sell};
@@ -335,8 +340,8 @@ int main(void) {
 			}
 
 			// We have 3 monsters at most and each monster can have
-			// at most 1 spell activated at a given time.
-			int spellsActivated[3][3] = { 0 };
+			// at most 10 spells activated at a given time.
+			struct spell_record spellsActivated[3][10] = { };
 
 			// Number of rounds that a spell is active
 			// TODO(stefanos): Constant for now, make it more dynamic.
@@ -388,35 +393,28 @@ int main(void) {
 									cout << "You don't have enough magic power to execute this spell" << endl;
 									continue;
 								}
-								// TODO(stefanos): Maybe a better implementation
-								// would be that we do have 3 subclasses for spell.
-								// The Spell class is going to be abstract because
-								// of a pure virtual method that will be something
-								// like activateSpell(). That will take a monster
-								// as input and depending on which spell it is,
-								// it's going to do the appropriate diminishing on the
-								// monster. For each spell class, we will set the
-								// amount of decrement for each thing.
-								// In that way, instead of the code below,
-								// we will just do: s->activateSpell(m);
-								// And when the spell is over, the class
-								// is also going to have a virtual method
-								// to reset the monster back to its original
-								// state.
 								
 								// For now, even with this implenmentation,
 								// the checking about whether a spell
 								// is still active, stays the same.
-								enum spellType type = s->getSpellType();
-								spellsActivated[i][type] = roundsOfSpell;
+								spellType type = s->getSpellType();
+								size_t j;
+								for(j = 0; j < 3; ++j) {
+									if(spellsActivated[i][j].s == NULL)
+										break;
+								}
+								spellsActivated[i][j].s = s;
+								spellsActivated[i][j].roundsRemaining = roundsOfSpell;
 								// TODO(stefanos): Amount of decrement
 								// is static for now. Could be part of defaultData?
-								if(type == IceSpell)
-									m->setDamageRange(30, 70);
-								else if(type == FireSpell)
-									m->setArmor(20);
+								uint32_t am = s->getReductionAmount();
+								if(type == spellTypes::IceSpell) {
+									m->reduceHighDamage(am);
+								} else if(type == spellTypes::FireSpell)
+									m->reduceArmor(am);
 								else
-									m->setAgility(15);
+									m->reduceAgility(am);
+
 								m->receiveAttack(spellDam);
 								break;
 							} else if (option == 2) {
@@ -467,18 +465,19 @@ int main(void) {
 				for(int j = 0; j < 3; ++j) {   // loop monsters
 					for(int k = 0; k < 3; ++k) {   // loop spells
 						int temp;
-						if((temp = spellsActivated[j][k]) > 0) {  // a spell is active
+						if((temp = spellsActivated[j][k].roundsRemaining) > 0) {  // a spell is active
 							--temp;
-							spellsActivated[j][k] = temp;
+							spellsActivated[j][k].roundsRemaining = temp;
+							class Spell *s = spellsActivated[j][k].s;
 							if(temp == 0) {   // spell just ended - revert back the stats
 								cout << "End of spell" << endl;
 								class Monster *a = map.searchMonster(j);
 								if(k == 0)    // IceSpell
-									a->setDamageRange(30, 100);
+									a->incrementHighDamage(s->getReductionAmount());
 								else if(k == 1)   // FireSpell
-									a->setArmor(30);
+									a->incrementArmor(s->getReductionAmount());
 								else     // LightingSpell
-									a->setAgility(2);
+									a->incrementAgility(s->getReductionAmount());
 							}
 						}
 					}

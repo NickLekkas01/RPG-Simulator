@@ -267,19 +267,20 @@ int Store::readItems(const std::string& fileName) {
 			items[i].taken = 0;
 
 		} else if(itemClass == "Spell") {
-			uint32_t damage[2], mana;
-			// TODO(stefanos): Think about the use of enum
-			enum spellType type;
+			uint32_t damage[2], reductionAmount, mana;
+			spellType type;
 			std::string spell_type;
-			itemsFile >> name >> price >> min_level >> damage[0] >> damage[1] >> mana >> spell_type;
+			itemsFile >> name >> price >> min_level >> damage[0] >> damage[1] 
+				>> reductionAmount >> mana >> spell_type;
 			if(spell_type == "IceSpell")
-				type = IceSpell;
+				type = spellTypes::IceSpell;
 			else if(spell_type == "FireSpell")
-				type = FireSpell;
+				type = spellTypes::FireSpell;
 			else
-				type = LightingSpell;
+				type = spellTypes::LightingSpell;
+
 			items[i].item = new Spell(name, price, min_level, 
-				itemTypes::Spell, damage, mana, type);
+				itemTypes::Spell, damage, mana, reductionAmount, type);
 			items[i].taken = 0;
 
 		} else if(itemClass == "Potion") {
@@ -295,6 +296,7 @@ int Store::readItems(const std::string& fileName) {
 
 			itemsFile >> name >> price >> min_level >> armorValue;
 			items[i].item = new Armor(name, price, min_level, itemTypes::Armor, armorValue);
+			items[i].taken = 0;
 		}
 
 		++currently_holding;

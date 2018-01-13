@@ -52,17 +52,35 @@ public:
 		return type;
 	}
 
-	void setDamageRange(uint32_t low, uint32_t high) {
-		monsterInfo.damage[0] = low;
-		monsterInfo.damage[1] = high;
+	void reduceHighDamage(uint32_t high) {
+		if(monsterInfo.damage[1] - high > monsterInfo.damage[0])
+			monsterInfo.damage[1] -= high;
 	}
 
-	void setArmor(uint32_t armor) {
-		monsterInfo.armor = armor;
+	void incrementHighDamage(uint32_t high) {
+		if(monsterInfo.damage[1] + high <= initialData->damage[1])
+			monsterInfo.damage[1] += high;
 	}
 
-	void setAgility(uint32_t agility) {
-		monsterInfo.agility = agility;
+	void reduceArmor(uint32_t armor) {
+		if(monsterInfo.armor - armor > monsterInfo.armor)
+			monsterInfo.armor -= armor;
+	}
+
+	void incrementArmor(uint32_t armor) {
+		if(monsterInfo.armor + armor <= initialData->armor)
+			monsterInfo.armor += armor;
+	}
+
+	void reduceAgility(uint32_t agility) {
+		if(monsterInfo.agility - agility > monsterInfo.agility)
+			monsterInfo.agility -= agility;
+	}
+
+
+	void incrementAgility(uint32_t agility) {
+		if(monsterInfo.agility + agility <= initialData->agility)
+			monsterInfo.agility += agility;
 	}
 
 	uint32_t getAttackDamage() const {
