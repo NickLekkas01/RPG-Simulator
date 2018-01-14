@@ -36,13 +36,13 @@ public:
 		return livingInfo.name;
 	}
 
-	void add_level(uint8_t lev){
+	void addLevel(uint8_t lev){
 		livingInfo.level+=lev;
 	}
-	void set_health(uint32_t num){
+	void addHealth(uint32_t num){
 		livingInfo.healthPower+=num;
 	}
-	void set_name(std::string nam){
+	void setName(std::string nam){
 		livingInfo.name=nam;
 	}
 };

@@ -105,9 +105,18 @@ public:
 			heroInfo.magicPower += magicPowerToRegen ;
 	}
 
-	void levelUp(){
+	void addExp(uint32_t exp) {
+		// TODO(stefanos): Possibly add a bound here.
+		heroInfo.exp += exp;
+	}
+
+	void addMoney(uint32_t m) {
+		heroInfo.money += m;
+	}
+
+	bool tryLevelUp(){
 		if(heroInfo.exp>100){
-			Living::add_level(1);
+			++livingInfo.level;
 			if(type == heroTypes::Warrior){
 				heroInfo.strength+=2;
 				heroInfo.agility+=2;
@@ -127,7 +136,10 @@ public:
 
 			heroInfo.money+=500;
 			heroInfo.exp=heroInfo.exp-100;
-		}
+
+			return true;
+		} else
+			return false;
 	}
 
 
@@ -181,6 +193,18 @@ public:
 		}
 		std::cout << std::endl;
 
+	}
+
+	void resetHealth(void) {
+		livingInfo.healthPower = livingInfo.initialHealthPower;
+	}
+
+	void resetHealthToHalf(void) {
+		livingInfo.healthPower = livingInfo.initialHealthPower / 2;
+	}
+
+	void resetMoneyToHalf(void) {
+		heroInfo.money = heroInfo.money / 2;
 	}
 
 

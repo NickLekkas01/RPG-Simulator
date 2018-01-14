@@ -156,11 +156,30 @@ public:
 			std::cout << std::endl << std::endl;
 			std::cout << "MONSTERS WON" << std::endl;
 			std::cout << std::endl << std::endl;
+
+			for(size_t i = 0; i < numHeroes; ++i) {
+				if(!heroes[i]->isAwake())
+					heroes[i]->resetHealthToHalf();
+				else
+					heroes[i]->resetHealth();
+
+				heroes[i]->resetMoneyToHalf();
+			}
+
 			return true;
 		} else if(allMonstersDead()) {
 			std::cout << std::endl << std::endl;
 			std::cout << "HEROES WON" << std::endl;
 			std::cout << std::endl << std::endl;
+
+			for(size_t i = 0; i < numHeroes; ++i) {
+				heroes[i]->addExp(numHeroes * 10 + (heroes[i]->getLevel() / 100.0f));
+				if(heroes[i]->tryLevelUp()) {
+					std::cout << heroes[i]->getName() << " leveled up!" << std::endl;
+				}
+				heroes[i]->addMoney(500 + 500 * (heroes[i]->getLevel() / 100.0f));
+			}
+
 			return true;
 		}
 

@@ -329,7 +329,6 @@ int main(void) {
 			cout << "FIGHT!!!!!!!!" << endl;
 			map.generateMonsters(defaultData);
 
-			bool fightContinues = true;
 			for (uint32_t i = 0; i < num_heroes; ++i) {
 				class Hero *h = map.searchHero(i);
 				class Monster *m = map.searchMonster(i);
@@ -347,7 +346,7 @@ int main(void) {
 			// TODO(stefanos): Constant for now, make it more dynamic.
 			int roundsOfSpell = 2;
 
-			while (fightContinues) {
+			while (true) {
 				for (uint32_t i = 0; i < num_heroes; ++i) {
 
 					class Hero *h;
@@ -360,9 +359,11 @@ int main(void) {
 						cout << "Attack Damage: " << h->getAttackDamage() << endl;
 						int32_t option;
 						while(true) {
-							cout << "Choose option:" << endl << "Fight(0) use Potion(1)" << endl;
+							cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2)" << endl;
 							cin >> option;
-							if(option == 1) {
+							if(option == 2) {
+								h->printInfo();
+							} else if(option == 1) {
 								h->printPotions();
 								cout << "Type the name of the potion: " << endl;
 								string name;
@@ -398,6 +399,8 @@ int main(void) {
 										m->receiveAttack(h->getAttackDamage());
 										break;
 									} else if (option == 1) {
+										// TODO(stefanos): Think about mana
+										// after the end of a fight.
 										string spellName;
 										cout << "Type the name of the spell you want to use" << endl;
 										cin >> spellName;
@@ -455,10 +458,14 @@ int main(void) {
 
 					// check for end of fight
 
+					int winners;
 					// TODO(stefanos): Complicated code, possibly
 					// I have to redo that!
-					if(!(fightContinues = !map.fightEnded()))
+
+					// CONTINUE
+					if(map.fightEnded()) {
 						break;
+					}
 
 					//// Monster attack ////
 					m = map.searchMonster(i);
@@ -480,7 +487,7 @@ int main(void) {
 					}
 
 					// end of fight check
-					if(!(fightContinues = !map.fightEnded()))
+					if(!map.fightEnded())
 						break;
 				}
 
@@ -511,6 +518,7 @@ int main(void) {
 				// Should be part of the input file
 				map.roundEnd(20, 25);
 			}
+
 			map.freeMonsters();
 		} else if(map.heroesOnStore() && choice == playerChoices::checkStoreItems) {
 			store.print();
