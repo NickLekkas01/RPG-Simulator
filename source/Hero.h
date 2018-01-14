@@ -443,6 +443,7 @@ public:
 	bool hasEnoughMoney(class Item* it) const {
 		return (heroInfo.money > it->get_price());
 	}
+
 	int buy(Item *Item_bought){
 		if(inventoryAvaiableSpace()){
             if(hasEnoughMoney(Item_bought)) {

@@ -33,9 +33,11 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 		h->printInfo();
 	} else if(choice == playerChoices::usePotion) {
 		h->printPotions();
-		cout << "Type the name of the potion: " << endl;
+		cout << "Type the name of the potion (or go back: -1): " << endl;
 		string name;
 		cin >> name;
+		if(name == "-1")
+			return;
 		class Item *it = h->usePotion(name);
 		if(it == NULL) {
 			cout << "The potion either does not exist, or you are " \
@@ -54,9 +56,11 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 			return;
 		}
 		h->printWeapons();
-		cout << "Type the name of the weapon you want to equip: " << endl;
+		cout << "Type the name of the weapon you want to equip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
+		if(name == "-1")
+			return;
 		class Item *it = h->searchItem(name);
 		if(it == NULL) {
 			cout << "The weapon does not exist" << endl;
@@ -76,9 +80,11 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 	    }
 	} else if(choice == playerChoices::unequipWeapon) {
 		h->checkInventory();
-		cout << "Type the name of the weapon you want to unequip: " << endl;
+		cout << "Type the name of the weapon you want to unequip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
+		if(name == "-1")
+			return;
 		class Item *it = h->searchItem(name);
 		if (it == NULL) {
 			cout << "The weapon does not exist" << endl;
@@ -94,9 +100,11 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 			return;
 		}
 		h->printArmors();
-		cout << "Type the name of the armor you want to equip: " << endl;
+		cout << "Type the name of the armor you want to equip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
+		if(name == "-1")
+			return;
 		class Item *it = h->searchItem(name);
 		if(it == NULL) {
 			cout << "The armor does not exist" << endl;
@@ -116,9 +124,11 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 		}
 	} else if(choice == playerChoices::unequipArmor){
 		h->checkInventory();
-		cout << "Type the name of the armor you want to unequip: " << endl;
+		cout << "Type the name of the armor you want to unequip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
+		if(name == "-1")
+			return;
 		class Item *it = h->searchItem(name);
 		if(it == NULL) {
 			cout << "The armor does not exist" << endl;
@@ -136,8 +146,10 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 			}
 			string name;
 			store.print();
-			cout << "Type the name of the item you want to buy: ";
+			cout << "Type the name of the item you want to buy (or go back: -1): ";
 			cin >> name;
+			if(name == "-1")
+				return;
 			class Item *it = store.searchItem(name);
 			if(it == NULL) {
 				cout << "That item is not on the store" << endl;
@@ -147,6 +159,7 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 				cout << "You don't have enough money to buy this item" << endl;
 				return;
 			}
+			// TODO(stefanos): Possibly save the search by passing the pointer.
 			h->buy(store.removeItem(name));
 		} else if(choice == playerChoices::sell) {
 	        // NOTE(stefanos): The procedure is the same with the buy,
@@ -157,14 +170,17 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 	        // Show the items that they already have
 	        h->checkInventory();
 	        string name;
-	        cout << "Type the name of the item you want to sell: ";
+	        cout << "Type the name of the item you want to sell (or go back: -1): ";
 	        cin >> name;
+			if(name == "-1")
+				return;
 	        class Item *it = h->searchItem(name);
 	        if (it == NULL) {
 	            cout << "This item is not on the inventory" << endl;
 	        } else if(h->isInUse(it)) {
 	            cout << "This item is in use. Unequip it first if you want to sell it." << endl;
 	        } else {
+				// TODO(stefanos): Possibly save the search by passing the pointer.
 				store.addItem(h->sell(name));
 			}
 		}
@@ -224,7 +240,8 @@ int main(void) {
 	// have the memory from the store. Memory gets destroyed when we don't need
 	// the store anymore. Provided that any item that any hero has is taken
 	// from the store, this is the end of the game.
-
+	
+	// TODO(stefanos): Put a more versatile size.
 	class Store store(10);
 	// TODO(stefanos): Path relative to the compiler
 	// Fix that on the release
@@ -342,7 +359,7 @@ int main(void) {
 
 			// Number of rounds that a spell is active
 			// TODO(stefanos): Constant for now, make it more dynamic.
-			int roundsOfSpell = 2;
+			const int roundsOfSpell = 2;
 
 			while (true) {
 				for (uint32_t i = 0; i < num_heroes; ++i) {
@@ -357,9 +374,11 @@ int main(void) {
 						cout << "Attack Damage: " << h->getAttackDamage() << endl;
 						int32_t option;
 						while(true) {
-							cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2)" << endl;
+							cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2) Go Back(-1)" << endl;
 							cin >> option;
-							if(option == 2) {
+							if(option == -1)
+								break;
+							else if(option == 2) {
 								h->printInfo();
 							} else if(option == 1) {
 								h->printPotions();
@@ -390,7 +409,7 @@ int main(void) {
 								m = map.searchMonster((uint32_t)option);
 
 								while(true) {
-									cout << "Choose option:" << endl << "Attack(0) Spell(1)" << endl;
+									cout << "Choose option:" << endl << "Attack(0) Spell(1) Go Back(-1)" << endl;
 									cin >> option;
 									// TODO(stefanos): Take agility into consideration
 
@@ -400,7 +419,9 @@ int main(void) {
 										}
 										break;
 									}
-									if(option == 0) {
+									if(option == -1)
+										break;
+									else if(option == 0) {
 										m->receiveAttack(h->getAttackDamage());
 										break;
 									} else if(option == 1) {
@@ -429,7 +450,7 @@ int main(void) {
 										// is still active, stays the same.
 										spellType type = s->getSpellType();
 										size_t j;
-										for(j = 0; j < 3; ++j) {
+										for(j = 0; j < 10; ++j) {
 											if(spellsActivated[i][j].s == NULL)
 												break;
 										}
@@ -528,8 +549,10 @@ int main(void) {
 		} else {
 			string name;
 			cout << "Type the name of the hero you want " \
-				"to do this operation for: " << endl;
+				"to do this operation for (or go back: -1): " << endl;
 			cin >> name;
+			if(name == -1)
+				continue;
 			class Hero *h = map.searchHero(name);
 			if(h == NULL) {
 				cout << "Sorry, that hero does not exist" << endl;
