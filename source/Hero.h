@@ -222,6 +222,13 @@ public:
 		return damage;
 	}
 
+	bool willGetAttacked(void) const {
+		uint32_t x = rand() % 101;
+		if(x < heroInfo.agility)
+			return false;
+		return true;
+	}
+
 	uint32_t getMagicPower(void) const {
 		return heroInfo.magicPower;
 	}

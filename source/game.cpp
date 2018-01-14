@@ -321,11 +321,9 @@ int main(void) {
 			float p = 0.3;
 			float x = rand() / ((float) RAND_MAX);
 
-			// TODO(stefanos): Test code where in every square
-			// there is a fight.
-			// In release version, revert this back to using
-			// probability
-			//if(x <= p) {
+			if(x > p)       // Will not emerge in fight
+				continue;
+
 			cout << "FIGHT!!!!!!!!" << endl;
 			map.generateMonsters(defaultData);
 
@@ -395,10 +393,17 @@ int main(void) {
 									cout << "Choose option:" << endl << "Attack(0) Spell(1)" << endl;
 									cin >> option;
 									// TODO(stefanos): Take agility into consideration
-									if (option == 0) {
+
+									if(option == 0 || option == 1) {
+										if(!m->willGetAttacked()) {
+											cout << "Monster avoided the attack" << endl;
+										}
+										break;
+									}
+									if(option == 0) {
 										m->receiveAttack(h->getAttackDamage());
 										break;
-									} else if (option == 1) {
+									} else if(option == 1) {
 										// TODO(stefanos): Think about mana
 										// after the end of a fight.
 										string spellName;
@@ -457,12 +462,6 @@ int main(void) {
 					}
 
 					// check for end of fight
-
-					int winners;
-					// TODO(stefanos): Complicated code, possibly
-					// I have to redo that!
-
-					// CONTINUE
 					if(map.fightEnded()) {
 						break;
 					}
@@ -481,9 +480,13 @@ int main(void) {
 							if(j == 3)
 								j = 0;
 						}
-						h->receiveAttack(damage);
-						h->printInfo();
-						cout << endl;
+						if(h->willGetAttacked()) {
+							h->receiveAttack(damage);
+							h->printInfo();
+							cout << endl;
+						} else {
+							cout << "Hero avoided the attack" << endl;
+						}
 					}
 
 					// end of fight check
