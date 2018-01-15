@@ -28,6 +28,10 @@ public:
 		return livingInfo.awake;
 	}
 
+	bool getHealthPower(void) const {
+		return livingInfo.healthPower;
+	}
+
 	void setAwake(bool state) {
 		livingInfo.awake = state;
 	}

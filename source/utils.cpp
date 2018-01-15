@@ -247,6 +247,11 @@ int Store::readItems(const std::string& fileName) {
 	}
 
 	skipComments(itemsFile);
+
+	// Read the number of items
+	itemsFile >> this->size;
+	
+	skipComments(itemsFile);
 	std::string itemClass;
 	// TODO(stefanos): Stop if it surpasses the size of the store;
 	while(itemsFile >> itemClass) {
@@ -267,11 +272,11 @@ int Store::readItems(const std::string& fileName) {
 			items[i].taken = 0;
 
 		} else if(itemClass == "Spell") {
-			uint32_t damage[2], reductionAmount, mana;
+			uint32_t damage[2], mana, reductionAmount, rounds;
 			spellType type;
 			std::string spell_type;
 			itemsFile >> name >> price >> min_level >> damage[0] >> damage[1] 
-				>> reductionAmount >> mana >> spell_type;
+				>> mana >> reductionAmount >> rounds >> spell_type;
 			if(spell_type == "IceSpell")
 				type = spellTypes::IceSpell;
 			else if(spell_type == "FireSpell")
@@ -280,7 +285,7 @@ int Store::readItems(const std::string& fileName) {
 				type = spellTypes::LightingSpell;
 
 			items[i].item = new Spell(name, price, min_level, 
-				itemTypes::Spell, damage, mana, reductionAmount, type);
+				itemTypes::Spell, damage, mana, reductionAmount, rounds, type);
 			items[i].taken = 0;
 
 		} else if(itemClass == "Potion") {
@@ -300,6 +305,9 @@ int Store::readItems(const std::string& fileName) {
 		}
 
 		++currently_holding;
+
+
+		skipComments(itemsFile);
 	}
 
 	itemsFile.close();

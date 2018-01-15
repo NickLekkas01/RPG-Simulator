@@ -2,14 +2,16 @@
 #define POTION_H
 
 #include "Item.h"
+#include <string>
 
 typedef uint32_t potionType;
 namespace potionTypes{
 	const uint32_t health = 0;
-	const uint32_t strength = 0;
-	const uint32_t dexterity = 0;
-	const uint32_t agility = 0;
+	const uint32_t strength = 1;
+	const uint32_t dexterity = 2;
+	const uint32_t agility = 3;
 	const char* const potionNames[] = { "Health Potion", "Strength Potion", "Dexterity Potion", "Agility Potion" }; 
+	const char* const statNames[] = { "health", "strength", "dexterity", "agility" }; 
 }
 
 class Potion : public Item {
@@ -27,6 +29,10 @@ public:
 	}
 	potionType getPotionType() const {
 		return type;
+	}
+
+	std::string getStatName(void) const {
+		return potionTypes::statNames[type];
 	}
 
 	void print(void) const {

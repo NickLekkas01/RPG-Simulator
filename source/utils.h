@@ -71,10 +71,15 @@ public:
 			std::cout << std::endl;
 		}
 	}
+
+	uint32_t getNumHeroes(void) const {
+		return numHeroes;
+	}
+
 	int initializeHeroesPosition(int32_t*);
 	
 
-	class Hero *searchHero(std::string name) {
+	class Hero *searchHero(std::string name) const {
 		if(heroes != NULL) {
 			for(uint32_t i = 0; i < numHeroes; ++i) {
 				if(heroes[i] != NULL)
@@ -87,35 +92,40 @@ public:
 		return NULL;
 	}
 
-	class Hero *searchHero(uint32_t i) {
+	class Hero *searchHero(uint32_t i) const {
 		// Assume that we have allocated memory for 'heroes'
 		return heroes[i];
 	}
 
-	class Monster *searchMonster(uint32_t i) {
+	class Monster *searchMonster(uint32_t i) const {
 		// Assume that we have allocated memory for 'monsters'
 		return monsters[i];
 	}
 
-	void generateMonsters(const struct defaultData_t& defaultData) {
+	void generateMonsters(uint32_t healthPower) {
 		// Assume that we have memory for monsters
-		for(size_t i = 0; i < numHeroes; ++i) {
+		for(size_t i = 0; i < this->numHeroes; ++i) {
 			class Hero *h = searchHero(i);
 			uint32_t level = h->getLevel();
 			std::stringstream name;
 			name << "Monster " << i;
-		struct livingInfo_t tempLivingInfo = {name.str(), level, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
+			struct livingInfo_t tempLivingInfo = {name.str(), level, healthPower, healthPower, 1};
+			struct monsterInfo_t tempMonsterInfo;
+			uint32_t heroStrength = h->getStrength();
+			tempMonsterInfo.damage[0] = heroStrength - 40;
+			tempMonsterInfo.damage[1] = rand() % ( (heroStrength + 10) - (heroStrength - 10) ) + (heroStrength - 10);
+			tempMonsterInfo.armor = (level < 5) ? (level * 10) : (level * 0.4f);
+			uint32_t heroAgility = h->getAgility();
+			tempMonsterInfo.agility = rand() % ( (heroAgility  + 10) - (heroAgility - 10) ) + (heroAgility - 10);
 			uint32_t type = rand() % 3;
+			// TODO(stefanos): Make stats different for each monster
+			/*
 			if(type == monsterTypes::Dragon) {
-				monsters[i] = new Monster(tempLivingInfo, &(defaultData.dragonInfo),
-					type);
 			} else if(type == monsterTypes::Exoskeleton) {
-				monsters[i] = new Monster(tempLivingInfo, &(defaultData.exoskeletonInfo),
-					type);
 			} else {    // Spirit
-				monsters[i] = new Monster(tempLivingInfo, &(defaultData.spiritInfo),
-					type);
 			}
+			*/
+			monsters[i] = new Monster(tempLivingInfo, tempMonsterInfo, type);
 		}
 	}
 
@@ -158,11 +168,8 @@ public:
 			std::cout << std::endl << std::endl;
 
 			for(size_t i = 0; i < numHeroes; ++i) {
-				if(!heroes[i]->isAwake())
-					heroes[i]->resetHealthToHalf();
-				else
-					heroes[i]->resetHealth();
-
+				heroes[i]->resetHealthToHalf();
+				heroes[i]->setAwake(true);
 				heroes[i]->resetMoneyToHalf();
 			}
 
@@ -173,6 +180,12 @@ public:
 			std::cout << std::endl << std::endl;
 
 			for(size_t i = 0; i < numHeroes; ++i) {
+				if(!heroes[i]->isAwake()) {
+					heroes[i]->resetHealthToHalf();
+					heroes[i]->setAwake(true);
+				} else
+					heroes[i]->resetHealth();
+				
 				heroes[i]->addExp(numHeroes * 10 + (heroes[i]->getLevel() / 100.0f));
 				if(heroes[i]->tryLevelUp()) {
 					std::cout << heroes[i]->getName() << " leveled up!" << std::endl;
@@ -236,10 +249,12 @@ struct itemLock {
 
 class Store {
 private:
-	const size_t size;
+	size_t size;
 	size_t currently_holding;
 	class itemLock *items;
 public:
+	Store() : currently_holding(0), size(0), items(NULL) { }
+
 	Store(size_t s) : size(s), currently_holding(0) {
 
 		// Allocate the initial shared memory
@@ -252,11 +267,11 @@ public:
 	
 	int readItems(const std::string&);
 
-	int hasAvailableSpace(void) const {
-		return currently_holding < size;
+	bool hasAvailableSpace(void) const {
+		return (currently_holding < size);
 	}
 
-	class Item* searchItem(std::string name) {
+	class Item* searchItem(const std::string& name) {
 		for(int i = 0; i < size; ++i)
 			if(items[i].item != NULL && items[i].taken == 0) {
 				if(items[i].item->get_name() == name) {

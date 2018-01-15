@@ -22,15 +22,16 @@ struct monsterInfo_t {
 class Monster : public Living {
 private:
 	struct monsterInfo_t monsterInfo;
-	const struct monsterInfo_t *const initialData;
 	monsterType type;
 public:
-	Monster(const struct livingInfo_t& li, const struct monsterInfo_t *const mi, monsterType t) :
-	     Living(li), initialData(mi), type(t) {
-			 monsterInfo.damage[0] = mi->damage[0];
-			 monsterInfo.damage[1] = mi->damage[1];
-			 monsterInfo.armor = mi->armor;
-			 monsterInfo.agility = mi->agility;
+	Monster(const struct livingInfo_t& li, const struct monsterInfo_t& mi,
+		monsterType t) : Living(li), type(t) {
+
+			// TODO(stefanos): Test with initializer list
+			monsterInfo.damage[0] = mi.damage[0];
+			monsterInfo.damage[1] = mi.damage[1];
+			monsterInfo.armor = mi.armor;
+			monsterInfo.agility = mi.agility;
 		 }
 
 	void receiveAttack(uint32_t opDamage) {
@@ -52,35 +53,42 @@ public:
 		return type;
 	}
 
+	uint32_t getHighDamage(void) const {
+		return monsterInfo.damage[1];
+	}
+
 	void reduceHighDamage(uint32_t high) {
-		if(monsterInfo.damage[1] - high > monsterInfo.damage[0])
-			monsterInfo.damage[1] -= high;
+		monsterInfo.damage[1] -= high;
 	}
 
 	void incrementHighDamage(uint32_t high) {
-		if(monsterInfo.damage[1] + high <= initialData->damage[1])
-			monsterInfo.damage[1] += high;
+		monsterInfo.damage[1] += high;
+	}
+
+	uint32_t getArmor(void) {
+		return monsterInfo.armor;
 	}
 
 	void reduceArmor(uint32_t armor) {
-		if(monsterInfo.armor - armor > monsterInfo.armor)
-			monsterInfo.armor -= armor;
+		monsterInfo.armor -= armor;
 	}
 
 	void incrementArmor(uint32_t armor) {
-		if(monsterInfo.armor + armor <= initialData->armor)
-			monsterInfo.armor += armor;
+		monsterInfo.armor += armor;
+	}
+
+
+	uint32_t getAgility(void) {
+		return monsterInfo.agility;
 	}
 
 	void reduceAgility(uint32_t agility) {
-		if(monsterInfo.agility - agility > monsterInfo.agility)
-			monsterInfo.agility -= agility;
+		monsterInfo.agility -= agility;
 	}
 
 
 	void incrementAgility(uint32_t agility) {
-		if(monsterInfo.agility + agility <= initialData->agility)
-			monsterInfo.agility += agility;
+		monsterInfo.agility += agility;
 	}
 
 	uint32_t getAttackDamage() const {

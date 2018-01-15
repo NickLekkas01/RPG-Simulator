@@ -13,6 +13,10 @@
 
 #define INPUT_FILE_ERROR 1
 
+// TODO:
+// Structure into functions
+// Make the gameplay interaction better
+
 using namespace std;
 
 struct spell_record {
@@ -20,10 +24,37 @@ struct spell_record {
 	uint32_t roundsRemaining;
 };
 
+const uint32_t numberOfSpells = 10;
+uint32_t numHeroes;
+
 namespace playerChoices {
-	int32_t initializeHeroes = 2;
+	const uint32_t initializeHeroes = 2;
 	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equipWeapon, unequipWeapon, equipArmor, unequipArmor, checkStoreItems, buy, sell};
 };
+
+void usePotion(class Hero *h, class Store& store) {
+	h->printPotions();
+	cout << "Type the name of the potion (or go back: -1): " << endl;
+	string name;
+	cin >> name;
+	if(name == "-1")
+		return;
+	class Potion *potion = (class Potion *) h->usePotion(name);
+	if(potion == NULL) {
+		cout << "The potion either does not exist, or you are " \
+			"not in the required level to use it" << endl;
+		return;
+	}
+	if(h->getLevel() < potion->getMinLevel()) {
+		cout << "You are not on the required level to use this potion" << endl;
+		return;
+	} else {
+		store.deleteItem(potion);
+	}
+
+	cout << h->getName() << "'s " << potion->getStatName() << " was increased to: " << h->getHealthPower() << endl;
+}
+
 
 void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store, class Map& map) {
 
@@ -32,24 +63,7 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 	} else if(choice == playerChoices::heroInfo) {
 		h->printInfo();
 	} else if(choice == playerChoices::usePotion) {
-		h->printPotions();
-		cout << "Type the name of the potion (or go back: -1): " << endl;
-		string name;
-		cin >> name;
-		if(name == "-1")
-			return;
-		class Item *it = h->usePotion(name);
-		if(it == NULL) {
-			cout << "The potion either does not exist, or you are " \
-				"not in the required level to use it" << endl;
-			return;
-		}
-		if(h->getLevel() < it->getMinLevel()) {
-			cout << "You are not on the required level to use this potion" << endl;
-			return;
-		} else {
-			store.deleteItem(it);
-		}
+		usePotion(h, store);
 	} else if(choice == playerChoices::equipWeapon) {
 		if(h->isInventoryEmpty()) {
 			cout << "There is nothing to equip" << endl;
@@ -187,20 +201,230 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 	}
 }
 
-int main(void) {
-	bool Running = true;
-	struct defaultData_t defaultData;
-	if(!defaultData.readDefaultData())
-		return INPUT_FILE_ERROR;
+void printPreFightInfo(const class Map& map) {
+	for (uint32_t i = 0; i < numHeroes; ++i) {
+		class Hero *h = map.searchHero(i);
+		class Monster *m = map.searchMonster(i);
+		h->printInfo();
+		cout << endl;
+		m->printInfo();
+		cout << endl;
+	}
+}
 
-	srand(time(NULL));
+void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells], class Hero *h, class Monster *m) {
+	// TODO(stefanos): Think about mana
+	// after the end of a fight.
+	string spellName;
+	cout << "Type the name of the spell you want to use" << endl;
+	cin >> spellName;
+	class Spell *s = (class Spell *) h->searchItem(spellName);
+	if(s == NULL) {
+		cout << "This spell does not exist" << endl;
+		return;
+	}
+	if(h->getLevel() < s->getMinLevel()) {
+		cout << "You are not on the required level to use this spell" << endl;
+		return;
+	}
+	uint32_t spellDam = h->getCastSpellDamage(s);
+	if(!spellDam) {
+		cout << "You don't have enough magic power to execute this spell" << endl;
+		return;
+	}
+	
+	spellType type = s->getSpellType();
+	size_t j;
+	for(j = 0; j < numberOfSpells; ++j) {
+		if(spellsActivated[i][j].s == NULL)
+			break;
+	}
+	spellsActivated[i][j].s = s;
+	spellsActivated[i][j].roundsRemaining = s->getRounds();
+	uint32_t am = s->getReductionAmount();
+	if(type == spellTypes::IceSpell) {
+		cout << m->getName() << "'s damage range limit was reduced to: " 
+			<< m->getHighDamage() << endl;
+		m->reduceHighDamage(am);
+	} else if(type == spellTypes::FireSpell) {
+		cout << m->getName() << "'s defense was reduced to: " 
+			<< m->getArmor() << endl;
+		m->reduceArmor(am);
+	} else {
+		cout << m->getName() << "'s agility was reduced to: " 
+			<< m->getAgility() << endl;
+		m->reduceAgility(am);
+	}
 
-	class Map map;
-	if(!map.readMap())
-		return INPUT_FILE_ERROR;
-	cout << "Welcome to the RPG game" << endl;
+	m->receiveAttack(spellDam);
+}
+
+void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_record spellsActivated[3][numberOfSpells]) {
+	int32_t option;
 
 
+	while(true) {
+		cout << "Choose option:" << endl << "Attack(0) Spell(1) Go Back(-1)" << endl;
+		cin >> option;
+
+		if(option == 0 || option == 1) {
+			if(!m->willGetAttacked()) {
+				cout << "Monster avoided the attack" << endl;
+				break;
+			}
+		}
+		if(option == -1)
+			break;
+		else if(option == 0) {
+			cout << "Hero attack damage: " << h->getAttackDamage() << endl;
+			m->receiveAttack(h->getAttackDamage());
+			if(m->isAwake())
+				cout << m->getName() << "'s health is now: " << m->getHealthPower() << endl;
+			else
+				cout << m->getName() << " died!" << endl;
+			break;
+		} else if(option == 1) {
+			useSpell(i, spellsActivated, h, m);
+		} else {
+			cout << "Not a proper option" << endl;
+		}
+	}
+	cout << endl;
+}
+
+void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class Map& map, struct spell_record spellsActivated[3][numberOfSpells]) {
+	cout << "Hero " << i + 1 << " attacks" << endl;
+	cout << "Attack Damage: " << h->getAttackDamage() << endl;
+	int32_t option;
+	while(true) {
+		cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2)" << endl;
+		cin >> option;
+		if(option == 2) {
+			// TODO(stefanos): Display stats better
+			h->printInfo();
+		} else if(option == 1) {
+			usePotion(h, store);
+			break;
+		} else if(option == 0) {
+			int32_t option;
+			do {
+				cout << "Give which monster you want to hit" << endl;
+				cin >> option;
+				cout << option << endl;
+			} while(option < 0 || option > (numHeroes - 1));
+		
+			class Monster *m = map.searchMonster((uint32_t)option);
+			handleHeroFight(i, h, m, spellsActivated);
+		} else {
+			cout << "Not a proper option" << endl;
+		}
+	}
+}
+
+void handleMonsterTurn(uint32_t i, class Monster *m, const class Map& map) {
+	cout << "Monster " << i+1 << " attacks" << endl;
+	uint32_t damage = m->getAttackDamage();
+	cout << "Attack Damage: " << damage << endl;
+	size_t j = i;
+	class Hero *h;
+	while(j < 3) {
+		if((h = map.searchHero(j))->isAwake())
+			break;
+		++j;
+		if(j == 3)
+			j = 0;
+	}
+	if(h->willGetAttacked()) {
+		h->receiveAttack(damage);
+		if(h->isAwake())
+			cout << h->getName() << "'s health is now: " << h->getHealthPower() << endl;
+		else
+			cout << h->getName() << " died!" << endl;
+		cout << endl;
+	} else {
+		cout << "Hero avoided the attack" << endl;
+	}
+}
+
+void handleRoundEnd(class Map& map, struct spell_record spellsActivated[3][numberOfSpells]) {
+	for(int j = 0; j < 3; ++j) {   // loop monsters
+		for(int k = 0; k < numberOfSpells; ++k) {   // loop spells
+			int temp;
+			if((temp = spellsActivated[j][k].roundsRemaining) > 0) {  // a spell is active
+				--temp;
+				spellsActivated[j][k].roundsRemaining = temp;
+				if(temp == 0) {   // spell just ended - revert back the stats
+					class Spell *s = spellsActivated[j][k].s;
+					cout << "End of spell" << endl;
+					class Monster *a = map.searchMonster(j);
+					if(k == 0)    // IceSpell
+						a->incrementHighDamage(s->getReductionAmount());
+					else if(k == 1)   // FireSpell
+						a->incrementArmor(s->getReductionAmount());
+					else     // LightingSpell
+						a->incrementAgility(s->getReductionAmount());
+				}
+			}
+		}
+	}
+
+	// TODO(stefanos): Constant values for now.
+	// Should be part of the input file
+	map.roundEnd(20, 25);
+}
+
+
+void fight(class Map& map, class Store& store) {
+	printPreFightInfo(map);
+
+	// We have 3 monsters at most and each monster can have
+	// at most 10 spells activated at a given time.
+	struct spell_record spellsActivated[3][numberOfSpells] = { };
+
+	while (true) {
+		bool fightEnded = false;
+
+		class Hero *h;
+		class Monster *m;
+		for (uint32_t i = 0; i < numHeroes; ++i) {
+			//// Hero attack ////
+			h = map.searchHero(i);
+			if(h->isAwake()) {
+				handleHeroTurn(i, h, store, map, spellsActivated);
+			}
+
+			// check for end of fight
+			if(map.fightEnded()) {
+				fightEnded = true;
+				break;
+			}
+
+			//// Monster attack ////
+			m = map.searchMonster(i);
+			if(m->isAwake()) {
+				handleMonsterTurn(i, m, map);
+			}
+
+			// end of fight check
+			if(!map.fightEnded()) {
+				fightEnded = true;
+				break;
+			}
+		}
+
+		if(fightEnded)
+			break;
+
+
+		/////// ROUND END /////////
+		handleRoundEnd(map, spellsActivated);
+
+	}
+
+	map.freeMonsters();
+}
+
+void initialChoices(bool& Running, class Map& map) {
 	// Initial loop
 	while(Running) {
 		int32_t choice;
@@ -229,31 +453,11 @@ int main(void) {
 			cout << "This operation can't be handled!" << endl;
 		}
 	}
+}
 
-	// TODO(stefanos): Gets seg faul here
-	while(!Running) {
-		return 0;
-	}
-
-	// Initialize the store
-	// NOTE(stefanos): Shared memory for the store. Items getting to the inventory
-	// have the memory from the store. Memory gets destroyed when we don't need
-	// the store anymore. Provided that any item that any hero has is taken
-	// from the store, this is the end of the game.
-	
-	// TODO(stefanos): Put a more versatile size.
-	class Store store(10);
-	// TODO(stefanos): Path relative to the compiler
-	// Fix that on the release
-	store.readItems("./build/items.dat");
-
-	uint32_t num_heroes;
-	do {
-		cout << "How many heroes do you want (1-3)? " << endl;
-		cin >> num_heroes;
-	} while(num_heroes < 1 || num_heroes > 3);
-	map.setNumHeroesAndMonsters(num_heroes);
-	for(int i = 0; i < num_heroes; ++i) {
+void generateHeroes(const defaultData_t& defaultData, class Map& map) {
+	for(int i = 0; i < numHeroes; ++i) {
+		// TODO(stefanos): Change those debug values
 		struct livingInfo_t livingInfo = {"", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
 		cout << "Type the name of the hero " << i + 1 << ": ";
 		cin >> livingInfo.name;
@@ -280,28 +484,80 @@ int main(void) {
 			}
 		}
 	}
+}
 
-	/* TODO(stefanos): DEBUG CODE - REMOVE THAT
-	map.printHeroes();
-	*/
+void printMainMenuChoices(bool heroesOnStore) {
+	cout << "Available choices" << endl;
+	cout << "Quit: 0" << endl;
+	cout << "Print Map: 1" << endl;
+	cout << "Move Heroes: 2" << endl;
+	cout << "Check inventory: 3" << endl;
+	cout << "Display Hero Info: 4" << endl;
+	cout << "Use Potion: 5" << endl;
+	cout << "Equip Weapon: 6" << endl;
+	cout << "Unequip Weapon: 7" << endl;
+	cout << "Equip Armor: 8" << endl;
+	cout << "Unequip Armor: 9" << endl;
+	if(heroesOnStore) {
+		cout << "Check items available on the store: 10" << endl;
+		cout << "Buy something: 11" << endl;
+		cout << "Sell something: 12" << endl;
+	}
+}
+
+void printMoveChoices() {
+	cout << "You can go:" << endl;
+	cout << "Up: " << directions::up << endl;
+	cout << "Down: " << directions::down << endl;
+	cout << "Right: " << directions::right << endl;
+	cout << "Left: " << directions::left << endl;
+	cout << "Go Back: -1" << endl;
+	cout << "Where do you want to go? " << endl;
+}
+
+int main(void) {
+	bool Running = true;
+	struct defaultData_t defaultData;
+	if(!defaultData.readDefaultData())
+		return INPUT_FILE_ERROR;
+
+	srand(time(NULL));
+
+	class Map map;
+	if(!map.readMap())
+		return INPUT_FILE_ERROR;
+	cout << "Welcome to the RPG game" << endl;
+	
+	initialChoices(Running, map);
+
+	while(!Running) {
+		return 0;
+	}
+
+	// Initialize the store
+	// NOTE(stefanos): Shared memory for the store. Items getting to the inventory
+	// have the memory from the store. Memory gets destroyed when we don't need
+	// the store anymore. Provided that any item that any hero has is taken
+	// from the store, this is the end of the game.
+	
+	class Store store;
+	// TODO(stefanos): Path relative to the compiler
+	// Fix that on the release
+	store.readItems("./build/items.dat");
+
+	do {
+		cout << "How many heroes do you want (1-3)? " << endl;
+		cin >> numHeroes;
+	} while(numHeroes < 1 || numHeroes > 3);
+
+	map.setNumHeroesAndMonsters(numHeroes);
+
+	generateHeroes(defaultData, map);
+
 	while(Running) {
+		
+		printMainMenuChoices(map.heroesOnStore());
 		int32_t choice;
-		cout << "Available choices" << endl;
-		cout << "Quit: 0" << endl;
-		cout << "Print Map: 1" << endl;
-		cout << "Move Heroes: 2" << endl;
-		cout << "Check inventory: 3" << endl;
-		cout << "Display Hero Info: 4" << endl;
-		cout << "Use Potion: 5" << endl;
-		cout << "Equip Weapon: 6" << endl;
-		cout << "Unequip Weapon: 7" << endl;
-		cout << "Equip Armor: 8" << endl;
-		cout << "Unequip Armor: 9" << endl;
-		if(map.heroesOnStore()) {
-			cout << "Check items available on the store: 10" << endl;
-			cout << "Buy something: 11" << endl;
-			cout << "Sell something: 12" << endl;
-		}
 		cout << "What do you want to do? ";
 		cin >> choice;
 
@@ -314,13 +570,7 @@ int main(void) {
 		} else if(choice == playerChoices::printMap) {
 			map.print();
 		} else if(choice == playerChoices::moveHeroes) {
-			cout << "You can go:" << endl;
-			cout << "Up: " << directions::up << endl;
-			cout << "Down: " << directions::down << endl;
-			cout << "Right: " << directions::right << endl;
-			cout << "Left: " << directions::left << endl;
-			cout << "Go Back: -1" << endl;
-			cout << "Where do you want to go? " << endl;
+			printMoveChoices();
 			cin >> choice;
 			if (choice == -1) { continue; }
 			else if(choice < 0 || choice > 3) {
@@ -330,220 +580,15 @@ int main(void) {
 				cout << "You can't go there!" << endl;
 			}
 
-			// compute probability of getting into a fight
-
-
-			// TODO(stefanos): Could not get this value
-			// read from a file.
-			float p = 0.3;
+			float possibilityToFight = 0.3;
 			float x = rand() / ((float) RAND_MAX);
 
-			if(x > p)       // Will not emerge in fight
+			if(x > possibilityToFight)  // Will not emerge in fight
 				continue;
 
 			cout << "FIGHT!!!!!!!!" << endl;
-			map.generateMonsters(defaultData);
-
-			for (uint32_t i = 0; i < num_heroes; ++i) {
-				class Hero *h = map.searchHero(i);
-				class Monster *m = map.searchMonster(i);
-				h->printInfo();
-				cout << endl;
-				m->printInfo();
-				cout << endl;
-			}
-
-			// We have 3 monsters at most and each monster can have
-			// at most 10 spells activated at a given time.
-			struct spell_record spellsActivated[3][10] = { };
-
-			// Number of rounds that a spell is active
-			// TODO(stefanos): Constant for now, make it more dynamic.
-			const int roundsOfSpell = 2;
-
-			while (true) {
-				for (uint32_t i = 0; i < num_heroes; ++i) {
-
-					class Hero *h;
-					class Monster *m;
-
-					//// Hero attack ////
-					h = map.searchHero(i);
-					if(h->isAwake()) {
-						cout << "Hero " << i + 1 << " attacks" << endl;
-						cout << "Attack Damage: " << h->getAttackDamage() << endl;
-						int32_t option;
-						while(true) {
-							cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2) Go Back(-1)" << endl;
-							cin >> option;
-							if(option == -1)
-								break;
-							else if(option == 2) {
-								h->printInfo();
-							} else if(option == 1) {
-								h->printPotions();
-								cout << "Type the name of the potion: " << endl;
-								string name;
-								cin >> name;
-								class Item *it = h->usePotion(name);
-								if(it == NULL) {
-									cout << "The potion either does not exist, or you are " \
-										"not in the required level to use it" << endl;
-									continue;
-								}
-								if(h->getLevel() < it->getMinLevel()) {
-									cout << "You are not on the required level to use this potion" << endl;
-									continue;
-								} else {
-									store.deleteItem(it);
-								}
-								h->printInfo();
-								break;
-							} else if(option == 0) {
-								do {
-									cout << "Give which monster you want to hit" << endl;
-									cin >> option;
-									cout << option << endl;
-								} while(option < 0 || option>(num_heroes - 1));
-
-								m = map.searchMonster((uint32_t)option);
-
-								while(true) {
-									cout << "Choose option:" << endl << "Attack(0) Spell(1) Go Back(-1)" << endl;
-									cin >> option;
-									// TODO(stefanos): Take agility into consideration
-
-									if(option == 0 || option == 1) {
-										if(!m->willGetAttacked()) {
-											cout << "Monster avoided the attack" << endl;
-										}
-										break;
-									}
-									if(option == -1)
-										break;
-									else if(option == 0) {
-										m->receiveAttack(h->getAttackDamage());
-										break;
-									} else if(option == 1) {
-										// TODO(stefanos): Think about mana
-										// after the end of a fight.
-										string spellName;
-										cout << "Type the name of the spell you want to use" << endl;
-										cin >> spellName;
-										class Spell *s = (class Spell *) h->searchItem(spellName);
-										if(s == NULL) {
-											cout << "This spell does not exist" << endl;
-											continue;
-										}
-										if(h->getLevel() < s->getMinLevel()) {
-											cout << "You are not on the required level to use this spell" << endl;
-											continue;
-										}
-										uint32_t spellDam = h->getCastSpellDamage(s);
-										if(!spellDam) {
-											cout << "You don't have enough magic power to execute this spell" << endl;
-											continue;
-										}
-										
-										// For now, even with this implenmentation,
-										// the checking about whether a spell
-										// is still active, stays the same.
-										spellType type = s->getSpellType();
-										size_t j;
-										for(j = 0; j < 10; ++j) {
-											if(spellsActivated[i][j].s == NULL)
-												break;
-										}
-										spellsActivated[i][j].s = s;
-										spellsActivated[i][j].roundsRemaining = roundsOfSpell;
-										// TODO(stefanos): Amount of decrement
-										// is static for now. Could be part of defaultData?
-										uint32_t am = s->getReductionAmount();
-										if(type == spellTypes::IceSpell) {
-											m->reduceHighDamage(am);
-										} else if(type == spellTypes::FireSpell)
-											m->reduceArmor(am);
-										else
-											m->reduceAgility(am);
-
-										m->receiveAttack(spellDam);
-										break;
-									} else {
-										cout << "Not a proper option" << endl;
-									}
-								}
-
-								m->printInfo();
-								cout << endl;
-								break;
-							} else {
-								cout << "Not a proper option" << endl;
-							}
-						}
-					}
-
-					// check for end of fight
-					if(map.fightEnded()) {
-						break;
-					}
-
-					//// Monster attack ////
-					m = map.searchMonster(i);
-					if(m->isAwake()) {
-						cout << "Monster " << i+1 << " attacks" << endl;
-						uint32_t damage = m->getAttackDamage();
-						cout << "Attack Damage: " << damage << endl;
-						size_t j = i;
-						while(j < 3) {
-							if((h = map.searchHero(j))->isAwake())
-								break;
-							++j;
-							if(j == 3)
-								j = 0;
-						}
-						if(h->willGetAttacked()) {
-							h->receiveAttack(damage);
-							h->printInfo();
-							cout << endl;
-						} else {
-							cout << "Hero avoided the attack" << endl;
-						}
-					}
-
-					// end of fight check
-					if(!map.fightEnded())
-						break;
-				}
-
-
-				/////// ROUND END /////////
-				for(int j = 0; j < 3; ++j) {   // loop monsters
-					for(int k = 0; k < 3; ++k) {   // loop spells
-						int temp;
-						if((temp = spellsActivated[j][k].roundsRemaining) > 0) {  // a spell is active
-							--temp;
-							spellsActivated[j][k].roundsRemaining = temp;
-							class Spell *s = spellsActivated[j][k].s;
-							if(temp == 0) {   // spell just ended - revert back the stats
-								cout << "End of spell" << endl;
-								class Monster *a = map.searchMonster(j);
-								if(k == 0)    // IceSpell
-									a->incrementHighDamage(s->getReductionAmount());
-								else if(k == 1)   // FireSpell
-									a->incrementArmor(s->getReductionAmount());
-								else     // LightingSpell
-									a->incrementAgility(s->getReductionAmount());
-							}
-						}
-					}
-				}
-
-				// TODO(stefanos): Constant values for now.
-				// Should be part of the input file
-				map.roundEnd(20, 25);
-			}
-
-			map.freeMonsters();
+			map.generateMonsters(defaultData.initialHealthPower);
+			fight(map, store);
 		} else if(map.heroesOnStore() && choice == playerChoices::checkStoreItems) {
 			store.print();
 		} else {
@@ -551,15 +596,13 @@ int main(void) {
 			cout << "Type the name of the hero you want " \
 				"to do this operation for (or go back: -1): " << endl;
 			cin >> name;
-			if(name == -1)
+			if(name == "-1")
 				continue;
 			class Hero *h = map.searchHero(name);
 			if(h == NULL) {
 				cout << "Sorry, that hero does not exist" << endl;
 				continue;
 			}
-
-			cout << "CHOICE: " << choice << endl;
 
 			handleHeroSpecificChoices(choice, h, store, map);
 		}

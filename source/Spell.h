@@ -16,11 +16,13 @@ private:
 	uint32_t damage[2];
 	uint32_t mana;
 	uint32_t reductionAmount;
+	uint32_t rounds;
 	spellType type;
 public:
 	Spell(std::string nam, uint32_t pr, uint32_t min_level, itemType type,
-		uint32_t dmg[2], uint32_t m, uint32_t rAmount, spellType t) :
-		Item(nam, pr, min_level, type), reductionAmount(rAmount), mana(m), type(t) {
+		uint32_t dmg[2], uint32_t m, uint32_t rAmount, uint32_t rnds, spellType t) :
+		Item(nam, pr, min_level, type), mana(m), reductionAmount(rAmount),
+			rounds(rnds), type(t) {
 		damage[0] = dmg[0];
 		damage[1] = dmg[1];
 	}
@@ -31,6 +33,10 @@ public:
 
 	uint32_t getReductionAmount(void) const {
 		return reductionAmount;
+	}
+
+	uint32_t getRounds(void) const {
+		return rounds;
 	}
 
 	uint32_t getMinDamage(){

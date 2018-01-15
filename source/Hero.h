@@ -102,7 +102,7 @@ public:
 		if(livingInfo.healthPower + healthToRegen <= livingInfo.initialHealthPower)
 			livingInfo.healthPower += healthToRegen;
 		if(heroInfo.magicPower + magicPowerToRegen <= initialData->magicPower)
-			heroInfo.magicPower += magicPowerToRegen ;
+			heroInfo.magicPower += magicPowerToRegen;
 	}
 
 	void addExp(uint32_t exp) {
@@ -222,6 +222,14 @@ public:
 		return damage;
 	}
 
+	uint32_t getStrength(void) const {
+		return heroInfo.strength;
+	}
+
+	uint32_t getAgility(void) const {
+		return heroInfo.agility;
+	}
+
 	bool willGetAttacked(void) const {
 		uint32_t x = rand() % 101;
 		if(x < heroInfo.agility)
@@ -278,7 +286,7 @@ public:
 		std::cout << std::endl;
 	}
 
-	class Item* searchItem(std::string name) {
+	class Item* searchItem(const std::string& name) {
 		for(int i = 0; i < InventoryInfo.currently_holding; ++i)
 			if(InventoryInfo.Inventory[i]->get_name() == name) {
 				return InventoryInfo.Inventory[i];
@@ -287,7 +295,7 @@ public:
 		return NULL;
 	}
 
-	class Item* usePotion(std::string name) {
+	class Item* usePotion(const std::string& name) {
 		for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
 
 			if(InventoryInfo.Inventory[i]->getItemType() == itemTypes::Potion && InventoryInfo.Inventory[i]->get_name() == name) {
@@ -461,7 +469,7 @@ public:
 		}
 	}
 
-	Item *sell(std::string name){
+	Item *sell(const std::string& name){
 
 		Item *tmp;
         int i;
