@@ -21,8 +21,6 @@ struct spell_record {
 };
 
 const uint32_t numberOfSpells = 10;
-//  TODO(stefanos): number of heroes maybe should not be global
-//  and we should read it every time from the map.
 uint32_t numHeroes;
 
 namespace playerChoices {
@@ -340,10 +338,7 @@ void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_r
 }
 
 void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class Map& map, struct spell_record spellsActivated[3][numberOfSpells]) {
-	// TODO(stefanos): More user friendly here
-	cout << "Hero's " << i + 1 << " attacks" << endl;
-	cout << "Attack Damage: " << h->getAttackDamage() << endl;
-
+	cout << "Hero's " << i + 1 << " turn" << endl;
 
 	int32_t option;
 	while(true) {
