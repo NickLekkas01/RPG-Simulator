@@ -249,20 +249,24 @@ int Store::readItems(const std::string& fileName) {
 	skipComments(itemsFile);
 
 	// Read the number of items
-	itemsFile >> this->size;
-	
+	size_t storeSize;
+	itemsFile >> storeSize;
+	this->size = storeSize;
+
+	// Allocate the initial shared memory
+	items = new itemLock[storeSize];
+	for(int i = 0; i < storeSize; ++i) {
+		items[i].item = NULL;
+		items[i].taken = 0;
+	}
+
 	skipComments(itemsFile);
 	std::string itemClass;
-	// TODO(stefanos): Stop if it surpasses the size of the store;
-	while(itemsFile >> itemClass) {
+	size_t itemsRead = 0;
+	while(itemsFile >> itemClass && itemsRead < storeSize) {
 		std::string name;
 		uint32_t price, min_level;
-		size_t i;
-		// TODO(stefanos): Just go to the next position
-		for(i = 0; i < size; ++i)
-			if(items[i].item == NULL) {
-				break;
-			}
+		size_t i = itemsRead;
 
 		if(itemClass == "Weapon") {
 			uint32_t damage, hands;
@@ -304,11 +308,11 @@ int Store::readItems(const std::string& fileName) {
 			items[i].taken = 0;
 		}
 
-		++currently_holding;
-
-
+		++itemsRead;
 		skipComments(itemsFile);
 	}
+
+	this->currently_holding = itemsRead;
 
 	itemsFile.close();
 	

@@ -393,7 +393,6 @@ public:
 		if(isInUse(it))
 			return false;
         for(int i = 0; i < InventoryInfo.currently_holding; ++i) {
-			// TODO(stefanos): Add a "weapon is currently in use" kind of field to the inventory and mark it here.
             if (InventoryInfo.Inventory[i] == it) {
 				InventoryInfo.ItemsUsed[i] = true;
 				class Weapon *weap = (class Weapon *) InventoryInfo.Inventory[i];

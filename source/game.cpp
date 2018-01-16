@@ -21,15 +21,22 @@ struct spell_record {
 };
 
 const uint32_t numberOfSpells = 10;
+//  TODO(stefanos): number of heroes maybe should not be global
+//  and we should read it every time from the map.
 uint32_t numHeroes;
 
 namespace playerChoices {
 	const uint32_t initializeHeroes = 2;
-	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equipWeapon, unequipWeapon, equipArmor, unequipArmor, checkStoreItems, buy, sell};
+	enum { quit, printMap, moveHeroes, checkInventory, heroInfo, usePotion, equipWeapon,
+		unequipWeapon, equipArmor, unequipArmor, checkStoreItems, buy, sell};
 };
 
 void usePotion(class Hero *h, class Store& store) {
 	h->printPotions();
+
+	// Search potion by name on hero's inventory.
+	// If we can't use it, output error messages, otherwise
+	// remove it from the store.
 	cout << "Type the name of the potion (or go back: -1): " << endl;
 	string name;
 	cin >> name;
@@ -66,6 +73,10 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 			return;
 		}
 		h->printWeapons();
+
+
+		// Search weapon by name on hero's inventory and try to eqeuip.
+		// If it fails, output error messages.
 		cout << "Type the name of the weapon you want to equip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
@@ -90,6 +101,9 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 	    }
 	} else if(choice == playerChoices::unequipWeapon) {
 		h->checkInventory();
+
+		// Search weapon by name on hero's inventory and try to uneqeuip.
+		// If it fails, output error messages.
 		cout << "Type the name of the weapon you want to unequip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
@@ -109,7 +123,12 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 			cout << "There is nothing to equip" << endl;
 			return;
 		}
+
 		h->printArmors();
+
+
+		// Search armor by name on hero's inventory and try to eqeuip.
+		// If it fails, output error messages.
 		cout << "Type the name of the armor you want to equip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
@@ -134,6 +153,9 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 		}
 	} else if(choice == playerChoices::unequipArmor){
 		h->checkInventory();
+
+		// Search armor by name on hero's inventory and try to uneqeuip.
+		// If it fails, output error messages.
 		cout << "Type the name of the armor you want to unequip (or go back: -1): " << endl;
 		string name;
 		cin >> name;
@@ -148,14 +170,21 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 			return;
 		}
 		h->unequipWeapon(it);
-	} else if(map.heroesOnStore()) {
+	} else if(map.heroesOnStore()) {      // If heroes are on the store square, we
+	                                      // have some more choices.
 		if(choice == playerChoices::buy) {
 			if(!h->inventoryAvaiableSpace()) {
 				cout << "Not enough space on the inventory" << endl;
 				return;
 			}
-			string name;
+
 			store.print();
+
+			
+			// Search the item by name on the store.
+			// If it is possible, buy it for the hero, otherwise
+			// output error messages.
+			string name;
 			cout << "Type the name of the item you want to buy (or go back: -1): ";
 			cin >> name;
 			if(name == "-1")
@@ -184,6 +213,10 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 	        cin >> name;
 			if(name == "-1")
 				return;
+
+			///  Try to search the item in the hero's inventory
+			///  by name, and output error messages if it can't be sold.
+			///  Otherwise, remove it from the store. 
 	        class Item *it = h->searchItem(name);
 	        if (it == NULL) {
 	            cout << "This item is not on the inventory" << endl;
@@ -210,9 +243,14 @@ void printPreFightInfo(const class Map& map) {
 void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells], class Hero *h, class Monster *m) {
 	// TODO(stefanos): Think about mana
 	// after the end of a fight.
+
+	///  Ask the user for the name of the spell
 	string spellName;
 	cout << "Type the name of the spell you want to use" << endl;
 	cin >> spellName;
+
+	///  Try to find the spell and output error messages
+	///  if the hero can't use it.
 	class Spell *s = (class Spell *) h->searchItem(spellName);
 	if(s == NULL) {
 		cout << "This spell does not exist" << endl;
@@ -222,13 +260,22 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 		cout << "You are not on the required level to use this spell" << endl;
 		return;
 	}
+
+	///  Get the damage of the spell (if 0, we don't have enough mana)
 	uint32_t spellDam = h->getCastSpellDamage(s);
 	if(!spellDam) {
 		cout << "You don't have enough magic power to execute this spell" << endl;
 		return;
 	}
+	// TODO(stefanos): Output info for spell's attack
+	// Hit the monster with this damage.
+	m->receiveAttack(spellDam);
+	
 	
 	spellType type = s->getSpellType();
+	
+	///  Find an empty position for already activated
+	///  spells, to put this spell record.
 	size_t j;
 	for(j = 0; j < numberOfSpells; ++j) {
 		if(spellsActivated[i][j].s == NULL)
@@ -236,6 +283,11 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 	}
 	spellsActivated[i][j].s = s;
 	spellsActivated[i][j].roundsRemaining = s->getRounds();
+
+	///  Depending on the type of the spell
+	///  and the amount it reduces the specific stat,
+	///  decrease the stat of the monster (those decrements
+	///  will be reverted back when spell's active rounds pass).
 	uint32_t am = s->getReductionAmount();
 	if(type == spellTypes::IceSpell) {
 		cout << m->getName() << "'s damage range limit was reduced to: " 
@@ -250,19 +302,17 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 			<< m->getAgility() << endl;
 		m->reduceAgility(am);
 	}
-
-	m->receiveAttack(spellDam);
 }
 
 void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_record spellsActivated[3][numberOfSpells]) {
 	int32_t option;
-
-
 	while(true) {
 		cout << "Choose option:" << endl << "Attack(0) Spell(1) Go Back(-1)" << endl;
 		cin >> option;
 
-		if(option == 0 || option == 1) {
+		if(option == 0 || option == 1) {   // It will attack with one of the two ways
+
+			///  Check if 'm' monster will get attacked.
 			if(!m->willGetAttacked()) {
 				cout << "Monster avoided the attack" << endl;
 				break;
@@ -273,6 +323,8 @@ void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_r
 		else if(option == 0) {
 			cout << "Hero attack damage: " << h->getAttackDamage() << endl;
 			m->receiveAttack(h->getAttackDamage());
+
+			///  Output messages for the outcome of hero's attack
 			if(m->isAwake())
 				cout << m->getName() << "'s health is now: " << m->getHealthPower() << endl;
 			else
@@ -288,18 +340,26 @@ void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_r
 }
 
 void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class Map& map, struct spell_record spellsActivated[3][numberOfSpells]) {
-	cout << "Hero " << i + 1 << " attacks" << endl;
+	// TODO(stefanos): More user friendly here
+	cout << "Hero's " << i + 1 << " attacks" << endl;
 	cout << "Attack Damage: " << h->getAttackDamage() << endl;
+
+
 	int32_t option;
 	while(true) {
 		cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2)" << endl;
 		cin >> option;
 		if(option == 2) {
+
+			// Choose whose stats you want to display
 			cout << "Display Hero Info(0) Display Monster Info(1): " << endl;
 			cin >> option;
-			if(option == 0)
+			if(option == 0)    // display ith's hero info
 				h->printInfo();
 			else {
+
+				///  Ask for which monster the play wants
+				///  to see stats.
 				do {
 					cout << "Which monster's stats you want to see? ";
 					cin >> option;
@@ -326,19 +386,36 @@ void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class M
 
 void handleMonsterTurn(uint32_t i, class Monster *m, const class Map& map) {
 	cout << "Monster " << i+1 << " attacks" << endl;
+
+	///  Get the damage the ith monster does (a number inside its 
+	///  damage range)
 	uint32_t damage = m->getAttackDamage();
 	cout << "Attack Damage: " << damage << endl;
+
+
+	///  Search heroes to find an alive hero
+	///  to hit
 	size_t j = i;
 	class Hero *h;
-	while(j < 3) {
+	while(j < 3) {   // loop heroes
 		if((h = map.searchHero(j))->isAwake())
 			break;
 		++j;
 		if(j == 3)
 			j = 0;
 	}
+
+	///  Check if the hero will be attacked
+	///  based on his agility
 	if(h->willGetAttacked()) {
+
+		///  Decrease his health and/or armor based
+		///  on the damage computed above.
 		h->receiveAttack(damage);
+
+
+		///  Output messages for the outcome of monster's
+		///  attack
 		if(h->isAwake())
 			cout << h->getName() << "'s health is now: " << h->getHealthPower() << endl;
 		else
@@ -353,18 +430,18 @@ void handleRoundEnd(class Map& map, struct spell_record spellsActivated[3][numbe
 	for(int j = 0; j < 3; ++j) {   // loop monsters
 		for(int k = 0; k < numberOfSpells; ++k) {   // loop spells
 			int temp;
-			if((temp = spellsActivated[j][k].roundsRemaining) > 0) {  // a spell is active
-				--temp;
+			if((temp = spellsActivated[j][k].roundsRemaining) > 0) {  // a spell is still active
+				--temp;    // a round just passed
 				spellsActivated[j][k].roundsRemaining = temp;
 				if(temp == 0) {   // spell just ended - revert back the stats
 					class Spell *s = spellsActivated[j][k].s;
 					cout << "End of spell" << endl;
 					class Monster *a = map.searchMonster(j);
-					if(k == 0)    // IceSpell
+					if(k == 0)    // IceSpell - revert damage range
 						a->incrementHighDamage(s->getReductionAmount());
-					else if(k == 1)   // FireSpell
+					else if(k == 1)   // FireSpell - revert Armor
 						a->incrementArmor(s->getReductionAmount());
-					else     // LightingSpell
+					else     // LightingSpell - revert agility
 						a->incrementAgility(s->getReductionAmount());
 				}
 			}
@@ -390,7 +467,7 @@ void fight(class Map& map, class Store& store) {
 		class Hero *h;
 		class Monster *m;
 		for (uint32_t i = 0; i < numHeroes; ++i) {
-			//// Hero attack ////
+			//// Hero's turn ////
 			h = map.searchHero(i);
 			if(h->isAwake()) {
 				handleHeroTurn(i, h, store, map, spellsActivated);
@@ -402,13 +479,13 @@ void fight(class Map& map, class Store& store) {
 				break;
 			}
 
-			//// Monster attack ////
+			//// Monster's turn ////
 			m = map.searchMonster(i);
 			if(m->isAwake()) {
 				handleMonsterTurn(i, m, map);
 			}
 
-			// end of fight check
+			// check for end of fight
 			if(!map.fightEnded()) {
 				fightEnded = true;
 				break;
@@ -442,6 +519,9 @@ void initialChoices(bool& Running, class Map& map) {
 		} else if(choice == playerChoices::printMap) {
 			map.print();
 		} else if(choice == playerChoices::initializeHeroes) {
+
+			///  Input the two dimensional position that
+			///  the heroes will start.
 			while(true) {
 				int32_t position[2];
 				cout << "Where do you want to start? " << endl;
@@ -531,6 +611,8 @@ int main(void) {
 		return INPUT_FILE_ERROR;
 	cout << "Welcome to the RPG game" << endl;
 	
+
+	///  Handle the initial 3 choices-loop of the game
 	initialChoices(Running, map);
 
 	while(!Running) {
@@ -553,8 +635,12 @@ int main(void) {
 		cin >> numHeroes;
 	} while(numHeroes < 1 || numHeroes > 3);
 
+	///  Set how many heroes we have (the same number
+	///  of monsters will be generated in each fight)
 	map.setNumHeroesAndMonsters(numHeroes);
 
+	///  Generate heroes based on default data read from
+	///  input file and put them on the map
 	generateHeroes(defaultData, map);
 
 	while(Running) {
@@ -573,7 +659,12 @@ int main(void) {
 		} else if(choice == playerChoices::printMap) {
 			map.print();
 		} else if(choice == playerChoices::moveHeroes) {
+
+			// Print four choices for movement
 			printMoveChoices();
+
+
+			///////////   Input choice   /////////////
 			cin >> choice;
 			if (choice == -1) { continue; }
 			else if(choice < 0 || choice > 3) {
@@ -583,6 +674,8 @@ int main(void) {
 				cout << "You can't go there!" << endl;
 			}
 
+
+			///////////   Compute possibility for fight  /////////////
 			float possibilityToFight = 0.3;
 			float x = rand() / ((float) RAND_MAX);
 
@@ -595,12 +688,16 @@ int main(void) {
 		} else if(map.heroesOnStore() && choice == playerChoices::checkStoreItems) {
 			store.print();
 		} else {
+			/////////  Choices that are for a specific hero  /////////
+
 			string name;
 			cout << "Type the name of the hero you want " \
 				"to do this operation for (or go back: -1): " << endl;
 			cin >> name;
-			if(name == "-1")
+			if(name == "-1")    // Go back
 				continue;
+
+			// Search the hero
 			class Hero *h = map.searchHero(name);
 			if(h == NULL) {
 				cout << "Sorry, that hero does not exist" << endl;

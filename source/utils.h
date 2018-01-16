@@ -13,10 +13,6 @@
 #include "Armor.h"
 #include "Monster.h"
 
-
-// TODO(stefanos): Think if it is better to put
-// in warrior, paladin and sorcerer all the info
-// and eliminate the hero Info
 struct defaultData_t {
 public:
 	uint32_t initialHealthPower;
@@ -208,24 +204,10 @@ public:
 			monsters[i] = NULL;
 		}
 	}
-	// TODO(stefanos): DEBUG CODE - REMOVE THAT
-	/*
-	void printHeroes(void) const {
-		std::cout << "Printing heroes" << std::endl;
-		if(heroes != NULL) {    // Assume that we have space
-			for(uint32_t i = 0; i < numHeroes; ++i)
-				if(heroes[i] != NULL) {
-					heroes[i]->printInfo();
-				}
-		}
-
-	}
-	*/
 
 	void createHero(const struct livingInfo_t& livingInfo, 
 		const struct heroInfo_t *const heroInfo, heroType heroClass) {
 
-		// TODO(stefanos): Add more error checking
 		if(heroes != NULL) {    // Assume that we have space
 			for(uint32_t i = 0; i < numHeroes; ++i)
 				if(heroes[i] == NULL) {
@@ -284,7 +266,7 @@ public:
 	}
 
 	// Mark an item as taken
-	void removeItem(class Item *it) {
+	bool removeItem(class Item *it) {
 		for(int i = 0; i < size; ++i) {
 			if(items[i].item == it) {
 				items[i].taken = 1;
