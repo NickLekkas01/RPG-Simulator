@@ -13,10 +13,6 @@
 
 #define INPUT_FILE_ERROR 1
 
-// TODO:
-// Structure into functions
-// Make the gameplay interaction better
-
 using namespace std;
 
 struct spell_record {
@@ -173,8 +169,8 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 				cout << "You don't have enough money to buy this item" << endl;
 				return;
 			}
-			// TODO(stefanos): Possibly save the search by passing the pointer.
-			h->buy(store.removeItem(name));
+			store.removeItem(it);
+			h->buy(it);
 		} else if(choice == playerChoices::sell) {
 	        // NOTE(stefanos): The procedure is the same with the buy,
 	        // just for the store now. Notice, that all the items that
@@ -194,7 +190,6 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 	        } else if(h->isInUse(it)) {
 	            cout << "This item is in use. Unequip it first if you want to sell it." << endl;
 	        } else {
-				// TODO(stefanos): Possibly save the search by passing the pointer.
 				store.addItem(h->sell(name));
 			}
 		}
@@ -300,17 +295,25 @@ void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class M
 		cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2)" << endl;
 		cin >> option;
 		if(option == 2) {
-			// TODO(stefanos): Display stats better
-			h->printInfo();
+			cout << "Display Hero Info(0) Display Monster Info(1): " << endl;
+			cin >> option;
+			if(option == 0)
+				h->printInfo();
+			else {
+				do {
+					cout << "Which monster's stats you want to see? ";
+					cin >> option;
+				} while(option < 0 || option > (numHeroes - 1));
+				class Monster *m = map.searchMonster((uint32_t) option);
+				m->printInfo();
+			}
 		} else if(option == 1) {
 			usePotion(h, store);
 			break;
 		} else if(option == 0) {
-			int32_t option;
 			do {
 				cout << "Give which monster you want to hit" << endl;
 				cin >> option;
-				cout << option << endl;
 			} while(option < 0 || option > (numHeroes - 1));
 		
 			class Monster *m = map.searchMonster((uint32_t)option);

@@ -284,14 +284,15 @@ public:
 	}
 
 	// Mark an item as taken
-	class Item* removeItem(const std::string& name) {
-		for(int i = 0; i < size; ++i)
-			if(items[i].item->get_name() == name) {
+	void removeItem(class Item *it) {
+		for(int i = 0; i < size; ++i) {
+			if(items[i].item == it) {
 				items[i].taken = 1;
 				--currently_holding;
-				return items[i].item;
+				return true;
 			}
-		return NULL;
+		}
+		return false;
 	}
 
 	// removes and deletes an item from memory
