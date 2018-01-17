@@ -287,6 +287,10 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 	///  decrease the stat of the monster (those decrements
 	///  will be reverted back when spell's active rounds pass).
 	uint32_t am = s->getReductionAmount();
+	// TODO(stefanos): Change modeling. Every spell should have a virtual
+	// function and it will take damage, dexterity and agility.
+	// It will change what is needed.
+	// Stats will be reverted in the same way.
 	if(type == spellTypes::IceSpell) {
 		cout << m->getName() << "'s damage range limit was reduced to: " 
 			<< m->getHighDamage() << endl;
