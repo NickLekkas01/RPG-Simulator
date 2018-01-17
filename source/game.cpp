@@ -270,8 +270,6 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 	m->receiveAttack(spellDam);
 	
 	
-	spellType type = s->getSpellType();
-	
 	///  Find an empty position for already activated
 	///  spells, to put this spell record.
 	size_t j;
@@ -282,28 +280,16 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 	spellsActivated[i][j].s = s;
 	spellsActivated[i][j].roundsRemaining = s->getRounds();
 
-	///  Depending on the type of the spell
-	///  and the amount it reduces the specific stat,
-	///  decrease the stat of the monster (those decrements
-	///  will be reverted back when spell's active rounds pass).
-	uint32_t am = s->getReductionAmount();
-	// TODO(stefanos): Change modeling. Every spell should have a virtual
-	// function and it will take damage, dexterity and agility.
-	// It will change what is needed.
-	// Stats will be reverted in the same way.
-	if(type == spellTypes::IceSpell) {
-		cout << m->getName() << "'s damage range limit was reduced to: " 
-			<< m->getHighDamage() << endl;
-		m->reduceHighDamage(am);
-	} else if(type == spellTypes::FireSpell) {
-		cout << m->getName() << "'s defense was reduced to: " 
-			<< m->getArmor() << endl;
-		m->reduceArmor(am);
-	} else {
-		cout << m->getName() << "'s agility was reduced to: " 
-			<< m->getAgility() << endl;
-		m->reduceAgility(am);
-	}
+	///  Reduce the stats
+	uint32_t highDamage, armor, agility;
+	// NOTE(stefanos): These are passed as references. No pointers
+	// for you C++ people!
+	m->getStats(highDamage, armor, agility);
+	string statChanged = s->reduceStats(highDamage, armor, agility);
+	uint32_t reductionAmount = s->getReductionAmount();
+
+	m->setStats(highDamage, armor, agility);
+	cout << m->getName() << "'s " << statChanged << " was reduced by " << reductionAmount << endl;
 }
 
 void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_record spellsActivated[3][numberOfSpells]) {
@@ -432,16 +418,20 @@ void handleRoundEnd(class Map& map, struct spell_record spellsActivated[3][numbe
 			if((temp = spellsActivated[j][k].roundsRemaining) > 0) {  // a spell is still active
 				--temp;    // a round just passed
 				spellsActivated[j][k].roundsRemaining = temp;
-				if(temp == 0) {   // spell just ended - revert back the stats
+				if(temp == 0) {   // spell just ended - restore back the stats
+					///  Restore the stats
+					class Monster *m = map.searchMonster(j);
 					class Spell *s = spellsActivated[j][k].s;
-					cout << "End of spell" << endl;
-					class Monster *a = map.searchMonster(j);
-					if(k == 0)    // IceSpell - revert damage range
-						a->incrementHighDamage(s->getReductionAmount());
-					else if(k == 1)   // FireSpell - revert Armor
-						a->incrementArmor(s->getReductionAmount());
-					else     // LightingSpell - revert agility
-						a->incrementAgility(s->getReductionAmount());
+					uint32_t highDamage, armor, agility;
+					// NOTE(stefanos): These are passed as references. No pointers
+					// for you C++ people!
+					m->getStats(highDamage, armor, agility);
+					// TODO(stefanos): Maybe request the stat that was restored here?
+					s->restoreStats(highDamage, armor, agility);
+
+					m->setStats(highDamage, armor, agility);
+
+					cout << "End of Spell" << endl;
 				}
 			}
 		}
@@ -497,7 +487,6 @@ void fight(class Map& map, class Store& store) {
 
 		/////// ROUND END /////////
 		handleRoundEnd(map, spellsActivated);
-
 	}
 
 	map.freeMonsters();

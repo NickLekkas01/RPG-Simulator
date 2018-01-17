@@ -5,6 +5,9 @@
 #include <fstream>
 #include <csignal>
 #include "utils.h"
+#include "IceSpell.h"
+#include "FireSpell.h"
+#include "LightingSpell.h"
 
 void assert_null_function(void) {}
 #define assert(condition) \
@@ -20,12 +23,17 @@ void assert_null_function(void) {}
 // is a comment
 void skipComments(std::istream& dataFile) {
 	char c;
-	std::string s;
 
 	while(!dataFile.eof()) {
 		c = dataFile.get();
+		int32_t temp = c;
+		std::cout << "INT: " << temp << std::endl;
 		if(c == '#') {
-			getline(dataFile, s);
+			while((c = dataFile.get()) != '\n' && c != '\r')
+			{ }
+			return;
+		} else if(c == '\n' || c == '\r') {
+			continue;
 		} else {
 			dataFile.unget();
 			return;
@@ -240,6 +248,7 @@ int Map::moveHeroes(int32_t direction) {
 }
 
 int Store::readItems(const std::string& fileName) {
+	std::cout << "GREETING" << std::endl;
 	std::ifstream itemsFile(fileName);
 	if(!itemsFile.good()) {
 		std::cout << "There was a problem opening the items data file" << std::endl;
@@ -251,6 +260,7 @@ int Store::readItems(const std::string& fileName) {
 	// Read the number of items
 	size_t storeSize;
 	itemsFile >> storeSize;
+	std::cout << "ANOTHER: " << storeSize << std::endl;
 	this->size = storeSize;
 
 	// Allocate the initial shared memory
@@ -268,7 +278,10 @@ int Store::readItems(const std::string& fileName) {
 		uint32_t price, min_level;
 		size_t i = itemsRead;
 
+		skipComments(itemsFile);
+		std::cout << "ItemsClass: " << itemClass << std::endl;
 		if(itemClass == "Weapon") {
+			std::cout << "WEAPON" << std::endl;
 			uint32_t damage, hands;
 			itemsFile >> name >> price >> min_level >> damage >> hands;
 			items[i].item = new Weapon(name, price, min_level, 
@@ -277,21 +290,21 @@ int Store::readItems(const std::string& fileName) {
 
 		} else if(itemClass == "Spell") {
 			uint32_t damage[2], mana, reductionAmount, rounds;
-			spellType type;
 			std::string spell_type;
 			itemsFile >> name >> price >> min_level >> damage[0] >> damage[1] 
 				>> mana >> reductionAmount >> rounds >> spell_type;
-			if(spell_type == "IceSpell")
-				type = spellTypes::IceSpell;
-			else if(spell_type == "FireSpell")
-				type = spellTypes::FireSpell;
-			else
-				type = spellTypes::LightingSpell;
+			if(spell_type == "IceSpell") {
+				items[i].item = new IceSpell(name, price, min_level,
+					itemTypes::Spell, damage, mana, reductionAmount, rounds);
+			} else if(spell_type == "FireSpell") {
+				items[i].item = new FireSpell(name, price, min_level,
+					itemTypes::Spell, damage, mana, reductionAmount, rounds);
+			} else {
+				items[i].item = new LightingSpell(name, price, min_level,
+					itemTypes::Spell, damage, mana, reductionAmount, rounds);
+			}
 
-			items[i].item = new Spell(name, price, min_level, 
-				itemTypes::Spell, damage, mana, reductionAmount, rounds, type);
 			items[i].taken = 0;
-
 		} else if(itemClass == "Potion") {
 			uint32_t restoration_amount;
 			uint32_t potion_type;
@@ -308,8 +321,9 @@ int Store::readItems(const std::string& fileName) {
 			items[i].taken = 0;
 		}
 
+		std::cout << "HERE: " << name << std::endl;
+
 		++itemsRead;
-		skipComments(itemsFile);
 	}
 
 	this->currently_holding = itemsRead;

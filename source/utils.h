@@ -121,7 +121,7 @@ public:
 			} else {    // Spirit
 			}
 			*/
-			monsters[i] = new Monster(tempLivingInfo, tempMonsterInfo, type);
+			monsters[i] = new Monster(tempLivingInfo, tempMonsterInfo);
 		}
 	}
 

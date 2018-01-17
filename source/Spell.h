@@ -1,6 +1,7 @@
 #ifndef SPELL_H
 #define SPELL_H
 
+#include <string>
 #include "Item.h"
 
 typedef uint8_t spellType;
@@ -15,21 +16,27 @@ class Spell : public Item {
 private:
 	uint32_t damage[2];
 	uint32_t mana;
-	uint32_t reductionAmount;
 	uint32_t rounds;
-	spellType type;
+
+protected:
+	uint32_t reductionAmount;
+
 public:
 	Spell(std::string nam, uint32_t pr, uint32_t min_level, itemType type,
-		uint32_t dmg[2], uint32_t m, uint32_t rAmount, uint32_t rnds, spellType t) :
+		uint32_t dmg[2], uint32_t m, uint32_t rAmount, uint32_t rnds) :
 		Item(nam, pr, min_level, type), mana(m), reductionAmount(rAmount),
-			rounds(rnds), type(t) {
+			rounds(rnds) {
 		damage[0] = dmg[0];
 		damage[1] = dmg[1];
 	}
 
-	spellType getSpellType(void) const {
-		return type;
-	}
+	// NOTE(stefanos): Changes the respective stat depending on the kind of spell,
+	// returns the name of the stat
+	virtual std::string 
+	reduceStats(uint32_t& highDamage, uint32_t& armor, uint32_t& agility) = 0;
+	
+	virtual void
+	restoreStats(uint32_t& highDamage, uint32_t& armor, uint32_t& agility) = 0;
 
 	uint32_t getReductionAmount(void) const {
 		return reductionAmount;
@@ -51,9 +58,8 @@ public:
 		return mana;
 	}
 
-	void print(void) const {
+	virtual void print(void) const {
 		Item::print();
-		std::cout << "Spell Type: " << spellTypes::typeNames[type] << std::endl;
 		std::cout << "Damage Low: " << damage[0] << std::endl;
 		std::cout << "Damage High: " << damage[1] << std::endl;
 		std::cout << "Reduction Amount: " << reductionAmount << std::endl;

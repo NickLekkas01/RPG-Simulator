@@ -5,14 +5,6 @@
 #include <cstdint>
 #include "Living.h"
 
-typedef uint8_t monsterType;
-namespace monsterTypes { 
-	const uint8_t Dragon = 0;
-	const uint8_t Exoskeleton = 1;
-	const uint8_t Spirit = 2;
-	const char *const monsterNames[] = { "Dragon", "Exoskeleton", "Spirit" };
-};
-
 struct monsterInfo_t {
 	uint32_t damage[2];
 	uint32_t armor;
@@ -22,10 +14,9 @@ struct monsterInfo_t {
 class Monster : public Living {
 private:
 	struct monsterInfo_t monsterInfo;
-	monsterType type;
 public:
-	Monster(const struct livingInfo_t& li, const struct monsterInfo_t& mi,
-		monsterType t) : Living(li), type(t) {
+	Monster(const struct livingInfo_t& li, const struct monsterInfo_t& mi) : Living(li)
+	{
 
 			// TODO(stefanos): Test with initializer list
 			monsterInfo.damage[0] = mi.damage[0];
@@ -49,46 +40,16 @@ public:
 		}
 	}
 
-	monsterType getMonsterType(void) const {
-		return type;
+	uint32_t getStats(uint32_t& highDamage, uint32_t& armor, uint32_t& agility) const {
+		highDamage = monsterInfo.damage[1];
+		armor = monsterInfo.armor;
+		agility = monsterInfo.agility;
 	}
 
-	uint32_t getHighDamage(void) const {
-		return monsterInfo.damage[1];
-	}
-
-	void reduceHighDamage(uint32_t high) {
-		monsterInfo.damage[1] -= high;
-	}
-
-	void incrementHighDamage(uint32_t high) {
-		monsterInfo.damage[1] += high;
-	}
-
-	uint32_t getArmor(void) {
-		return monsterInfo.armor;
-	}
-
-	void reduceArmor(uint32_t armor) {
-		monsterInfo.armor -= armor;
-	}
-
-	void incrementArmor(uint32_t armor) {
-		monsterInfo.armor += armor;
-	}
-
-
-	uint32_t getAgility(void) {
-		return monsterInfo.agility;
-	}
-
-	void reduceAgility(uint32_t agility) {
-		monsterInfo.agility -= agility;
-	}
-
-
-	void incrementAgility(uint32_t agility) {
-		monsterInfo.agility += agility;
+	void setStats(uint32_t highDamage, uint32_t armor, uint32_t agility) {
+		monsterInfo.damage[1] = highDamage;
+		monsterInfo.armor = armor;
+		monsterInfo.agility = agility;
 	}
 
 	uint32_t getAttackDamage() const {
@@ -110,7 +71,7 @@ public:
 
 
 	void printInfo(void) const {
-		std::cout << "Type: " << monsterTypes::monsterNames[type] << std::endl;
+		// TODO(stefanos): Maybe print the type?
 		std::cout << "Name: " << Living::getName() << std::endl;
 		std::cout << "Level: "   << livingInfo.level << std::endl;
 		std::cout << "Health: "   << livingInfo.healthPower << std::endl;
