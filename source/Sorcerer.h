@@ -1,19 +1,19 @@
-#ifndef WARRIOR_H
-#define WARRIOR_H
+#ifndef SORCERER_H
+#define SORCERER_H
 
 #include "Hero.h"
 
-class Warrior : public Hero {
+class Sorcerer : public Hero {
 public:
-	Warrior(const struct livingInfo_t& li, const struct heroInfo_t *const hi) :
+	Sorcerer(const struct livingInfo_t& li, const struct heroInfo_t *const hi) :
 		Hero(li, hi) { }
 
 	bool tryLevelUp(void) {
 		if(Hero::tryLevelUp()) {
 			heroInfo.strength+=2;
 			heroInfo.agility+=2;
-			heroInfo.dexterity++;
-			heroInfo.magicPower+=30;
+			++heroInfo.strength;
+			heroInfo.magicPower+=100;
 
 			return true;
 		}
@@ -21,7 +21,7 @@ public:
 	}
 
 	void printInfo(void) const {
-		std::cout << "Type: " << "Warrior" << std::endl;
+		std::cout << "Type: " << "Sorcerer" << std::endl;
 		Hero::printInfo();
 	}
 };

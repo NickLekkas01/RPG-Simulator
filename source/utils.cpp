@@ -21,13 +21,13 @@ void assert_null_function(void) {}
 
 // (stefanos): Any line starting with a #
 // is a comment
+// TODO(stefanos): Test on linux
 void skipComments(std::istream& dataFile) {
 	char c;
 
 	while(!dataFile.eof()) {
 		c = dataFile.get();
 		int32_t temp = c;
-		std::cout << "INT: " << temp << std::endl;
 		if(c == '#') {
 			while((c = dataFile.get()) != '\n' && c != '\r')
 			{ }
@@ -278,10 +278,8 @@ int Store::readItems(const std::string& fileName) {
 		uint32_t price, min_level;
 		size_t i = itemsRead;
 
-		skipComments(itemsFile);
 		std::cout << "ItemsClass: " << itemClass << std::endl;
 		if(itemClass == "Weapon") {
-			std::cout << "WEAPON" << std::endl;
 			uint32_t damage, hands;
 			itemsFile >> name >> price >> min_level >> damage >> hands;
 			items[i].item = new Weapon(name, price, min_level, 
@@ -321,7 +319,7 @@ int Store::readItems(const std::string& fileName) {
 			items[i].taken = 0;
 		}
 
-		std::cout << "HERE: " << name << std::endl;
+		skipComments(itemsFile);
 
 		++itemsRead;
 	}

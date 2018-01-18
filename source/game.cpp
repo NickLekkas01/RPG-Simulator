@@ -6,12 +6,17 @@
 #include <cstdlib>
 #include <ctime>
 #include "Hero.h"
+#include "Warrior.h"
+#include "Paladin.h"
+#include "Sorcerer.h"
 #include "Monster.h"
 #include "Weapon.h"
 #include "Spell.h"
 #include "utils.h"
 
 #define INPUT_FILE_ERROR 1
+
+// TODO(stefanos): Remove type from the Item
 
 using namespace std;
 

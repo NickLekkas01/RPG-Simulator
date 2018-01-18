@@ -6,6 +6,9 @@
 #include <string>
 #include <sstream>
 #include "Hero.h"
+#include "Warrior.h"
+#include "Paladin.h"
+#include "Sorcerer.h"
 #include "Item.h"
 #include "Weapon.h"
 #include "Spell.h"
@@ -34,6 +37,11 @@ public:
 	int readDefaultData(void);
 };
 
+namespace heroTypes {
+	const uint8_t Warrior = 0;
+	const uint8_t Paladin = 1;
+	const uint8_t Sorcerer = 2;
+};
 
 enum directions { up, down, right, left };
 class Map {
@@ -206,12 +214,17 @@ public:
 	}
 
 	void createHero(const struct livingInfo_t& livingInfo, 
-		const struct heroInfo_t *const heroInfo, heroType heroClass) {
+		const struct heroInfo_t *const heroInfo, uint8_t heroClass) {
 
 		if(heroes != NULL) {    // Assume that we have space
 			for(uint32_t i = 0; i < numHeroes; ++i)
 				if(heroes[i] == NULL) {
-					heroes[i] = new Hero(livingInfo, heroInfo, heroClass);
+					if(heroClass == heroTypes::Warrior)
+						heroes[i] = new Warrior(livingInfo, heroInfo);
+					else if(heroClass == heroTypes::Paladin)
+						heroes[i] = new Paladin(livingInfo, heroInfo);
+					else
+						heroes[i] = new Sorcerer(livingInfo, heroInfo);
 					return;
 				}
 		}

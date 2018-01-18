@@ -10,16 +10,6 @@
 #include "Armor.h"
 #include "Spell.h"
 
-typedef uint8_t heroType;
-// NOTE(stefanos): Changed to avoid linker
-// problems
-namespace heroTypes {
-	const uint8_t Warrior = 0;
-	const uint8_t Sorcerer = 1;
-	const uint8_t Paladin = 2;
-	const char *const typeNames[] = { "Warrior", "Paladin", "Sorcerer" };
-};
-
 struct heroInfo_t {
 	uint32_t magicPower;
 	uint32_t strength;
@@ -38,15 +28,16 @@ struct Inventory_t{
 
 class Hero : public Living {
 private:
-	struct heroInfo_t heroInfo;
 	const struct heroInfo_t *const initialData;
-	heroType type;
     Weapon *hands_availability[2];
 	class Armor* armor;
     struct Inventory_t InventoryInfo;
+
+protected:
+	struct heroInfo_t heroInfo;
 public:
-	Hero(const struct livingInfo_t& li, const struct heroInfo_t *const hi, heroType t) :
-	     Living(li), heroInfo(*hi), initialData(hi), type(t), armor(NULL) {
+	Hero(const struct livingInfo_t& li, const struct heroInfo_t *const hi) :
+	     Living(li), heroInfo(*hi), initialData(hi), armor(NULL) {
          InventoryInfo.size=10;
          InventoryInfo.currently_holding=0;
          InventoryInfo.Inventory=new Item*[10];
@@ -62,8 +53,7 @@ public:
         delete []InventoryInfo.ItemsUsed;
 	}
 
-	void printInfo(void) const {
-		std::cout << "Type: " << heroTypes::typeNames[type] << std::endl;
+	virtual void printInfo(void) const {
 		std::cout << "Name: " << livingInfo.name << std::endl;
 		std::cout << "Health Power: " << livingInfo.healthPower << std::endl;
 		std::cout << "Level: " << livingInfo.level << std::endl;
@@ -114,32 +104,11 @@ public:
 		heroInfo.money += m;
 	}
 
-	bool tryLevelUp(){
+	virtual bool tryLevelUp(void){
 		if(heroInfo.exp>100){
 			++livingInfo.level;
-			if(type == heroTypes::Warrior){
-				heroInfo.strength+=2;
-				heroInfo.agility+=2;
-				heroInfo.dexterity++;
-				heroInfo.magicPower+=30;
-			} else if(type == heroTypes::Paladin){
-				heroInfo.strength+=2;
-				heroInfo.dexterity+=2;
-				heroInfo.agility++;
-				heroInfo.magicPower+=50;
-			} else if(type == heroTypes::Sorcerer){
-				heroInfo.dexterity+=2;
-				heroInfo.agility+=2;
-				heroInfo.strength+=1;
-				heroInfo.magicPower+=100;
-			}
-
-			heroInfo.money+=500;
-			heroInfo.exp=heroInfo.exp-100;
-
 			return true;
-		} else
-			return false;
+		}
 	}
 
 
