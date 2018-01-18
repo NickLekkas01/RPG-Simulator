@@ -19,7 +19,8 @@
 struct defaultData_t {
 public:
 	uint32_t initialHealthPower;
-	uint32_t probabilityToFight;  // at % percentage
+	uint32_t healthToRegen;
+	uint32_t magicPowerToRegen;
 	
 	// Heroes
 	struct heroInfo_t warriorInfo;

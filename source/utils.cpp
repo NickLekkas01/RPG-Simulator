@@ -288,8 +288,6 @@ int Store::readItems(const std::string& fileName) {
 			itemsFile >> name >> price >> min_level >> damage >> hands;
 			items[i].item = new Weapon(name, price, min_level, 
 				itemTypes::Weapon, damage, hands);
-			items[i].taken = 0;
-
 		} else if(itemClass == "Spell") {
 			uint32_t damage[2], mana, reductionAmount, rounds;
 			std::string spell_type;
@@ -306,7 +304,6 @@ int Store::readItems(const std::string& fileName) {
 					itemTypes::Spell, damage, mana, reductionAmount, rounds);
 			}
 
-			items[i].taken = 0;
 		} else if(itemClass == "Potion") {
 			uint32_t restoration_amount;
 			std::string potion_type;
@@ -325,14 +322,14 @@ int Store::readItems(const std::string& fileName) {
 				items[i].item = new AgilityPotion(name, price, min_level, 
 					itemTypes::Potion, restoration_amount);
 			}
-			// TODO(stefanos): Should we add an items.taken here?
 		} else if(itemClass == "Armor") {
 			uint32_t armorValue;
 
 			itemsFile >> name >> price >> min_level >> armorValue;
 			items[i].item = new Armor(name, price, min_level, itemTypes::Armor, armorValue);
-			items[i].taken = 0;
 		}
+
+		items[i].taken = 0;
 
 		skipComments(itemsFile);
 

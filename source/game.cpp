@@ -16,7 +16,7 @@
 
 #define INPUT_FILE_ERROR 1
 
-// TODO(stefanos): Remove type from the Item
+// TODO(stefanos): Remove type from the Item?
 
 using namespace std;
 
@@ -25,8 +25,14 @@ struct spell_record {
 	uint32_t roundsRemaining;
 };
 
+struct roundEndStats_t {
+	uint32_t healthToRegen;
+	uint32_t magicPowerToRegen;
+};
+
+// TODO(stefanos): Remove these global variables
 const uint32_t numberOfSpells = 10;
-uint32_t numHeroes;
+const uint32_t maxNumHeroes = 3;
 
 namespace playerChoices {
 	const uint32_t initializeHeroes = 2;
@@ -58,10 +64,7 @@ void usePotion(class Hero *h, class Store& store) {
 		store.deleteItem(potion);
 	}
 	
-	// TODO(stefanos): Add a message here
-	/*
 	cout << h->getName() << "'s " << potion->getStatName() << " was increased!" << endl;
-	*/
 }
 
 
@@ -236,6 +239,7 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 }
 
 void printPreFightInfo(const class Map& map) {
+	uint32_t numHeroes = map.getNumHeroes();
 	for (uint32_t i = 0; i < numHeroes; ++i) {
 		class Hero *h = map.searchHero(i);
 		class Monster *m = map.searchMonster(i);
@@ -246,7 +250,7 @@ void printPreFightInfo(const class Map& map) {
 	}
 }
 
-void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells], class Hero *h, class Monster *m) {
+void useSpell(uint32_t i, struct spell_record spellsActivated[maxNumHeroes][numberOfSpells], class Hero *h, class Monster *m) {
 	// TODO(stefanos): Think about mana
 	// after the end of a fight.
 
@@ -273,10 +277,15 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 		cout << "You don't have enough magic power to execute this spell" << endl;
 		return;
 	}
-	// TODO(stefanos): Output info for spell's attack
+
+	// TODO(stefanos): Wrap in a function?
 	// Hit the monster with this damage.
 	m->receiveAttack(spellDam);
-	
+	if(m->isAwake())
+		cout << m->getName() << "'s health is now: " << m->getHealthPower() << endl;
+	else
+		cout << m->getName() << " died!" << endl;
+
 	
 	///  Find an empty position for already activated
 	///  spells, to put this spell record.
@@ -300,7 +309,7 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[3][numberOfSpells]
 	cout << m->getName() << "'s " << statChanged << " was reduced by " << reductionAmount << endl;
 }
 
-void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_record spellsActivated[3][numberOfSpells]) {
+void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_record spellsActivated[maxNumHeroes][numberOfSpells]) {
 	int32_t option;
 	while(true) {
 		cout << "Choose option:" << endl << "Attack(0) Spell(1) Go Back(-1)" << endl;
@@ -335,10 +344,11 @@ void handleHeroFight(uint32_t i, class Hero *h, class Monster *m, struct spell_r
 	cout << endl;
 }
 
-void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class Map& map, struct spell_record spellsActivated[3][numberOfSpells]) {
+void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class Map& map, struct spell_record spellsActivated[maxNumHeroes][numberOfSpells]) {
 	cout << "Hero's " << i + 1 << " turn" << endl;
 
 	int32_t option;
+	uint32_t numHeroes = map.getNumHeroes();
 	while(true) {
 		cout << "Choose option:" << endl << "Fight(0) use Potion(1) display Stats (2)" << endl;
 		cin >> option;
@@ -419,8 +429,9 @@ void handleMonsterTurn(uint32_t i, class Monster *m, const class Map& map) {
 	}
 }
 
-void handleRoundEnd(class Map& map, struct spell_record spellsActivated[3][numberOfSpells]) {
-	for(int j = 0; j < 3; ++j) {   // loop monsters
+void handleRoundEnd(class Map& map, struct spell_record spellsActivated[maxNumHeroes][numberOfSpells]) {
+	uint32_t numHeroes = map.getNumHeroes();
+	for(int j = 0; j < numHeroes; ++j) {   // loop monsters
 		for(int k = 0; k < numberOfSpells; ++k) {   // loop spells
 			int temp;
 			if((temp = spellsActivated[j][k].roundsRemaining) > 0) {  // a spell is still active
@@ -444,25 +455,22 @@ void handleRoundEnd(class Map& map, struct spell_record spellsActivated[3][numbe
 			}
 		}
 	}
-
-	// TODO(stefanos): Constant values for now.
-	// Should be part of the input file
-	map.roundEnd(20, 25);
 }
 
 
-void fight(class Map& map, class Store& store) {
+void fight(class Map& map, class Store& store, struct roundEndStats_t roundEndStats) {
 	printPreFightInfo(map);
 
 	// We have 3 monsters at most and each monster can have
 	// at most 10 spells activated at a given time.
-	struct spell_record spellsActivated[3][numberOfSpells] = { };
+	struct spell_record spellsActivated[maxNumHeroes][numberOfSpells] = { };
 
 	while (true) {
 		bool fightEnded = false;
 
 		class Hero *h;
 		class Monster *m;
+		uint32_t numHeroes = map.getNumHeroes();
 		for (uint32_t i = 0; i < numHeroes; ++i) {
 			//// Hero's turn ////
 			h = map.searchHero(i);
@@ -495,6 +503,8 @@ void fight(class Map& map, class Store& store) {
 
 		/////// ROUND END /////////
 		handleRoundEnd(map, spellsActivated);
+
+		map.roundEnd(roundEndStats.healthToRegen, roundEndStats.magicPowerToRegen);
 	}
 
 	map.freeMonsters();
@@ -535,6 +545,7 @@ void initialChoices(bool& Running, class Map& map) {
 }
 
 void generateHeroes(const defaultData_t& defaultData, class Map& map) {
+	uint32_t numHeroes = map.getNumHeroes();
 	for(int i = 0; i < numHeroes; ++i) {
 		// TODO(stefanos): Change those debug values
 		struct livingInfo_t livingInfo = {"", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
@@ -626,6 +637,7 @@ int main(void) {
 	// Fix that on the release
 	store.readItems("./build/items.dat");
 
+	uint32_t numHeroes;
 	do {
 		cout << "How many heroes do you want (1-3)? " << endl;
 		cin >> numHeroes;
@@ -680,7 +692,8 @@ int main(void) {
 
 			cout << "FIGHT!!!!!!!!" << endl;
 			map.generateMonsters(defaultData.initialHealthPower);
-			fight(map, store);
+			roundEndStats_t roundEndStats = { defaultData.healthToRegen, defaultData.magicPowerToRegen };
+			fight(map, store, roundEndStats);
 		} else if(map.heroesOnStore() && choice == playerChoices::checkStoreItems) {
 			store.print();
 		} else {

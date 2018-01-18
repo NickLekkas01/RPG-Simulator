@@ -96,7 +96,6 @@ public:
 	}
 
 	void addExp(uint32_t exp) {
-		// TODO(stefanos): Possibly add a bound here.
 		heroInfo.exp += exp;
 	}
 

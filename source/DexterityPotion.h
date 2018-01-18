@@ -17,8 +17,12 @@ public:
 	}
 
 	virtual void use(uint32_t& healthPower, uint32_t& strength, uint32_t& dexterity,
-		uint32_t& agility) {
+		uint32_t& agility) const {
 		dexterity += restorationAmount;
+	}
+
+	std::string getStatName(void) const {
+		return "dexterity";
 	}
 };
 

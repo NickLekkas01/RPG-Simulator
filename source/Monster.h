@@ -71,7 +71,6 @@ public:
 
 
 	void printInfo(void) const {
-		// TODO(stefanos): Maybe print the type?
 		std::cout << "Name: " << Living::getName() << std::endl;
 		std::cout << "Level: "   << livingInfo.level << std::endl;
 		std::cout << "Health: "   << livingInfo.healthPower << std::endl;

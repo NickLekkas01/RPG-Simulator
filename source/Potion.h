@@ -23,7 +23,9 @@ public:
 	}
 	
 	virtual void use(uint32_t& healthPower, uint32_t& strength, uint32_t& dexterity,
-		uint32_t& agility) = 0;
+		uint32_t& agility) const = 0;
+
+	virtual std::string getStatName(void) const = 0;
 };
 
 #endif

@@ -2,6 +2,7 @@
 #define HEALTHPOTION_H
 
 #include <iostream>
+#include <string>
 #include "Potion.h"
 
 class HealthPotion : public Potion {
@@ -16,9 +17,13 @@ public:
 		std::cout << "Type: Health Potion" << std::endl;
 	}
 
-	virtual void use(uint32_t& healthPower, uint32_t& strength, uint32_t& dexterity,
-		uint32_t& agility) {
+	void use(uint32_t& healthPower, uint32_t& strength, uint32_t& dexterity,
+		uint32_t& agility) const {
 		healthPower += restorationAmount;
+	}
+
+	std::string getStatName(void) const {
+		return "health power";
 	}
 };
 
