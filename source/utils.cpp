@@ -4,6 +4,10 @@
 #include <istream>
 #include <fstream>
 #include <csignal>
+#include "HealthPotion.h"
+#include "StrengthPotion.h"
+#include "DexterityPotion.h"
+#include "AgilityPotion.h"
 #include "utils.h"
 #include "IceSpell.h"
 #include "FireSpell.h"
@@ -305,12 +309,23 @@ int Store::readItems(const std::string& fileName) {
 			items[i].taken = 0;
 		} else if(itemClass == "Potion") {
 			uint32_t restoration_amount;
-			uint32_t potion_type;
-
+			std::string potion_type;
+			
 			itemsFile >> name >> price >> min_level >> restoration_amount >> potion_type;
-			items[i].item = new Potion(name, price, min_level, 
-				itemTypes::Potion, restoration_amount,
-				potion_type);
+			if(potion_type == "Health") {
+				items[i].item = new HealthPotion(name, price, min_level, 
+					itemTypes::Potion, restoration_amount);
+			} else if(potion_type == "Strength") {
+				items[i].item = new StrengthPotion(name, price, min_level, 
+					itemTypes::Potion, restoration_amount);
+			} else if(potion_type == "Dexterity") {
+				items[i].item = new DexterityPotion(name, price, min_level, 
+					itemTypes::Potion, restoration_amount);
+			} else {
+				items[i].item = new AgilityPotion(name, price, min_level, 
+					itemTypes::Potion, restoration_amount);
+			}
+			// TODO(stefanos): Should we add an items.taken here?
 		} else if(itemClass == "Armor") {
 			uint32_t armorValue;
 

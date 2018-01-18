@@ -272,35 +272,25 @@ public:
 				uint32_t min_lvl = pot->getMinLevel();
 				if(livingInfo.level < min_lvl)
 					return NULL;
-				potionType type = pot->getPotionType();
+
+				uint32_t healthPower, strength, dexterity, agility;
+
+				// NOTE(stefanos): These are passed as references, no pointers
+				// for you C++ people!
+				pot->use(healthPower, strength, dexterity, agility);
 				uint32_t restoration_amount = pot->getRestorationAmount();
-				// TODO(stefanos): Set upper bound for how much any property
-				// can be raised.
-				if(type == potionTypes::health) {
-					if((livingInfo.healthPower += restoration_amount) > livingInfo.initialHealthPower)
-						livingInfo.healthPower = livingInfo.initialHealthPower;
-				} else if(type == potionTypes::strength) {
-					if((heroInfo.strength += restoration_amount) <= 
-						initialData->strength) {
-
-						heroInfo.strength += restoration_amount;
-					}
-				} else if(type == potionTypes::dexterity) {
-					if((heroInfo.dexterity += restoration_amount) <= 
-						initialData->dexterity) {
-
-						heroInfo.dexterity += restoration_amount;
-					}
-				} else if(type == potionTypes::agility) {
-					if((heroInfo.agility += restoration_amount) <= 
-						initialData->agility) {
-
-						heroInfo.agility += restoration_amount;
-					}
+				if((livingInfo.healthPower = healthPower) > 
+					livingInfo.initialHealthPower) {
+					livingInfo.healthPower = livingInfo.initialHealthPower;
 				}
+				heroInfo.strength = strength;
+				heroInfo.dexterity = dexterity;
+				// TODO(stefanos): Set bound for agility?
+				// TODO(stefanos): Set bound for the others also?
+				heroInfo.agility = agility;
 
-				class Item *tmp = InventoryInfo.Inventory[i];
-				for(int j = i + 1; j<InventoryInfo.currently_holding; j++){
+				class Item *tmp = pot;
+				for(int j = i + 1; j<InventoryInfo.currently_holding; j++) {
 					InventoryInfo.Inventory[j-1]=InventoryInfo.Inventory[j];
 				}
 				--InventoryInfo.currently_holding;

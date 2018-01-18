@@ -1,6 +1,7 @@
 #ifndef PALADIN_H
 #define PALADIN_H
 
+#include <iostream>
 #include "Hero.h"
 
 class Paladin : public Hero {
@@ -21,7 +22,7 @@ public:
 	}
 
 	void printInfo(void) const {
-		std::cout << "Type: " << "Paladin" << std::endl;
+		std::cout << "Type: Paladin" << std::endl;
 		Hero::printInfo();
 	}
 };

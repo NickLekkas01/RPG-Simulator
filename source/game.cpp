@@ -57,8 +57,11 @@ void usePotion(class Hero *h, class Store& store) {
 	} else {
 		store.deleteItem(potion);
 	}
-
-	cout << h->getName() << "'s " << potion->getStatName() << " was increased to: " << h->getHealthPower() << endl;
+	
+	// TODO(stefanos): Add a message here
+	/*
+	cout << h->getName() << "'s " << potion->getStatName() << " was increased!" << endl;
+	*/
 }
 
 
