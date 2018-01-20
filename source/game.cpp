@@ -381,6 +381,7 @@ void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class M
 		
 			class Monster *m = map.searchMonster((uint32_t)option);
 			handleHeroFight(i, h, m, spellsActivated);
+			break;
 		} else {
 			cout << "Not a proper option" << endl;
 		}
