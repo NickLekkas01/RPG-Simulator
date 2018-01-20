@@ -117,7 +117,7 @@ public:
 			struct livingInfo_t tempLivingInfo = {name.str(), level, healthPower, healthPower, 1};
 			struct monsterInfo_t tempMonsterInfo;
 			uint32_t heroStrength = h->getStrength();
-			tempMonsterInfo.damage[0] = heroStrength - 40;
+			tempMonsterInfo.damage[0] = heroStrength - 20;
 			tempMonsterInfo.damage[1] = rand() % ( (heroStrength + 10) - (heroStrength - 10) ) + (heroStrength - 10);
 			tempMonsterInfo.armor = (level < 5) ? (level * 10) : (level * 0.4f);
 			uint32_t heroAgility = h->getAgility();

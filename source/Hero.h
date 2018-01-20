@@ -401,7 +401,6 @@ public:
         return true;
     }
 
-
 	bool inventoryAvaiableSpace(void) const {
 		return (InventoryInfo.currently_holding<InventoryInfo.size);
 	}
