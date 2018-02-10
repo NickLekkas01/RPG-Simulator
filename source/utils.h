@@ -124,12 +124,16 @@ public:
 			tempMonsterInfo.agility = rand() % ( (heroAgility  + 10) - (heroAgility - 10) ) + (heroAgility - 10);
 			uint32_t type = rand() % 3;
 			// TODO(stefanos): Make stats different for each monster
-			/*
+			
 			if(type == monsterTypes::Dragon) {
+				tempMonsterInfo.damage[0] *= 1.3;
+				tempMonsterInfo.damage[1] *= 1.3;
 			} else if(type == monsterTypes::Exoskeleton) {
+				tempMonsterInfo.armor *= 1.3;
 			} else {    // Spirit
+				tempMonsterInfo.agility *= 1.3;
 			}
-			*/
+			
 			monsters[i] = new Monster(tempLivingInfo, tempMonsterInfo);
 		}
 	}
