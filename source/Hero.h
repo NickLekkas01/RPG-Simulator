@@ -67,7 +67,7 @@ public:
 		std::cout << "Equipment: " << std::endl;
 		if(hands_availability[0] == NULL &&
 			hands_availability[1] == NULL)
-			std::cout << "The hero holds no weapon or spell" << std::endl;
+			std::cout << "The hero holds no weapon" << std::endl;
 		else if(hands_availability[0] != hands_availability[1]) {
 			if(hands_availability[0] != NULL) {
 				std::cout << "Hand 1: " << std::endl;
