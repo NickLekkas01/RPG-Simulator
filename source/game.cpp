@@ -40,7 +40,7 @@ namespace playerChoices {
 		unequipWeapon, equipArmor, unequipArmor, checkStoreItems, buy, sell};
 };
 
-void usePotion(class Hero *h, class Store& store) {
+bool usePotion(class Hero *h, class Store& store) {
 	h->printPotions();
 
 	// Search potion by name on hero's inventory.
@@ -50,23 +50,23 @@ void usePotion(class Hero *h, class Store& store) {
 	string name;
 	cin >> name;
 	if(name == "-1")
-		return;
+		return false;
 	class Potion *potion = (class Potion *) h->usePotion(name);
 	if(potion == NULL) {
 		cout << "The potion either does not exist, or you are " \
 			"not in the required level to use it" << endl;
-		return;
+		return false;
 	}
 	if(h->getLevel() < potion->getMinLevel()) {
 		cout << "You are not on the required level to use this potion" << endl;
-		return;
+		return false;
 	} else {
 		store.deleteItem(potion);
 	}
 	
 	cout << h->getName() << "'s " << potion->getStatName() << " was increased!" << endl;
+	return true;
 }
-
 
 void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store, class Map& map) {
 
@@ -378,8 +378,10 @@ void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class M
 				m->printInfo();
 			}
 		} else if(option == 1) {
-			usePotion(h, store);
-			break;
+			if(usePotion(h, store))
+				break;
+			else
+				continue;
 		} else if(option == 0) {
 			do {
 				cout << "Give which monster you want to hit" << endl;
