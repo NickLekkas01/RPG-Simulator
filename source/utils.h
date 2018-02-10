@@ -125,12 +125,12 @@ public:
 			uint32_t type = rand() % 3;
 			// TODO(stefanos): Make stats different for each monster
 			
-			if(type == monsterTypes::Dragon) {
+			if(type == 0) {							//monsterTypes::Dragon
 				tempMonsterInfo.damage[0] *= 1.3;
 				tempMonsterInfo.damage[1] *= 1.3;
-			} else if(type == monsterTypes::Exoskeleton) {
+			} else if(type == 1) {					//monsterTypes::Exoskeleton
 				tempMonsterInfo.armor *= 1.3;
-			} else {    // Spirit
+			} else {    							//monsterTypes::Spirit
 				tempMonsterInfo.agility *= 1.3;
 			}
 			
