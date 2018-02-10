@@ -122,6 +122,8 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 		if (it == NULL) {
 			cout << "The weapon does not exist" << endl;
 			return;
+		} else if(it->getItemType() != itemTypes::Weapon) {
+			cout << "You can only unequip weapons" << endl;
 		} else if (!h->isInUse(it)) {
 			cout << "The weapon is not equipped" << endl;
 			return;
@@ -174,11 +176,13 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 		if(it == NULL) {
 			cout << "The armor does not exist" << endl;
 			return;
+		} else if(it->getItemType() != itemTypes::Armor) {
+			cout << "You can only unequip armors" << endl;
 		} else if(!h->isInUse(it)) {
 			cout << "The armor is not equipped" << endl;
 			return;
 		}
-		h->unequipWeapon(it);
+		h->unequipArmor(it);
 	} else if(map.heroesOnStore()) {      // If heroes are on the store square, we
 	                                      // have some more choices.
 		if(choice == playerChoices::buy) {
