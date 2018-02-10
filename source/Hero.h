@@ -71,7 +71,7 @@ public:
 		else if(hands_availability[0] != hands_availability[1]) {
 			if(hands_availability[0] != NULL) {
 				std::cout << "Hand 1: " << std::endl;
-				std::cout << "\t";
+				//std::cout << "\t";
  				hands_availability[0]->print();
 				std::cout << std::endl;
 

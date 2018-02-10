@@ -239,6 +239,7 @@ void handleHeroSpecificChoices(int32_t choice, class Hero *h, class Store& store
 }
 
 void printPreFightInfo(const class Map& map) {
+	cout << endl;
 	uint32_t numHeroes = map.getNumHeroes();
 	for (uint32_t i = 0; i < numHeroes; ++i) {
 		class Hero *h = map.searchHero(i);
@@ -357,6 +358,7 @@ void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class M
 			// Choose whose stats you want to display
 			cout << "Display Hero Info(0) Display Monster Info(1): " << endl;
 			cin >> option;
+			cout << endl;
 			if(option == 0)    // display ith's hero info
 				h->printInfo();
 			else {
@@ -368,6 +370,7 @@ void handleHeroTurn(uint32_t i, class Hero *h, class Store& store, const class M
 					cin >> option;
 				} while(option < 0 || option > (numHeroes - 1));
 				class Monster *m = map.searchMonster((uint32_t) option);
+				cout << endl;
 				m->printInfo();
 			}
 		} else if(option == 1) {
@@ -482,6 +485,7 @@ void fight(class Map& map, class Store& store, struct roundEndStats_t roundEndSt
 			// check for end of fight
 			if(map.fightEnded()) {
 				fightEnded = true;
+				cout<<"Apo heroes bghka"<<endl;
 				break;
 			}
 
@@ -492,8 +496,9 @@ void fight(class Map& map, class Store& store, struct roundEndStats_t roundEndSt
 			}
 
 			// check for end of fight
-			if(!map.fightEnded()) {
+			if(map.fightEnded()) {
 				fightEnded = true;
+				cout<<"Apo monsters bghka"<<endl;
 				break;
 			}
 		}
@@ -515,6 +520,7 @@ void initialChoices(bool& Running, class Map& map) {
 	// Initial loop
 	while(Running) {
 		int32_t choice;
+		cout << endl;
 		cout << "Available choices" << endl;
 		cout << "Quit: 0" << endl;
 		cout << "Print Map: 1" << endl;
@@ -578,6 +584,7 @@ void generateHeroes(const defaultData_t& defaultData, class Map& map) {
 }
 
 void printMainMenuChoices(bool heroesOnStore) {
+	cout << endl;
 	cout << "Available choices" << endl;
 	cout << "Quit: 0" << endl;
 	cout << "Print Map: 1" << endl;
@@ -658,6 +665,7 @@ int main(void) {
 		int32_t choice;
 		cout << "What do you want to do? ";
 		cin >> choice;
+		cout << endl;
 
 		if(choice > 12) {
 			cout << "This operation can't be handled" << endl;
@@ -691,7 +699,7 @@ int main(void) {
 			if(x > possibilityToFight)  // Will not emerge in fight
 				continue;
 
-			cout << "FIGHT!!!!!!!!" << endl;
+			cout << endl << "FIGHT!!!!!!!!" << endl << endl;
 			map.generateMonsters(defaultData.initialHealthPower);
 			roundEndStats_t roundEndStats = { defaultData.healthToRegen, defaultData.magicPowerToRegen };
 			fight(map, store, roundEndStats);

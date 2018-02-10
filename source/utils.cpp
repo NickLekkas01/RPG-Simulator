@@ -252,7 +252,7 @@ int Map::moveHeroes(int32_t direction) {
 }
 
 int Store::readItems(const std::string& fileName) {
-	std::cout << "GREETING" << std::endl;
+	std::cout << std::endl << "GREETING" << std::endl;
 	std::ifstream itemsFile(fileName);
 	if(!itemsFile.good()) {
 		std::cout << "There was a problem opening the items data file" << std::endl;
