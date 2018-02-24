@@ -19,32 +19,18 @@ private:
 	uint32_t minimum_level;
 	itemType iType;
 public:
-	Item(std::string nam, uint32_t pr, uint32_t min_level, itemType type) :
-		name(nam), price(pr), minimum_level(min_level), iType(type) { }
+	Item(std::string, uint32_t, uint32_t, itemType) ;
 
-	Item(const class Item& i) : name(i.name), price(i.price),
-		minimum_level(i.minimum_level) { }
+	Item(const class Item&);
 	
-	std::string get_name() const{
-		return name;
-	}
-	int get_price() const{
-		return price;
-	}
+	std::string get_name() const;
+	int get_price() const;
 
-	itemType getItemType(void) const {
-		return iType;
-	}
+	itemType getItemType(void) const;
 
-	uint8_t getMinLevel() const{
-		return minimum_level;
-	}
+	uint8_t getMinLevel() const;
 
-	virtual void print(void) const {
-		std::cout << "Name: " << name << std::endl;
-		std::cout << "Price: " << price << std::endl;
-		std::cout << "Minimum Level: " << minimum_level << std::endl;
-	}
+	virtual void print(void) const ;
 };
 
 #endif

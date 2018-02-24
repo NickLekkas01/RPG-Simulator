@@ -15,40 +15,22 @@ class Living {
 protected:
 	struct livingInfo_t livingInfo;
 public:
-	Living(const struct livingInfo_t& info) : livingInfo(info) { }
-	struct livingInfo_t get_livingInfo(){
-		return livingInfo;
-	}
+	Living(const struct livingInfo_t&) ;
+	struct livingInfo_t get_livingInfo();
 
-	uint32_t getLevel(void) const {
-		return livingInfo.level;
-	}
+	uint32_t getLevel(void) const ;
 
-	bool isAwake(void) const {
-		return livingInfo.awake;
-	}
+	bool isAwake(void) const ;
 
-	bool getHealthPower(void) const {
-		return livingInfo.healthPower;
-	}
+	bool getHealthPower(void) const ;
 
-	void setAwake(bool state) {
-		livingInfo.awake = state;
-	}
+	void setAwake(bool) ;
 
-	std::string getName(void) const {
-		return livingInfo.name;
-	}
+	std::string getName(void) const ;
 
-	void addLevel(uint8_t lev){
-		livingInfo.level+=lev;
-	}
-	void addHealth(uint32_t num){
-		livingInfo.healthPower+=num;
-	}
-	void setName(std::string nam){
-		livingInfo.name=nam;
-	}
+	void addLevel(uint8_t );
+	void addHealth(uint32_t);
+	void setName(std::string);
 };
 
 #endif

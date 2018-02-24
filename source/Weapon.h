@@ -10,26 +10,16 @@ private:
 	uint32_t damage;
 	uint32_t hands;      // 1 -> 1 hand, 2 -> both
 public:
-	Weapon(std::string nam, uint32_t pr, uint32_t min_level, itemType type,
-		uint32_t dmg, uint32_t h) :
-		Item(nam, pr, min_level, type), damage(dmg), hands(h) { }
+	Weapon(std::string, uint32_t, uint32_t, itemType,
+		uint32_t, uint32_t) ;
 
-	Weapon(const class Weapon& w) : Item(w), damage(w.damage),
-		hands(w.hands) { }
+	Weapon(const class Weapon&);
 
-    uint32_t get_hands() const {
-        return hands;
-    }
+    uint32_t get_hands() const ;
 
-    uint32_t get_damage() const {
-        return damage;
-    }
+    uint32_t get_damage() const ;
 
-	void print(void) const {
-		Item::print();
-		std::cout << "Damage: " << damage << std::endl;
-		std::cout << "Hands required: " << hands << std::endl;
-	}
+	void print(void) const ;
 };
 
 #endif

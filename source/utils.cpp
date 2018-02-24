@@ -218,6 +218,183 @@ int Map::initializeHeroesPosition(int32_t position[2]) {
 	return 0;
 }
 
+void Map::freeMonsters(){
+		for(uint32_t i = 0; i < numHeroes; ++i){
+			if(monsters[i] != NULL){
+				delete monsters[i];
+				monsters[i] = NULL;
+			}
+		}
+	}
+
+void Map::printHeroInfo(void) const {
+		for(uint32_t i = 0; i < numHeroes; ++i) {
+			if(heroes[i] != NULL)
+				heroes[i]->printInfo();
+			std::cout << std::endl;
+		}
+	}
+
+class Hero *Map::searchHero(std::string name) const {
+		if(heroes != NULL) {
+			for(uint32_t i = 0; i < numHeroes; ++i) {
+				if(heroes[i] != NULL)
+					if(heroes[i]->getName() == name) {
+						return heroes[i];
+					}
+			}
+		}
+
+		return NULL;
+	}
+
+	class Hero *Map::searchHero(uint32_t i) const {
+		// Assume that we have allocated memory for 'heroes'
+		return heroes[i];
+	}
+
+	class Monster *Map::searchMonster(uint32_t i) const {
+		// Assume that we have allocated memory for 'monsters'
+		return monsters[i];
+	}
+
+	void Map::generateMonsters(uint32_t healthPower) {
+		// Assume that we have memory for monsters
+		for(size_t i = 0; i < this->numHeroes; ++i) {
+			class Hero *h = searchHero(i);
+			uint32_t level = h->getLevel();
+			std::stringstream name;
+			name << "Monster " << i;
+			struct livingInfo_t tempLivingInfo = {name.str(), level, healthPower, healthPower, 1};
+			struct monsterInfo_t tempMonsterInfo;
+			uint32_t heroStrength = h->getStrength();
+			tempMonsterInfo.damage[0] = heroStrength - 20;
+			tempMonsterInfo.damage[1] = rand() % ( (heroStrength + 10) - (heroStrength - 10) ) + (heroStrength - 10);
+			tempMonsterInfo.armor = (level < 5) ? (level * 10) : (level * 0.4f);
+			uint32_t heroAgility = h->getAgility();
+			tempMonsterInfo.agility = rand() % ( (heroAgility  + 10) - (heroAgility - 10) ) + (heroAgility - 10);
+			uint32_t type = rand() % 3;
+			// TODO(stefanos): Make stats different for each monster
+			
+			if(type == 0) {							//monsterTypes::Dragon
+				tempMonsterInfo.damage[0] *= 1.3;
+				tempMonsterInfo.damage[1] *= 1.3;
+			} else if(type == 1) {					//monsterTypes::Exoskeleton
+				tempMonsterInfo.armor *= 1.3;
+			} else {    							//monsterTypes::Spirit
+				tempMonsterInfo.agility *= 1.3;
+			}
+			
+			monsters[i] = new Monster(tempLivingInfo, tempMonsterInfo);
+		}
+	}
+
+	void Map::roundEnd(uint32_t healthToRegen, uint32_t magicPowerToRegen) {
+		for(size_t i = 0; i < numHeroes; ++i) {
+			class Hero *h = heroes[i];
+			if(h->isAwake()) {
+				h->regenerate(healthToRegen, magicPowerToRegen);
+			}
+
+			class Monster *m = monsters[i];
+			if(m->isAwake()) {
+				m->regenerate(healthToRegen);
+			}
+		}
+	}
+
+	bool Map::allHeroesDead(void) const {
+		for(size_t i = 0; i < numHeroes; ++i) {
+			if(heroes[i]->isAwake())
+				return false;
+		}
+		
+		return true;
+	}
+
+	bool Map::allMonstersDead(void) const {
+		for(size_t i = 0; i < numHeroes; ++i) {
+			if(monsters[i]->isAwake())
+				return false;
+		}
+		
+		return true;
+	}
+
+	bool Map::fightEnded(void) const {
+		if(allHeroesDead()) {
+			std::cout << std::endl << std::endl;
+			std::cout << "MONSTERS WON" << std::endl;
+			std::cout << std::endl << std::endl;
+
+			for(size_t i = 0; i < numHeroes; ++i) {
+				heroes[i]->resetHealthToHalf();
+				heroes[i]->setAwake(true);
+				heroes[i]->resetMoneyToHalf();
+			}
+
+			return true;
+		} else if(allMonstersDead()) {
+			std::cout << std::endl << std::endl;
+			std::cout << "HEROES WON" << std::endl;
+			std::cout << std::endl << std::endl;
+
+			for(size_t i = 0; i < numHeroes; ++i) {
+				if(!heroes[i]->isAwake()) {
+					heroes[i]->resetHealthToHalf();
+					heroes[i]->setAwake(true);
+				} else
+					heroes[i]->resetHealth();
+				
+				heroes[i]->addExp(numHeroes * 10 + (heroes[i]->getLevel() / 100.0f));
+				if(heroes[i]->tryLevelUp()) {
+					std::cout << heroes[i]->getName() << " leveled up!" << std::endl;
+				}
+				heroes[i]->addMoney(500 + 500 * (heroes[i]->getLevel() / 100.0f));
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	void Map::setNumHeroesAndMonsters(uint32_t num_heroes) {
+		numHeroes = num_heroes;
+		heroes = new Hero*[num_heroes];
+		monsters = new Monster*[num_heroes];
+		for(uint32_t i = 0; i < num_heroes; ++i) {
+			heroes[i] = NULL;
+			monsters[i] = NULL;
+		}
+	}
+
+	void Map::createHero(const struct livingInfo_t& livingInfo, 
+		const struct heroInfo_t *const heroInfo, uint8_t heroClass) {
+
+		if(heroes != NULL) {    // Assume that we have space
+			for(uint32_t i = 0; i < numHeroes; ++i)
+				if(heroes[i] == NULL) {
+					if(heroClass == heroTypes::Warrior)
+						heroes[i] = new Warrior(livingInfo, heroInfo);
+					else if(heroClass == heroTypes::Paladin)
+						heroes[i] = new Paladin(livingInfo, heroInfo);
+					else
+						heroes[i] = new Sorcerer(livingInfo, heroInfo);
+					return;
+				}
+		}
+	}
+
+	uint32_t Map::getNumHeroes(void) const {
+		return numHeroes;
+	}
+
+	int Map::heroesInitialized(void) const { return (heroesPosition[0] != -1); }
+
+	int Map::heroesOnStore(void) const {
+		return (Grid[heroesPosition[0]][heroesPosition[1]] == 'S');
+	}
 
 int Map::moveHeroes(int32_t direction) {
 	// IMPORTANT!
@@ -250,6 +427,98 @@ int Map::moveHeroes(int32_t direction) {
 
 	return 1;
 }
+
+Store::Store() : currently_holding(0), size(0), items(NULL) { }
+
+Store::Store(size_t s) : size(s), currently_holding(0) {
+
+		// Allocate the initial shared memory
+		items = new itemLock[size];
+		for(int i = 0; i < size; ++i) {
+			items[i].item = NULL;
+			items[i].taken = 0;
+		}
+	}
+
+	bool Store::hasAvailableSpace(void) const {
+		return (currently_holding < size);
+	}
+
+class Item* Store::searchItem(const std::string& name) {
+		for(int i = 0; i < size; ++i)
+			if(items[i].item != NULL && items[i].taken == 0) {
+				if(items[i].item->get_name() == name) {
+					return items[i].item;
+				}
+			}
+
+		return NULL;
+
+	}
+
+	// Mark an item as taken
+	bool Store::removeItem(class Item *it) {
+		for(int i = 0; i < size; ++i) {
+			if(items[i].item == it) {
+				items[i].taken = 1;
+				--currently_holding;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// removes and deletes an item from memory
+	int Store::deleteItem(class Item *it) {
+		if(it != NULL) {
+			for(int i = 0; i < size; ++i)
+				if(items[i].item == it) {
+					delete items[i].item;
+					items[i].item = NULL;
+					items[i].taken = 0;
+					--currently_holding;
+					return 1;
+				}
+		}
+
+		return 0;
+	}
+
+	// TODO(stefanos): Maybe add a return value for checking.
+	void Store::addItem(class Item *it) {
+
+		// NOTE(stefanos): Put it in the initial
+		// position (the position it was when you got it)
+		for(int i = 0; i < size; ++i)
+			if(items[i].item != NULL && items[i].item == it && items[i].taken == 1) {
+				items[i].taken = 0;
+				++currently_holding;
+			}
+	}
+
+	// Print items using virtual functionality
+	void Store::print(void) const {
+		std::cout << std::endl;
+		std::cout << "Store Items" << std::endl;
+		for(int i = 0; i < size; ++i) {
+			if(items[i].item != NULL && items[i].taken == 0) {
+				items[i].item->print();
+				std::cout << std::endl;
+			}
+		}
+		std::cout << std::endl;
+	}
+
+	// Deallocate the initial memory
+	Store::~Store() {
+		if(items != NULL) {
+			for(int i = 0; i < size; ++i)
+				if(items[i].item != NULL) {
+					delete items[i].item;
+				}
+			delete[] items;
+		}
+	}
 
 int Store::readItems(const std::string& fileName) {
 	std::cout << std::endl << "GREETING" << std::endl;

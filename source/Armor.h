@@ -8,22 +8,14 @@ class Armor : public Item {
 private:
 	uint32_t armorValue;
 public:
-	Armor(std::string name, uint32_t price, uint32_t min_level, itemType type, uint32_t value) : Item(name, price, min_level, type), armorValue(value) {}
+	Armor(std::string, uint32_t, uint32_t, itemType, uint32_t);
 
-	uint32_t getArmor(){
-		return armorValue;
-	}
-	void resetArmor(uint32_t value = 0) {
-		armorValue = value;
-	}
-	void decreaseArmor(uint32_t num){
-		armorValue-=num;
-	}
+	uint32_t getArmor();
+	void resetArmor(uint32_t) ;
+	void resetArmor() ;
+	void decreaseArmor(uint32_t);
 
-	void print() const {
-		Item::print();
-		std::cout << "Armor: " << armorValue << std::endl;
-	}
+	void print() const;
 };
 
 #endif

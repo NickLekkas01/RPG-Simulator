@@ -6,25 +6,11 @@
 
 class Sorcerer : public Hero {
 public:
-	Sorcerer(const struct livingInfo_t& li, const struct heroInfo_t *const hi) :
-		Hero(li, hi) { }
+	Sorcerer(const struct livingInfo_t&, const struct heroInfo_t *const);
 
-	bool tryLevelUp(void) {
-		if(Hero::tryLevelUp()) {
-			heroInfo.strength+=2;
-			heroInfo.agility+=2;
-			++heroInfo.strength;
-			heroInfo.magicPower+=100;
+	bool tryLevelUp(void);
 
-			return true;
-		}
-		return false;
-	}
-
-	void printInfo(void) const {
-		std::cout << "Type: Sorcerer" << std::endl;
-		Hero::printInfo();
-	}
+	void printInfo(void) const ;
 };
 
 #endif
