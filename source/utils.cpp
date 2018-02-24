@@ -551,7 +551,6 @@ int Store::readItems(const std::string& fileName) {
 		uint32_t price, min_level;
 		size_t i = itemsRead;
 
-		std::cout << "ItemsClass: " << itemClass << std::endl;
 		if(itemClass == "Weapon") {
 			uint32_t damage, hands;
 			itemsFile >> name >> price >> min_level >> damage >> hands;

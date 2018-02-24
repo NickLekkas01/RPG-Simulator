@@ -16,8 +16,6 @@
 
 #define INPUT_FILE_ERROR 1
 
-// TODO(stefanos): Remove type from the Item?
-
 using namespace std;
 
 struct spell_record {
