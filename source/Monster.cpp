@@ -6,17 +6,14 @@
 
 Monster::Monster(const struct livingInfo_t& li, const struct monsterInfo_t& mi) : Living(li)
 {
-
-		// TODO(stefanos): Test with initializer list
-
-		std::cout << "Damage: " << mi.damage[0] << std::endl;
-		std::cout << "Armor: " << mi.armor << std::endl;
-		std::cout << "Agility: " << mi.agility << std::endl;
-		monsterInfo.damage[0] = mi.damage[0];
-		monsterInfo.damage[1] = mi.damage[1];
-		monsterInfo.armor = mi.armor;
-		monsterInfo.agility = mi.agility;
-	 }
+	std::cout << "Damage: " << mi.damage[0] << std::endl;
+	std::cout << "Armor: " << mi.armor << std::endl;
+	std::cout << "Agility: " << mi.agility << std::endl;
+	monsterInfo.damage[0] = mi.damage[0];
+	monsterInfo.damage[1] = mi.damage[1];
+	monsterInfo.armor = mi.armor;
+	monsterInfo.agility = mi.agility;
+}
 
 void Monster::receiveAttack(uint32_t opDamage) {
 	if(monsterInfo.armor > opDamage) {

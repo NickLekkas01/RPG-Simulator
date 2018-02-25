@@ -259,8 +259,6 @@
 				}
 				heroInfo.strength = strength;
 				heroInfo.dexterity = dexterity;
-				// TODO(stefanos): Set bound for agility?
-				// TODO(stefanos): Set bound for the others also?
 				heroInfo.agility = agility;
 
 				class Item *tmp = pot;

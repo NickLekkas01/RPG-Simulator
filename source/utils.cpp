@@ -256,7 +256,6 @@ class Hero *Map::searchHero(std::string name) const {
 			uint32_t heroAgility = h->getAgility();
 			tempMonsterInfo.agility = rand() % ( (heroAgility  + 10) - (heroAgility - 10) ) + (heroAgility - 10);
 			uint32_t type = rand() % 3;
-			// TODO(stefanos): Make stats different for each monster
 			
 			if(type == 0) {							//monsterTypes::Dragon
 				tempMonsterInfo.damage[0] *= 1.3;
@@ -466,7 +465,6 @@ class Item* Store::searchItem(const std::string& name) {
 		return 0;
 	}
 
-	// TODO(stefanos): Maybe add a return value for checking.
 	void Store::addItem(class Item *it) {
 
 		// NOTE(stefanos): Put it in the initial
