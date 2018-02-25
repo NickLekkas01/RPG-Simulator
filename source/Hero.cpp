@@ -80,6 +80,7 @@
 	bool Hero::tryLevelUp(void){
 		if(heroInfo.exp>100){
 			++livingInfo.level;
+			heroInfo.exp -= 100;
 			return true;
 		}
 	}

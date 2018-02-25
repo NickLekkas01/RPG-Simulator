@@ -27,12 +27,6 @@ public:
 	struct heroInfo_t paladinInfo;
 	struct heroInfo_t sorcererInfo;
 	
-	// Monster
-	struct monsterInfo_t dragonInfo;
-	struct monsterInfo_t exoskeletonInfo;
-	struct monsterInfo_t spiritInfo;
-
-
 	defaultData_t() { }
 	~defaultData_t() { }
 	int readDefaultData(void);
@@ -124,7 +118,6 @@ public:
 	// removes and deletes an item from memory
 	int deleteItem(class Item *) ;
 
-	// TODO(stefanos): Maybe add a return value for checking.
 	void addItem(class Item *) ;
 	
 	// Print items using virtual functionality

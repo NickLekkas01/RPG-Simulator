@@ -25,7 +25,6 @@ void assert_null_function(void) {}
 
 // (stefanos): Any line starting with a #
 // is a comment
-// TODO(stefanos): Test on linux
 void skipComments(std::istream& dataFile) {
 	char c;
 
@@ -80,23 +79,6 @@ int defaultData_t::readDefaultData() {
 			dataFile >> sorcererInfo.strength;
 			dataFile >> sorcererInfo.dexterity;
 			dataFile >> sorcererInfo.agility;
-		}
-
-		if(dataClass == "Dragon") {
-			dataFile >> dragonInfo.damage[0];
-			dataFile >> dragonInfo.damage[1];
-			dataFile >> dragonInfo.armor;
-			dataFile >> dragonInfo.agility;
-		} else if(dataClass == "Exoskeleton") {
-			dataFile >> exoskeletonInfo.damage[0];
-			dataFile >> exoskeletonInfo.damage[1];
-			dataFile >> exoskeletonInfo.armor;
-			dataFile >> exoskeletonInfo.agility;
-		} else if(dataClass == "Spirit") {
-			dataFile >> spiritInfo.damage[0];
-			dataFile >> spiritInfo.damage[1];
-			dataFile >> spiritInfo.armor;
-			dataFile >> spiritInfo.agility;
 		}
 	}
 
@@ -533,7 +515,6 @@ int Store::readItems(const std::string& fileName) {
 	// Read the number of items
 	size_t storeSize;
 	itemsFile >> storeSize;
-	std::cout << "ANOTHER: " << storeSize << std::endl;
 	this->size = storeSize;
 
 	// Allocate the initial shared memory

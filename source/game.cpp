@@ -28,7 +28,6 @@ struct roundEndStats_t {
 	uint32_t magicPowerToRegen;
 };
 
-// TODO(stefanos): Remove these global variables
 const uint32_t numberOfSpells = 10;
 const uint32_t maxNumHeroes = 3;
 
@@ -254,9 +253,6 @@ void printPreFightInfo(const class Map& map) {
 }
 
 void useSpell(uint32_t i, struct spell_record spellsActivated[maxNumHeroes][numberOfSpells], class Hero *h, class Monster *m) {
-	// TODO(stefanos): Think about mana
-	// after the end of a fight.
-
 	///  Ask the user for the name of the spell
 	string spellName;
 	cout << "Type the name of the spell you want to use" << endl;
@@ -281,7 +277,6 @@ void useSpell(uint32_t i, struct spell_record spellsActivated[maxNumHeroes][numb
 		return;
 	}
 
-	// TODO(stefanos): Wrap in a function?
 	// Hit the monster with this damage.
 	m->receiveAttack(spellDam);
 	if(m->isAwake())
@@ -453,7 +448,6 @@ void handleRoundEnd(class Map& map, struct spell_record spellsActivated[maxNumHe
 					// NOTE(stefanos): These are passed as references. No pointers
 					// for you C++ people!
 					m->getStats(highDamage, armor, agility);
-					// TODO(stefanos): Maybe request the stat that was restored here?
 					s->restoreStats(highDamage, armor, agility);
 
 					m->setStats(highDamage, armor, agility);
@@ -489,7 +483,6 @@ void fight(class Map& map, class Store& store, struct roundEndStats_t roundEndSt
 			// check for end of fight
 			if(map.fightEnded()) {
 				fightEnded = true;
-				cout<<"Apo heroes bghka"<<endl;
 				break;
 			}
 
@@ -502,7 +495,6 @@ void fight(class Map& map, class Store& store, struct roundEndStats_t roundEndSt
 			// check for end of fight
 			if(map.fightEnded()) {
 				fightEnded = true;
-				cout<<"Apo monsters bghka"<<endl;
 				break;
 			}
 		}
@@ -558,8 +550,7 @@ void initialChoices(bool& Running, class Map& map) {
 void generateHeroes(const defaultData_t& defaultData, class Map& map) {
 	uint32_t numHeroes = map.getNumHeroes();
 	for(int i = 0; i < numHeroes; ++i) {
-		// TODO(stefanos): Change those debug values
-		struct livingInfo_t livingInfo = {"", 7, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
+		struct livingInfo_t livingInfo = {"", 1, defaultData.initialHealthPower, defaultData.initialHealthPower, 1};
 		cout << "Type the name of the hero " << i + 1 << ": ";
 		cin >> livingInfo.name;
 
