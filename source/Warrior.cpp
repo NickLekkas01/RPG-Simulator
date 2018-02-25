@@ -12,7 +12,7 @@ bool Warrior::tryLevelUp(void) {
 		heroInfo.strength+=2;
 		heroInfo.agility+=2;
 		heroInfo.dexterity++;
-		heroInfo.magicPower+=30;
+		heroInfo.magicPower+=10;
 
 		return true;
 	}

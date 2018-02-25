@@ -10,9 +10,9 @@
 	bool Paladin::tryLevelUp(void) {
 		if(Hero::tryLevelUp()) {
 			heroInfo.strength+=2;
-			heroInfo.agility+=2;
+			heroInfo.dexterity+=2;
 			heroInfo.agility++;
-			heroInfo.magicPower+=50;
+			heroInfo.magicPower+=20;
 
 			return true;
 		}
