@@ -1,0 +1,14 @@
+# Number of items
+10
+
+#      Name   | Price  |  Minimum Level |  Damage  |  Hands
+Weapon Sword     15            3             40        1
+
+#         Name   | Price  |  Minimum Level |  Damage  |  Hands
+Weapon   Katana      19           4             42         1
+
+#         Name   | Price  |  Minimum Level |  Damage Low  |  Damage High  |  Mana  |  Reduction Amount  |  Rounds  |  Type
+Spell    MySpell    12             2              15             50           34             17              2       IceSpell
+
+#          Name   |  Price  |  Minimum Level  |  Restoration Amount  |  Potion Type 
+Potion   MyPotion      45            6                   7                  0

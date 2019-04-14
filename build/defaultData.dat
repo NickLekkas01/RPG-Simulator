@@ -1,0 +1,15 @@
+# Initial health power (same for every Living)
+100
+
+# Health to regenerate in every round (same for every Living)
+20
+
+# Magic power to regenerate in every round (only for Heroes)
+25
+
+############ HEROES ##############
+#         Magic Power | Money | Experience  |  Strength | Dexterity | Agility
+Warrior      52         10000      10            60         20         20
+Paladin      52         10000      10            40          60        40
+Sorcerer     52         10000      10            20          40        60
+

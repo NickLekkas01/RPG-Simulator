@@ -1,0 +1,1 @@
+g++ ./source/*.cpp -o ./build/game -std=c++11
