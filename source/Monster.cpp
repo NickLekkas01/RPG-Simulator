@@ -30,10 +30,11 @@ void Monster::receiveAttack(uint32_t opDamage) {
 	}
 }
 
-uint32_t Monster::getStats(uint32_t& highDamage, uint32_t& armor, uint32_t& agility) const {
+void Monster::getStats(uint32_t& highDamage, uint32_t& armor, uint32_t& agility) const {
 	highDamage = monsterInfo.damage[1];
 	armor = monsterInfo.armor;
 	agility = monsterInfo.agility;
+
 }
 
 void Monster::setStats(uint32_t highDamage, uint32_t armor, uint32_t agility) {

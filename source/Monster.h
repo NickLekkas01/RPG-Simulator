@@ -19,7 +19,7 @@ public:
 
 	void receiveAttack(uint32_t) ;
 
-	uint32_t getStats(uint32_t& , uint32_t&, uint32_t&) const ;
+	void getStats(uint32_t& , uint32_t&, uint32_t&) const ;
 
 	void setStats(uint32_t, uint32_t, uint32_t) ;
 
