@@ -655,12 +655,12 @@ int main(void) {
 	generateHeroes(defaultData, map);
 
 	while(Running) {
-		
 		printMainMenuChoices(map.heroesOnStore());
 		int32_t choice;
 		cout << "What do you want to do? ";
 		cin >> choice;
 		cout << endl;
+		if (system("CLS")) system("clear");
 
 		if(choice > 12) {
 			cout << "This operation can't be handled" << endl;
@@ -672,6 +672,7 @@ int main(void) {
 			map.print();
 		} else if(choice == playerChoices::moveHeroes) {
 
+			map.print();
 			// Print four choices for movement
 			printMoveChoices();
 
